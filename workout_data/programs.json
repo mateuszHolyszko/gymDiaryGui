@@ -1,0 +1,36 @@
+{
+  "programs": {
+    "Strength Training": [
+      {
+        "name": "Bench Press",
+        "rep_range": "8-12",
+        "muscle": "Chest",
+        "bodyweight": false
+      },
+      {
+        "name": "Bench Press",
+        "rep_range": "8-12",
+        "muscle": "Chest",
+        "bodyweight": false
+      },
+      {
+        "name": "Bench Press",
+        "rep_range": "8-12",
+        "muscle": "Chest",
+        "bodyweight": false
+      },
+      {
+        "name": "Bench Press",
+        "rep_range": "8-12",
+        "muscle": "Chest",
+        "bodyweight": false
+      },
+      {
+        "name": "Bench Press",
+        "rep_range": "8-12",
+        "muscle": "Chest",
+        "bodyweight": false
+      }
+    ]
+  }
+}
