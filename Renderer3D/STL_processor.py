@@ -4,7 +4,7 @@ import os
 import random
 
 class STLProcessor:
-    def __init__(self, models_folder='3D_Renderer\models'):
+    def __init__(self, models_folder='Renderer3D\models'):
         self.models_folder = models_folder
         self.mesh = None
         self.mesh_name = ""

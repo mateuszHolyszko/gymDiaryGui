@@ -2,6 +2,7 @@ from elements.panel import Panel
 from elements.button import Button
 from elements.label import Label
 from elements.inputField import InputField
+from elements.pane3D import Pane3D
 
 def main_menu_controller(window_manager):
     # Main window panel (vertical layout, fills the screen)
@@ -45,9 +46,15 @@ def main_menu_controller(window_manager):
     panel3.add_child(exit_btn)
     panel3.add_child(placeholder_btn)
 
+    # Pane3D for 3D model rendering (placeholder)
+    panel4 = Panel("panel4", x=405, y=110, width=400, height=260, layout_type="vertical", selectable=False, draw_box=True)
+    pane3d = Pane3D("model_view", "Renderer3D\models\cat2.stl",width=400, height=260, selectable=False)
+    panel4.add_child(pane3d)
+
     # Assemble main window (panels arranged vertically)
     main_window.add_child(panel1)
     main_window.add_child(panel2)
     main_window.add_child(panel3)
+    main_window.add_child(panel4)
 
     return main_window, btn2  # Start focus on first button
