@@ -75,6 +75,8 @@ def main():
 
         # Render the UI tree
         root.render(screen, [root] + current.get_path()[1:], font, 0, 0, screen.get_width(), screen.get_height())
+        root.renderTop(screen, [root] + current.get_path()[1:], font, 0, 0, screen.get_width(), screen.get_height())
+
 
         # switching menus logic
         if "current_focus" in window_manager.context:

@@ -105,6 +105,10 @@ class Element:
         # Panels and leaf elements will override this
         pass
 
+    def renderTop(self, surface, path, font, x=None, y=None, width=None, height=None):
+        # Default: do nothing. Overridden by elements that need to render on top.
+        pass
+
     def connect(self, signal_name, callback):
         if signal_name not in self._signals:
             self._signals[signal_name] = []

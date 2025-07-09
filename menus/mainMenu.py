@@ -2,8 +2,10 @@ from elements.panel import Panel
 from elements.button import Button
 from elements.label import Label
 from elements.inputField import InputField
+from elements.InputSelect import InputSelect
 from elements.pane3D import Pane3D
 from elements.misc.clock import Clock
+
 
 def main_menu_controller(window_manager):
     # Main window panel (vertical layout, fills the screen)
@@ -43,6 +45,10 @@ def main_menu_controller(window_manager):
     panel2.add_child(label3)
     panel2.add_child(input_field)
 
+    options = ["Option A", "Option B", "Option C"]
+    input_select = InputSelect("input_select_example", options, x=0, y=0, width=380, height=30, window_manager=window_manager)
+    panel2.add_child(input_select)
+
     # Panel 3: Exit and placeholder button (horizontal layout)
     panel3 = Panel("panel3", x=0, y=380, width=400, height=100, layout_type="horizontal")
     exit_btn = Button("exit_btn", "Exit", x=0, y=0, width=180, height=80, on_press=lambda: window_manager.handle_action("exit"))
@@ -52,7 +58,7 @@ def main_menu_controller(window_manager):
 
     # Pane3D for 3D model rendering (placeholder)
     panel4 = Panel("panel4", x=405, y=110, width=400, height=370, layout_type="vertical", selectable=False, draw_box=True)
-    pane3d = Pane3D("model_view", "Renderer3D\models\male_003.fbx.stl",width=400, height=370, selectable=False)
+    pane3d = Pane3D("model_view", "Renderer3D\models\male_003.fbx.stl",width=395, height=365, selectable=False)
     panel4.add_child(pane3d)
 
     # Assemble main window (panels arranged vertically)

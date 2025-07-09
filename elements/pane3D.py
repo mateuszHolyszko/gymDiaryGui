@@ -11,6 +11,7 @@ class Pane3D(Element):
         self.rotation_speed = 0.5
         self.processor = STLProcessor()
         self.renderer = STLRenderer(width, height)
+        self.renderer.zoom(1.4)
         self._initialize_rendering()
 
     def _initialize_rendering(self):
@@ -19,6 +20,9 @@ class Pane3D(Element):
             self.processor.models_folder = os.path.dirname(self.stl_file)
             self.processor.stl_files = [os.path.basename(self.stl_file)]
             self.processor.load_random_stl()
+            
+            # Removed initial camera-like rotations, now handled by Camera class in STLRenderer
+
         except Exception as e:
             print(f"Error initializing 3D pane: {e}")
             self.processor.mesh = None
@@ -64,7 +68,7 @@ class Pane3D(Element):
         surface.blit(self.renderer.get_surface(), (render_x, render_y))
 
     def on_key(self, event):
-        """Handle keyboard input for rotation control"""
+        """Handle keyboard input for rotation control and zoom"""
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 self.rotation_speed -= 0.1
@@ -74,5 +78,11 @@ class Pane3D(Element):
                 return True
             elif event.key == pygame.K_UP:
                 self.rotation_speed = 0
+                return True
+            elif event.key == pygame.K_KP_PLUS: # Zoom in
+                self.renderer.zoom(1.1) # Zoom in by 10%
+                return True
+            elif event.key == pygame.K_KP_MINUS: # Zoom out
+                self.renderer.zoom(0.9) # Zoom out by 10%
                 return True
         return False
