@@ -31,6 +31,34 @@
         "muscle": "Chest",
         "bodyweight": false
       }
+    ],
+    "Pull Training": [
+      {
+        "name": "Test",
+        "rep_range": "8-12",
+        "muscle": "Back",
+        "bodyweight": false
+      },
+      {
+        "name": "Test",
+        "rep_range": "8-12",
+        "muscle": "Back",
+        "bodyweight": false
+      }
+    ],
+    "Push Training": [
+      {
+        "name": "Test push",
+        "rep_range": "8-12",
+        "muscle": "Chest",
+        "bodyweight": false
+      },
+      {
+        "name": "Test push",
+        "rep_range": "8-12",
+        "muscle": "Chest",
+        "bodyweight": false
+      }
     ]
   }
 }

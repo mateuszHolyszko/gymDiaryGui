@@ -13,6 +13,7 @@ class Table(Element):
         self.cell_padding = 2
         self.layout_type = "table"
         self._data = []  # 2D list to hold row data
+        self._column_types = {}
         
     def set_data(self, data):
         """Set table data as a 2D list (list of rows)"""
@@ -31,6 +32,22 @@ class Table(Element):
         self._data = []
         self.rows = 0
         self.children = []
+
+    def set_column_type(self, col_index, data_type):
+        """
+        Set data type for an entire column
+        Args:
+            col_index: 0-based column index
+            data_type: One of Cell.DATA_TYPES ("text", "range", etc.)
+        """
+        if data_type in Cell.DATA_TYPES:
+            self._column_types[col_index] = data_type
+            # Update existing cells in this column
+            for cell in self.children:
+                if hasattr(cell, 'col') and cell.col == col_index:
+                    cell.set_data_type(data_type)
+        else:
+            print(f"Warning: Invalid data type '{data_type}' for column {col_index}")
         
     def _sync_children(self):
         self.children = []
@@ -38,10 +55,23 @@ class Table(Element):
             for col_idx, cell_data in enumerate(row[:self.cols]):
                 if isinstance(cell_data, Element):
                     cell = cell_data
-                    cell.parent = self  # Ensure parent is set
+                    cell.parent = self
                 else:
-                    cell = Cell(f"cell_{row_idx}_{col_idx}", str(cell_data))
-                    cell.parent = self  # Set table as parent
+                    # Get column type if specified, default to "text"
+                    cell_type = self._column_types.get(col_idx, "text")
+                    cell = Cell(
+                        f"cell_{row_idx}_{col_idx}", 
+                        str(cell_data),
+                        data_type=cell_type
+                    )
+                    cell.parent = self
+                
+                # Set row and column positions
+                if hasattr(cell, 'row'):
+                    cell.row = row_idx
+                if hasattr(cell, 'col'):
+                    cell.col = col_idx
+                
                 self.children.append(cell)
 
     def get_cell(self, row, col):
@@ -56,7 +86,7 @@ class Table(Element):
         return None
     
     def set_headers(self):
-        """Automatically sets first row and first column as headers"""
+        """Automatically sets first row and first column as headers and makes first row unselectable"""
         if not hasattr(self, '_data') or not self._data:
             return
         
@@ -66,7 +96,11 @@ class Table(Element):
                 if row_idx == 0 or col_idx == 0:
                     cell_idx = row_idx * self.cols + col_idx
                     if cell_idx < len(self.children):
-                        self.children[cell_idx].set_type("header")
+                        cell = self.children[cell_idx]
+                        cell.set_type("header")
+                        # Make first row completely unselectable
+                        if row_idx == 0:
+                            cell.selectable = False
         
     def render(self, surface, path, font, x=None, y=None, width=None, height=None):
         x = self.x

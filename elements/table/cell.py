@@ -2,12 +2,17 @@ from ..base import Element
 import pygame
 
 class Cell(Element):
-    def __init__(self, name, text="", cell_type="cell", selectable=True, on_select=None, on_press=None):
+    DATA_TYPES = ["text", "range", "number", "boolean", "select"]  # Available data types
+    
+    def __init__(self, name, text="", cell_type="cell", selectable=True, on_select=None, on_press=None, data_type="text"):
         super().__init__(name, 0, 0, 0, 0, selectable=selectable, text=text)
         self.cell_type = cell_type.lower()
         self.on_select = on_select
         self.on_press = on_press
         self.padding = 4
+        self.row = -1
+        self.col = -1
+        self.data_type = data_type if data_type in self.DATA_TYPES else "text"
         self._configure_styles()
 
     def _configure_styles(self):
@@ -31,9 +36,16 @@ class Cell(Element):
         if not self.selectable:
             return
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-            print(f"{self.cell_type.capitalize()} '{self.text}' pressed!")
+            print(f"{self.cell_type.capitalize()}|Row:'{self.row}'|Col:'{self.col}'|Type:'{self.data_type}'|Text:'{self.text}' pressed!")
             if self.on_press:
                 self.on_press()
+
+    def set_data_type(self, data_type):
+        """Set the data type if it's valid"""
+        if data_type in self.DATA_TYPES:
+            self.data_type = data_type
+        else:
+            print(f"Warning: Invalid data type '{data_type}'. Keeping current type '{self.data_type}'")
 
     def render(self, surface, path, font, x=None, y=None, width=None, height=None):
         x = self.x if x is None else x

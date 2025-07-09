@@ -3,6 +3,7 @@ from elements.button import Button
 from elements.label import Label
 from elements.inputField import InputField
 from elements.pane3D import Pane3D
+from elements.misc.clock import Clock
 
 def main_menu_controller(window_manager):
     # Main window panel (vertical layout, fills the screen)
@@ -10,14 +11,17 @@ def main_menu_controller(window_manager):
 
     # Panel 1: Navigation buttons (horizontal layout)
     panel1 = Panel("panel1", x=0, y=0, width=820, height=100, layout_type="horizontal")
-    btn1 = Button("btn1", "Go to Main Menu", x=0, y=0, width=180, height=80,selectable=False, on_press=lambda: print("Switch to Window A (placeholder)"))
-    btn2 = Button("btn2", "Go to Table Menu", x=0, y=0, width=180, height=80, on_press=lambda: window_manager.handle_action("switch_menu", menu="table"))
-    btn3 = Button("btn3", "Go to Window C", x=0, y=0, width=180, height=80, on_press=lambda: print("Switch to Window C (placeholder)"))
-    btn4 = Button("btn4", "Go to Window D", x=0, y=0, width=180, height=80, on_press=lambda: print("Switch to Window D (placeholder)"))
+    btn1 = Button("btn1", "Go to Main Menu", x=0, y=0, width=160, height=80,selectable=False, on_press=lambda: print("Switch to Window A (placeholder)"))
+    btn2 = Button("btn2", "Go to Table Menu", x=0, y=0, width=160, height=80, on_press=lambda: window_manager.handle_action("switch_menu", menu="table"))
+    btn3 = Button("btn3", "Go to Window C", x=0, y=0, width=160, height=80, on_press=lambda: print("Switch to Window C (placeholder)"))
+    btn4 = Button("btn4", "Go to Window D", x=0, y=0, width=160, height=80, on_press=lambda: print("Switch to Window D (placeholder)"))
+    clock = Clock("main_clock", width=160, height=80,time_format="%H:%M:%S")  # Shows seconds toodate_format="%A, %B %d %Y"  # E.g. "Monday, January 01 2023"
+    
     panel1.add_child(btn1)
     panel1.add_child(btn2)
     panel1.add_child(btn3)
     panel1.add_child(btn4)
+    panel1.add_child(clock)
 
     # Panel 2: Labels (vertical layout)
     panel2 = Panel("panel2", x=0, y=110, width=400, height=260, layout_type="vertical")
@@ -47,8 +51,8 @@ def main_menu_controller(window_manager):
     panel3.add_child(placeholder_btn)
 
     # Pane3D for 3D model rendering (placeholder)
-    panel4 = Panel("panel4", x=405, y=110, width=400, height=260, layout_type="vertical", selectable=False, draw_box=True)
-    pane3d = Pane3D("model_view", "Renderer3D\models\cat2.stl",width=400, height=260, selectable=False)
+    panel4 = Panel("panel4", x=405, y=110, width=400, height=370, layout_type="vertical", selectable=False, draw_box=True)
+    pane3d = Pane3D("model_view", "Renderer3D\models\male_003.fbx.stl",width=400, height=370, selectable=False)
     panel4.add_child(pane3d)
 
     # Assemble main window (panels arranged vertically)

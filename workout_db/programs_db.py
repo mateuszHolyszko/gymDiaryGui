@@ -6,6 +6,11 @@ class ProgramsDB(WorkoutDatabase):
     def get_all_programs(self) -> Dict[str, List[Dict]]:
         """Get all programs with their exercises"""
         return self._read_programs()
+    
+    def get_all_program_names(self) -> list:
+        """Returns a list of all program names in the database"""
+        programs = self._read_programs()  # This gets the full programs dictionary
+        return list(programs.keys())  # Convert the dictionary keys to a list
 
     def get_program(self, program_name: str) -> List[Dict]:
         """Get a specific program by name"""
