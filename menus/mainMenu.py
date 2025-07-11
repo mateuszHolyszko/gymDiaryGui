@@ -9,7 +9,7 @@ from elements.misc.clock import Clock
 
 def main_menu_controller(window_manager):
     # Main window panel (vertical layout, fills the screen)
-    main_window = Panel("main_window", x=0, y=0, width=820, height=480, layout_type="vertical")
+    main_window = Panel("main_window", x=0, y=0, width=820, height=480, layout_type="vertical",draw_box=False)
 
     # Panel 1: Navigation buttons (horizontal layout)
     panel1 = Panel("panel1", x=0, y=0, width=820, height=100, layout_type="horizontal")

@@ -33,7 +33,7 @@ def main():
 
     print("\nControls: [→]next, [←]prev, [SPACE]child, [ESC]up/parent, [ENTER] press button, [q]uit\n")
 
-    FPS = 60  # Set your desired refresh rate here
+    FPS = 12  # Set your desired refresh rate here
     clock = pygame.time.Clock()
     running = True
     running_flag = [True]  # Use a mutable object so it can be changed in global_keys

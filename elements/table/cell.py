@@ -36,6 +36,8 @@ class Cell(Element):
         if not self.selectable:
             return
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            # Emit signal with cell's text, row, column, and data type
+            self.emit("pressed", self.text, self.row, self.col, self.data_type)
             print(f"{self.cell_type.capitalize()}|Row:'{self.row}'|Col:'{self.col}'|Type:'{self.data_type}'|Text:'{self.text}' pressed!")
             if self.on_press:
                 self.on_press()

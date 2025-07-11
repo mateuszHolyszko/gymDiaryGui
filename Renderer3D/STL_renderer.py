@@ -13,9 +13,9 @@ class STLRenderer:
         # Rendering settings
         self.background = (0, 0, 0)
         self.foreground = (255, 255, 255)
-        self.light_dir = np.array([0.5, 0.5, -0.7])
+        self.light_dir = np.array([-1.0, 1.0, 1.0])
         self.light_dir /= np.linalg.norm(self.light_dir)
-        self.backface_epsilon = 1e-6
+        self.backface_epsilon = 4e-7
 
         # Camera setup for "top slightly left" view
         # Model is standardized to roughly [-0.5, 0.5] range.

@@ -18,7 +18,7 @@ class Panel(Element):
 
         # Only draw box if draw_box is True
         if self.draw_box:
-            color = (200, 200, 0) if self in path else (255, 255, 255)
+            color = (255,255,255)
             pygame.draw.rect(surface, color, (x, y, width, height), 2)
 
         n = len(self.children)
@@ -53,6 +53,11 @@ class Panel(Element):
         y = self.y
         width = self.width
         height = self.height
+
+        # Only draw box if draw_box is True and is selected
+        if self.draw_box and self in path:
+            color = (200, 200, 0) 
+            pygame.draw.rect(surface, color, (x, y, width, height), 2)
 
         n = len(self.children)
         if n == 0:

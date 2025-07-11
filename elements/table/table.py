@@ -97,10 +97,12 @@ class Table(Element):
                     cell_idx = row_idx * self.cols + col_idx
                     if cell_idx < len(self.children):
                         cell = self.children[cell_idx]
-                        cell.set_type("header")
-                        # Make first row completely unselectable
-                        if row_idx == 0:
-                            cell.selectable = False
+                        # Only set as header if it's a Cell object
+                        if isinstance(cell, Cell):
+                            cell.set_type("header")
+                            # Make first row completely unselectable
+                            if row_idx == 0:
+                                cell.selectable = False
         
     def render(self, surface, path, font, x=None, y=None, width=None, height=None):
         x = self.x
