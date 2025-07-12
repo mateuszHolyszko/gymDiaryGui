@@ -9,10 +9,35 @@ class KeyBinds:
             return selectable[0] if selectable else current
         idx = selectable.index(current)
         n = len(selectable)
-        if event.key == pygame.K_DOWN and idx + 1 < n:
-            return selectable[idx + 1]
-        elif event.key == pygame.K_UP and idx - 1 >= 0:
-            return selectable[idx - 1]
+        if event.key == pygame.K_DOWN:
+            if idx + 1 < n:
+                return selectable[idx + 1]
+            else:
+                # At end, try to move to neighbor panel (down)
+                neighbor = panel.get_neighbor('down') if hasattr(panel, 'get_neighbor') else None
+                if neighbor:
+                    neighbor_selectable = neighbor.get_selectable_children()
+                    return neighbor_selectable[0] if neighbor_selectable else current
+        elif event.key == pygame.K_UP:
+            if idx - 1 >= 0:
+                return selectable[idx - 1]
+            else:
+                # At start, try to move to neighbor panel (up)
+                neighbor = panel.get_neighbor('up') if hasattr(panel, 'get_neighbor') else None
+                if neighbor:
+                    neighbor_selectable = neighbor.get_selectable_children()
+                    return neighbor_selectable[0] if neighbor_selectable else current
+        # Also handle left/right for neighbor panels
+        if event.key == pygame.K_RIGHT:
+            neighbor = panel.get_neighbor('right') if hasattr(panel, 'get_neighbor') else None
+            if neighbor:
+                neighbor_selectable = neighbor.get_selectable_children()
+                return neighbor_selectable[0] if neighbor_selectable else current
+        elif event.key == pygame.K_LEFT:
+            neighbor = panel.get_neighbor('left') if hasattr(panel, 'get_neighbor') else None
+            if neighbor:
+                neighbor_selectable = neighbor.get_selectable_children()
+                return neighbor_selectable[0] if neighbor_selectable else current
         return current
 
     @staticmethod
@@ -22,10 +47,38 @@ class KeyBinds:
             return selectable[0] if selectable else current
         idx = selectable.index(current)
         n = len(selectable)
-        if event.key == pygame.K_RIGHT and idx + 1 < n:
-            return selectable[idx + 1]
-        elif event.key == pygame.K_LEFT and idx - 1 >= 0:
-            return selectable[idx - 1]
+        if event.key == pygame.K_RIGHT:
+            if idx + 1 < n:
+                return selectable[idx + 1]
+            else:
+                # At end, try to move to neighbor panel (right)
+                neighbor = panel.get_neighbor('right') if hasattr(panel, 'get_neighbor') else None
+                if neighbor:
+                    neighbor_selectable = neighbor.get_selectable_children()
+                    return neighbor_selectable[0] if neighbor_selectable else current
+        elif event.key == pygame.K_LEFT:
+            if idx - 1 >= 0:
+                return selectable[idx - 1]
+            else:
+                # At start, try to move to neighbor panel (left)
+                neighbor = panel.get_neighbor('left') if hasattr(panel, 'get_neighbor') else None
+                if neighbor:
+                    neighbor_selectable = neighbor.get_selectable_children()
+                    return neighbor_selectable[-1] if neighbor_selectable else current
+                
+        # Also handle up/down for neighbor panels
+        if event.key == pygame.K_DOWN:
+            # try to move to neighbor panel (down)
+            neighbor = panel.get_neighbor('down') if hasattr(panel, 'get_neighbor') else None
+            if neighbor:
+                neighbor_selectable = neighbor.get_selectable_children()
+                return neighbor_selectable[0] if neighbor_selectable else current
+        elif event.key == pygame.K_UP:
+            # try to move to neighbor panel (up)
+            neighbor = panel.get_neighbor('up') if hasattr(panel, 'get_neighbor') else None
+            if neighbor:
+                neighbor_selectable = neighbor.get_selectable_children()
+                return neighbor_selectable[-1] if neighbor_selectable else current
         return current
     
     @staticmethod
@@ -51,19 +104,34 @@ class KeyBinds:
             # Move right within row
             if current_col + 1 < cols and idx + 1 < len(selectable):
                 return selectable[idx + 1]
-                
+            else:
+                # At end of row, try to move to neighbor panel (right)
+                neighbor = panel.get_neighbor('right') if hasattr(panel, 'get_neighbor') else None
+                if neighbor:
+                    neighbor_selectable = neighbor.get_selectable_children()
+                    return neighbor_selectable[0] if neighbor_selectable else current
         elif event.key == pygame.K_LEFT:
             # Move left within row
             if current_col > 0:
                 return selectable[idx - 1]
-                
+            else:
+                # At start of row, try to move to neighbor panel (left)
+                neighbor = panel.get_neighbor('left') if hasattr(panel, 'get_neighbor') else None
+                if neighbor:
+                    neighbor_selectable = neighbor.get_selectable_children()
+                    return neighbor_selectable[0] if neighbor_selectable else current
         elif event.key == pygame.K_DOWN:
             # Move down to same column in next row
             next_row = current_row + 1
             next_idx = next_row * cols + current_col
             if next_row < rows and next_idx < len(selectable):
                 return selectable[next_idx]
-                
+            else:
+                # At last row, try to move to neighbor panel (down)
+                neighbor = panel.get_neighbor('down') if hasattr(panel, 'get_neighbor') else None
+                if neighbor:
+                    neighbor_selectable = neighbor.get_selectable_children()
+                    return neighbor_selectable[0] if neighbor_selectable else current
         elif event.key == pygame.K_UP:
             # Move up to same column in previous row
             prev_row = current_row - 1
@@ -71,7 +139,12 @@ class KeyBinds:
                 prev_idx = prev_row * cols + current_col
                 if prev_idx < len(selectable):
                     return selectable[prev_idx]
-        
+            else:
+                # At first row, try to move to neighbor panel (up)
+                neighbor = panel.get_neighbor('up') if hasattr(panel, 'get_neighbor') else None
+                if neighbor:
+                    neighbor_selectable = neighbor.get_selectable_children()
+                    return neighbor_selectable[0] if neighbor_selectable else current
         # Wrap-around navigation (optional)
         elif event.key == pygame.K_TAB:
             # Move to next cell with wrap-around

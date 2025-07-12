@@ -61,6 +61,12 @@ def main_menu_controller(window_manager):
     pane3d = Pane3D("model_view", "Renderer3D\models\male_003.fbx.stl",width=395, height=365, selectable=False)
     panel4.add_child(pane3d)
 
+    # Set neighbors for navigation
+    panel1.set_neighbor('down', panel2)
+    panel2.set_neighbor('up', panel1)
+    panel2.set_neighbor('down', panel3)
+    panel3.set_neighbor('up', panel2)
+
     # Assemble main window (panels arranged vertically)
     main_window.add_child(panel1)
     main_window.add_child(panel2)

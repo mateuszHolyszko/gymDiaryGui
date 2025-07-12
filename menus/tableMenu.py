@@ -33,7 +33,6 @@ def table_menu_controller(window_manager):
 
     # Panel 2: Table setup (horizontal layout)
 
-    panel2 = Panel("panel2", x=0, y=105, width=820, height=270, layout_type="horizontal")
     programButtonsPanel = Panel("program_buttons_panel", x=0, y=105, width=main_window.width/4, height=270, layout_type="vertical")
     program_names = programs_db.get_all_program_names()
 
@@ -75,9 +74,6 @@ def table_menu_controller(window_manager):
     if programButtonsPanel.children:
         programButtonsPanel.children[0].activated = True
 
-    panel2.add_child(programButtonsPanel)
-    panel2.add_child(table)
-
     # Panel 3: Exit and placeholder button (horizontal layout)
     panel3 = Panel("panel3", x=0, y=380, width=400, height=100, layout_type="horizontal")
     exit_btn = Button("exit_btn", "Exit", x=0, y=0, width=180, height=80,
@@ -87,9 +83,20 @@ def table_menu_controller(window_manager):
     panel3.add_child(exit_btn)
     panel3.add_child(placeholder_btn)
 
+    # Set neighbors for navigation
+    panel1.set_neighbor('down', programButtonsPanel)
+    programButtonsPanel.set_neighbor('up', panel1)
+    table.set_neighbor('up', panel1)
+    programButtonsPanel.set_neighbor('right', table)
+    table.set_neighbor('left', programButtonsPanel)
+    programButtonsPanel.set_neighbor('down', panel3)
+    table.set_neighbor('down', panel3)
+    panel3.set_neighbor('up', programButtonsPanel)
+
     # Assemble main window (panels arranged vertically)
     main_window.add_child(panel1)
-    main_window.add_child(panel2)
+    main_window.add_child(programButtonsPanel)
+    main_window.add_child(table)
     main_window.add_child(panel3)
 
     return main_window, btn1  # Start focus on first button

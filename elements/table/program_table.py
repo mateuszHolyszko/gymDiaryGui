@@ -6,6 +6,10 @@ from workout_db.programs_db import ProgramsDB
 from elements.base import Element # Needed for isinstance check in Table._sync_children
 
 class ProgramTable(Table):
+    """
+    ProgramTable supports neighbor panel navigation via set_neighbor/get_neighbor,
+    inherited from Table. Use set_neighbor(direction, panel) to connect to other panels.
+    """
     def __init__(self, name, program_db, program_name, x=0, y=0, width=200, height=200, selectable=True, draw_box=True):
         # Initialize the Table with 4 columns as expected by ProgramsDB data
         super().__init__(name, x, y, width, height, cols=4, selectable=selectable, draw_box=draw_box)

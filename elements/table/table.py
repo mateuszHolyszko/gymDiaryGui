@@ -4,7 +4,7 @@ import pygame
 
 class Table(Element):
     PADDING = 4  # pixels
-    
+
     def __init__(self, name, x=0, y=0, width=200, height=200, cols=1, selectable=True, draw_box=True):
         super().__init__(name, x, y, width, height, selectable=selectable)
         self.cols = cols
@@ -14,6 +14,17 @@ class Table(Element):
         self.layout_type = "table"
         self._data = []  # 2D list to hold row data
         self._column_types = {}
+        # Neighbors: dict with keys 'up', 'down', 'left', 'right' -> Panel or None
+        self.neighbors = {'up': None, 'down': None, 'left': None, 'right': None}
+
+    def set_neighbor(self, direction, panel):
+        """Set a neighbor panel in a given direction ('up', 'down', 'left', 'right')."""
+        if direction in self.neighbors:
+            self.neighbors[direction] = panel
+
+    def get_neighbor(self, direction):
+        """Get the neighbor panel in a given direction."""
+        return self.neighbors.get(direction, None)
         
     def set_data(self, data):
         """Set table data as a 2D list (list of rows)"""

@@ -8,6 +8,17 @@ class Panel(Element):
         super().__init__(name, x, y, width, height, selectable=selectable)
         self.layout_type = layout_type  # "vertical" or "horizontal"
         self.draw_box = draw_box
+        # Neighbors: dict with keys 'up', 'down', 'left', 'right' -> Panel or None
+        self.neighbors = {'up': None, 'down': None, 'left': None, 'right': None}
+
+    def set_neighbor(self, direction, panel):
+        """Set a neighbor panel in a given direction ('up', 'down', 'left', 'right')."""
+        if direction in self.neighbors:
+            self.neighbors[direction] = panel
+
+    def get_neighbor(self, direction):
+        """Get the neighbor panel in a given direction."""
+        return self.neighbors.get(direction, None)
 
     def render(self, surface, path, font, x=None, y=None, width=None, height=None):
         # Always use panel's own absolute position and size
