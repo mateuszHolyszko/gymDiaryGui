@@ -1,0 +1,119 @@
+{
+  "sessions": [
+    {
+      "date": "04-08-2024",
+      "program": "Strength Training",
+      "exercises": [
+        {
+          "name": "Bench Press",
+          "sets": [
+            {
+              "weight": 100,
+              "reps": 10
+            },
+            {
+              "weight": 95,
+              "reps": 8
+            }
+          ]
+        },
+        {
+          "name": "Push Ups",
+          "sets": []
+        }
+      ]
+    },
+    {
+      "date": "04-08-2024",
+      "program": "Strength Training",
+      "exercises": [
+        {
+          "name": "Bench Press",
+          "sets": [
+            {
+              "weight": 100,
+              "reps": 10
+            },
+            {
+              "weight": 95,
+              "reps": 8
+            }
+          ]
+        },
+        {
+          "name": "Push Ups",
+          "sets": []
+        }
+      ]
+    },
+    {
+      "date": "04-08-2024",
+      "program": "Strength Training",
+      "exercises": [
+        {
+          "name": "Bench Press",
+          "sets": [
+            {
+              "weight": 100,
+              "reps": 10
+            },
+            {
+              "weight": 95,
+              "reps": 8
+            }
+          ]
+        },
+        {
+          "name": "Push Ups",
+          "sets": []
+        }
+      ]
+    },
+    {
+      "date": "04-08-2024",
+      "program": "Strength Training",
+      "exercises": [
+        {
+          "name": "Bench Press",
+          "sets": [
+            {
+              "weight": 100,
+              "reps": 10
+            },
+            {
+              "weight": 95,
+              "reps": 8
+            }
+          ]
+        },
+        {
+          "name": "Push Ups",
+          "sets": []
+        }
+      ]
+    },
+    {
+      "date": "04-08-2024",
+      "program": "Strength Training",
+      "exercises": [
+        {
+          "name": "Bench Press",
+          "sets": [
+            {
+              "weight": 100,
+              "reps": 10
+            },
+            {
+              "weight": 95,
+              "reps": 8
+            }
+          ]
+        },
+        {
+          "name": "Push Ups",
+          "sets": []
+        }
+      ]
+    }
+  ]
+}

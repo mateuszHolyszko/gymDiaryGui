@@ -1,0 +1,35 @@
+class Menu:
+    def __init__(self, screen, manager):
+        self.screen = screen
+        self.manager = manager
+        self.panels = []
+        self.setup()  # Automatically call setup during initialization
+        
+    def setup(self):
+        """Override this to:
+        1. Add panels
+        2. Create elements
+        3. Set up actions
+        """
+        pass
+        
+    def add_panel(self, panel_class, *args, **kwargs):
+        """Add a panel by class reference and return it"""
+        # Ensure manager is passed but not duplicated
+        if 'manager' not in kwargs:
+            kwargs['manager'] = self.manager
+        panel = panel_class(*args, **kwargs)
+        self.panels.append(panel)
+        return panel
+        
+    def render(self, screen):
+        for panel in self.panels:
+            panel.render(screen)
+
+    def set_initial_focus(self, element):
+        """Delegate to manager's focus system"""
+        self.manager.focus_manager.set_focus(element)
+            
+    def handle_event(self, event):
+        """Delegate event handling to manager"""
+        return self.manager.handle_event(event)
