@@ -135,6 +135,10 @@ class SelectDropDown(Element):
             if hasattr(self, 'previous_focus'):
                 self.manager.focus_manager.set_focus(self.previous_focus)
 
+    def on_finished_edit(self):
+        """Default finished edit action - can be overridden with lambda."""
+        print(f"finished editing SelectDropDown with selected option: {self.getSelectedOption()}")
+
     def handle_event(self, event: pygame.event.Event) -> bool:
         if not self.selectable:
             return False
@@ -144,6 +148,7 @@ class SelectDropDown(Element):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     self.is_expanded = False
+                    self.on_finished_edit()
                     return True
                 elif event.key == pygame.K_UP:
                     self.selected_index = max(0, self.selected_index - 1)

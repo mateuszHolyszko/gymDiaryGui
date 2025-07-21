@@ -104,3 +104,43 @@ class InputField(Element):
         if self.parent_panel:
             self.x = self.parent_panel.x + self._explicit_x
             self.y = self.parent_panel.y + self._explicit_y
+
+    def getInput(self, screen, prompt=None):
+        """
+        Blocking input method: lets user enter a value using <, >, and Enter, without disturbing global focus.
+        Returns the entered value (int).
+        """
+        import pygame
+        clock = pygame.time.Clock()
+        running = True
+        original_value = self.value
+        self.is_active = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    break
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        self.is_active = False
+                        running = False
+                        break
+                    elif event.key == pygame.K_ESCAPE:
+                        self.value = original_value
+                        self.is_active = False
+                        running = False
+                        break
+                    elif event.key == pygame.K_LEFT or event.key == pygame.K_COMMA:
+                        self.value = max(self.min_value, self.value - self.step)
+                    elif event.key == pygame.K_RIGHT or event.key == pygame.K_PERIOD:
+                        self.value = min(self.max_value, self.value + self.step)
+            # Redraw
+            screen.fill((30, 30, 30))
+            if prompt:
+                font = pygame.font.SysFont("Arial", 18)
+                prompt_surf = font.render(str(prompt), True, (200, 200, 200))
+                screen.blit(prompt_surf, (self.x, self.y - 30))
+            self.render(screen)
+            pygame.display.flip()
+            clock.tick(30)
+        return self.value
