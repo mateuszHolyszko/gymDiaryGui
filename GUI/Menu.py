@@ -23,8 +23,15 @@ class Menu:
         return panel
         
     def render(self, screen):
+        # Collect all elements from all panels with their layer and panel info
+        all_elements = []
         for panel in self.panels:
-            panel.render(screen)
+            for element in panel.elements:
+                all_elements.append((element.layer, element))
+    
+        # Sort all elements by layer and render them
+        for layer, element in sorted(all_elements, key=lambda x: x[0]):
+            element.render(screen)
 
     def set_initial_focus(self, element):
         """Delegate to manager's focus system"""

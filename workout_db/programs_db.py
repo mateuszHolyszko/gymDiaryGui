@@ -16,6 +16,57 @@ class ProgramsDB(WorkoutDatabase):
         """Get a specific program by name"""
         programs = self._read_programs()
         return programs.get(program_name, [])
+    
+    def get_repRange(self, program_name: str, exercise_name: str) -> tuple:
+        """Get the rep range of an exercise in a program as a tuple of integers
+        
+        Args:
+            program_name: Name of the program to search
+            exercise_name: Name of the exercise to find
+            
+        Returns:
+            Tuple of (min_reps, max_reps) or None if not found
+        """
+        program = self.get_program(program_name)
+        if not program:
+            return None
+            
+        for exercise in program:
+            if exercise.get('name') == exercise_name:
+                rep_range_str = exercise.get('rep_range', '')
+                if not rep_range_str:
+                    return None
+                    
+                try:
+                    # Split the string by '-' and convert to integers
+                    min_rep, max_rep = map(int, rep_range_str.split('-'))
+                    return (min_rep, max_rep)
+                except (ValueError, AttributeError):
+                    # Handle cases where format is invalid
+                    return None
+                    
+        return None
+    
+    def get_target(self, program_name: str, exercise_name: str) -> str:
+        """Get the targeted muscle group of an exercise in a program as a string
+        
+        Args:
+            program_name: Name of the program to search
+            exercise_name: Name of the exercise to find
+            
+        Returns:
+            string or None if not found
+        """
+        program = self.get_program(program_name)
+        if not program:
+            return None
+            
+        for exercise in program:
+            if exercise.get('name') == exercise_name:
+                target_str = exercise.get('muscle', '')
+                if not target_str:
+                    return None
+                return target_str
 
     def add_program(self, program_name: str):
         """Add a new empty program"""

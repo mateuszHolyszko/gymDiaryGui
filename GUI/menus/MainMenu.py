@@ -55,7 +55,7 @@ class MainMenu(Menu):
         # Add input fields for row 1
         self.table.add_element(InputField(initial_value=0, width=120, height=40, manager=self.manager), 1, 0)
         self.table.add_element(InputField(initial_value=18, width=120, height=40, manager=self.manager), 1, 1)
-        self.table.add_element(Button("Submit", width=120, height=40, manager=self.manager), 1, 2)
+        #self.table.add_element(Button("Submit", width=120, height=40, manager=self.manager), 1, 2)
 
         # Add another row (could be more input fields, labels, or buttons)
         self.table.add_element(Label("Row 2", width=120, height=40, manager=self.manager), 2, 0)

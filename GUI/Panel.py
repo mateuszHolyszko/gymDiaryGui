@@ -24,7 +24,7 @@ class Panel:
 
     def getElements(self):
         """Returns a list of elements in the panel."""
-        return self.elements
+        return [e for e in self.elements if e is not None]
     
     def setNeighbors(self):
         """Sets neighbors for all elements based on their layout."""
@@ -83,7 +83,7 @@ class Panel:
             return (self.x + self.width//2, self.y + self.height//2)
 
     def render(self, screen):
-        """Render elements sorted by layer"""
-        for element in sorted(self.elements, key=lambda e: e.layer):
+        # Panel no longer needs to sort elements itself
+        for element in self.elements:
             if getattr(element, 'parent_panel', None) == self:
                 element.render(screen)

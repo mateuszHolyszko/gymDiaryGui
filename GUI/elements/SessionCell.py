@@ -1,6 +1,7 @@
 import pygame
 from .Element import Element
 from GUI.style import StyleManager
+from workout_db.exercises import Exercises
 
 class SessionCell(Element):
     def __init__(
@@ -14,7 +15,11 @@ class SessionCell(Element):
         selectable: bool = True,
         neighbors: dict = None,
         font_size: int = 16,
-        layer: int = 0
+        layer: int = 0,
+        weight_previous: float = 0,
+        reps_previous: int = 1,
+        rep_range: tuple = (1, 2),
+        exercise: str = "Squat"
     ):
         super().__init__(
             x=x,
@@ -27,13 +32,13 @@ class SessionCell(Element):
             neighbors=neighbors,
             layer=layer
         )
-        self.weightFromPreviousSession = 8
-        self.weightFromThisSession = self.weightFromPreviousSession
-        self.repsFromPreviousSession = 8
-        self.repsFromThisSession = self.repsFromPreviousSession
-        self.repRange = (5, 15)
-        self.excercise = "Bench Press"
-        self.excerciseTargetMuscle = "Back" # Get based on excercise
+        self.weightFromPreviousSession = weight_previous
+        self.weightFromThisSession = weight_previous
+        self.repsFromPreviousSession = reps_previous
+        self.repsFromThisSession = reps_previous
+        self.repRange = rep_range
+        self.exercise = exercise
+        self.excerciseTargetMuscle = Exercises.get_target_muscle(self.exercise) # Get based on excercise
         self.font = pygame.font.SysFont("Arial", font_size)
         self.edit_state = "notEdited"  # 'notEdited', 'editReps', 'editWeight', 'hasBeenEdited'
         self.has_been_edited = False

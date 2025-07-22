@@ -1,20 +1,20 @@
 {
   "programs": {
-    "A": [
+    "Strength Training": [
       {
-        "name": "Chest press",
+        "name": "Bench Press",
         "rep_range": "8-10",
         "muscle": "Chest",
         "bodyweight": false
       },
       {
-        "name": "Shoulder Press",
+        "name": "Overhead Press",
         "rep_range": "12-20",
         "muscle": "Shoulders",
         "bodyweight": false
       },
       {
-        "name": "Biceps curl",
+        "name": "Bicep Curl",
         "rep_range": "15-23",
         "muscle": "Biceps",
         "bodyweight": false
