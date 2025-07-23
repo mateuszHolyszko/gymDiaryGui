@@ -1,6 +1,7 @@
 import pygame
 from GUI.Panel import Panel
 from GUI.elements.Button import Button
+from GUI.elements.Clock import Clock
 
 class NavigationBar(Panel):
     def __init__(self, manager, **kwargs):  # manager as explicit first argument
@@ -21,10 +22,15 @@ class NavigationBar(Panel):
             Button("Program", width=100, height=40, manager=self.manager),
             Button("Stats", width=100, height=40, manager=self.manager)
         ]
+
+        self.clock = Clock(width=100, height=40, manager=self.manager)
         
         # Add buttons to panel
         for btn in self.buttons:
             self.add_element(btn)
+
+        # Add clock to panel
+        self.add_element(self.clock)
         
         # Setup neighbors
         for i in range(len(self.buttons)-1):

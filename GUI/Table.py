@@ -254,12 +254,12 @@ class Table(Panel):
             )
             # Style the button differently
             add_set_button.set_style_override({
-                'bg_color': (100, 100, 100),
+                'bg_color': (25, 25, 25),
                 'text_color': (255, 255, 255),
-                'highlight_color': (150, 150, 150)
+                'highlight_color': (50, 50, 50)
             })
             # Add action to the button
-            add_set_button.on_press = lambda r=r: self._add_set_to_row(r)
+            add_set_button.on_press = lambda r=r: self._add_set_to_row(r,programName)
             
             self.elements_grid[r][add_set_col] = add_set_button
             self.elements.append(add_set_button)
@@ -268,6 +268,105 @@ class Table(Panel):
         self.setNeighbors()
         self.enforceElementsSize()
 
-    def _add_set_to_row(self, row_index):
-        """Callback for when AddSet button is pressed"""
-        print(f"Adding set to row {row_index}")
+    def _add_set_to_row(self, row_index, programName):
+        """Callback for when AddSet button is pressed - adds a new set to the row"""
+        row = self.elements_grid[row_index]
+        
+        # Find the last SessionCell in the row
+        last_set_col = 0
+        for c in range(len(row)-1, -1, -1):  # Search from right to left
+            if row[c] is not None and isinstance(row[c], SessionCell):
+                last_set_col = c
+                break
+        
+        # Get current cell dimensions
+        cell_width = (self.width - 2*self.padding) / self.cols
+        cell_height = (self.height - 2*self.padding) / self.rows
+        
+        # Get exercise info from first cell in row
+        exercise_button = self.elements_grid[row_index][0]
+        exercise_name = exercise_button.text if exercise_button else "Unknown"
+        exercise_repRange = self.database.get_repRange(programName, exercise_name)
+        
+        # Check if we need to expand the table
+        if last_set_col >= self.cols - 2:  # -2 because last column is AddSet button
+            # Expand table by one column
+            self.cols += 1
+            new_cell_width = (self.width - 2*self.padding) / self.cols
+            
+            # Update grid structure
+            for r in range(self.rows):
+                self.elements_grid[r].append(None)  # Add new column
+                
+            # Move AddSet button to new position
+            add_set_button = self.elements_grid[row_index][-2]  # Get current AddSet button
+            if add_set_button:
+                self.elements_grid[row_index][-1] = add_set_button  # Move to new column
+                self.elements_grid[row_index][-2] = None  # Clear old position
+                
+                # Update button position
+                add_set_button.width = new_cell_width
+                add_set_button.x = self.x + self.padding + (self.cols-1) * new_cell_width
+                add_set_button.position_from_center(
+                    self.x + self.padding + (self.cols-1 + 0.5) * new_cell_width,
+                    self.y + self.padding + (row_index + 0.5) * cell_height
+                )
+            
+            # Position for new set is after last set
+            new_col = last_set_col + 1
+        else:
+            # Find the AddSet button in this row
+            add_set_col = None
+            for c in range(len(row)-1, -1, -1):
+                if row[c] is not None and hasattr(row[c], 'text') and row[c].text == "+ Add Set":
+                    add_set_col = c
+                    break
+            
+            if add_set_col is None:
+                print("Error: Couldn't find AddSet button in row")
+                return
+            
+            # Move AddSet button one column to the right
+            add_set_button = row[add_set_col]
+            self.elements_grid[row_index][add_set_col + 1] = add_set_button
+            self.elements_grid[row_index][add_set_col] = None
+            
+            # Update button position
+            add_set_button.x = self.x + self.padding + (add_set_col + 1) * cell_width
+            add_set_button.position_from_center(
+                self.x + self.padding + (add_set_col + 1 + 0.5) * cell_width,
+                self.y + self.padding + (row_index + 0.5) * cell_height
+            )
+            
+            # Position for new set is where AddSet button was
+            new_col = add_set_col
+        
+        # Create new SessionCell at the calculated position
+        new_cell = SessionCell(
+            x=self.x + self.padding + new_col * cell_width,
+            y=self.y + self.padding + row_index * cell_height,
+            width=cell_width,
+            height=cell_height,
+            manager=self.manager,
+            parent_panel=self,
+            weight_previous=0,  # Default weight
+            reps_previous=0,    # Default reps
+            rep_range=exercise_repRange,
+            exercise=exercise_name
+        )
+        
+        # Insert the new cell into the grid
+        self.elements_grid[row_index][new_col] = new_cell
+        self.elements.append(new_cell)
+        
+        # Update neighbors
+        self.setNeighbors()
+        self.manager.current_menu.connectNeighbors()
+        
+        # Reposition all elements
+        self._reposition_elements()
+        self.enforceElementsSize()
+        
+        # Focus on the new cell
+        if hasattr(self.manager, 'focus_manager'):
+            self.manager.focus_manager.set_focus(new_cell)

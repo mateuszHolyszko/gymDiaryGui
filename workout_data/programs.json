@@ -20,35 +20,35 @@
         "bodyweight": false
       }
     ],
-    "C": [
+    "Push Day": [
       {
-        "name": "firstexc",
+        "name": "Push Up",
         "rep_range": "8-12",
-        "muscle": "Back",
-        "bodyweight": false
-      },
-      {
-        "name": "secondTest",
-        "rep_range": "3-12",
         "muscle": "Chest",
         "bodyweight": false
       },
       {
-        "name": "thirdtest",
-        "rep_range": "10-15",
-        "muscle": "Forearms",
-        "bodyweight": "No"
+        "name": "Pull Up",
+        "rep_range": "3-12",
+        "muscle": "Back",
+        "bodyweight": true
       },
       {
-        "name": "fourthTest",
-        "rep_range": "4-8",
-        "muscle": "Forearms",
+        "name": "Lateral Raise",
+        "rep_range": "10-15",
+        "muscle": "Shoulders",
         "bodyweight": false
       },
       {
-        "name": "test",
+        "name": "Sit Up",
+        "rep_range": "4-8",
+        "muscle": "Abs",
+        "bodyweight": true
+      },
+      {
+        "name": "Wrist Curl",
         "rep_range": "8-12",
-        "muscle": "Quads",
+        "muscle": "Forearms",
         "bodyweight": false
       }
     ],

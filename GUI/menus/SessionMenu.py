@@ -20,7 +20,7 @@ class SessionMenu(Menu):
         self.nav_bar = self.add_panel(NavigationBar)
         
         # Create choose session panel
-        self.sessionPanel = self.add_panel(Panel, x=0, y=0, width=screenWidth, height=screenHeight //8)
+        self.sessionPanel = self.add_panel(Panel, x=0, y=0, width=screenWidth, height=screenHeight //8, layout_type="horizontal")
         # Create table panel
         self.table = self.add_panel(Table,
                                      x=0
@@ -29,14 +29,16 @@ class SessionMenu(Menu):
                                      ,height=screenHeight - self.nav_bar.height - self.sessionPanel.height
                                      ,rows=3
                                      ,cols=3
-                                     ,padding=10
+                                     ,padding=10                                     
                                      )
         self.table.draw_table_lines = False 
         
         # Add elements
         programNames = self.database.get_all_program_names()
         self.selectProgram = SelectDropDown(options=programNames, width=screenWidth//4, height=50, manager=self.manager, layer=3)
+        self.saveSessionButton = Button(text="Save Session", width=screenWidth//4, height=50, manager=self.manager, layer=1)
         self.sessionPanel.add_element(self.selectProgram)
+        self.sessionPanel.add_element(self.saveSessionButton)
 
         self.table.load_data_session(programNames[0],self.session.getSessionAsList(programNames[0]),manager=self.manager) # Load initial program data
         

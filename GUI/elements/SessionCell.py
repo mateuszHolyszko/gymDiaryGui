@@ -53,16 +53,25 @@ class SessionCell(Element):
     def render(self, screen):
         # Draw background
         bg_color = self.style.bg_color
+        pygame.draw.rect(screen, bg_color, (self.x, self.y, self.width, self.height))
         if self.is_focused:
             bg_color = self.style.highlight_color
+        elif self.edit_state == "hasBeenEdited":
+            bg_color = StyleManager.get_muscle_group_color(self.excerciseTargetMuscle)["bg_color"]
+            bg_color = StyleManager.gray_out_color(bg_color, 0.4) 
         pygame.draw.rect(screen, bg_color, (self.x, self.y+self.height//2, self.width, self.height//2))
         # Draw border and divider
         pygame.draw.rect(screen, self.style.border_color, (self.x, self.y, self.width, self.height), 2)
         pygame.draw.line(screen, self.style.border_color, (self.x, self.y+self.height//2), (self.x+self.width, self.y+self.height//2), 2)
         # Top half: previous session
-        header_text_bot = f"{self.weightFromPreviousSession}kg {self.repsFromPreviousSession}reps"
+        if self.weightFromPreviousSession == 0 and self.repsFromPreviousSession == 0:
+            header_text_bot = "New Set"
+        else:
+            header_text_bot = f"{self.weightFromPreviousSession}kg {self.repsFromPreviousSession}reps"
+            
         header_surf = self.font.render(header_text_bot, True, self.style.text_color)
-        screen.blit(header_surf, (self.x + (self.width-header_surf.get_width())//2, self.y + (self.height//4+header_surf.get_height()//3)))
+        screen.blit(header_surf, (self.x + (self.width-header_surf.get_width())//2, 
+                self.y + (self.height//4+header_surf.get_height()//3)))
         # Divider in top Half
         pygame.draw.rect(screen, StyleManager.get_muscle_group_color(self.excerciseTargetMuscle)["bg_color"], (self.x, self.y, self.width, self.height//4))
         pygame.draw.line(screen, self.style.border_color, (self.x, self.y+self.height//4), (self.x+self.width, self.y+self.height//4), 2)
@@ -85,13 +94,24 @@ class SessionCell(Element):
             text = self.font.render(prompt+value, True, self.style.text_color)
             screen.blit(text, (self.x + (self.width-text.get_width())//2, self.y+self.height//2 + (self.height//4-text.get_height()//2)))
         elif self.edit_state == "notEdited":
-            range_text = f"Target: {self.repRange[0]}-{self.repRange[1]} reps"
+            range_text = f"Range: {self.repRange[0]}-{self.repRange[1]}"
             text = self.font.render(range_text, True, self.style.text_color)
             screen.blit(text, (self.x + (self.width-text.get_width())//2, self.y+self.height//2 + (self.height//4-text.get_height()//2)))
         elif self.edit_state == "hasBeenEdited":
-            session_text = f"{self.weightFromThisSession}kg {self.repsFromThisSession}reps"
-            text = self.font.render(session_text, True, self.style.text_color)
-            screen.blit(text, (self.x + (self.width-text.get_width())//2, self.y+self.height//2 + (self.height//4-text.get_height()//2)))
+            # Create separate surfaces for weight and reps
+            weight_text = self.font.render(f"{self.weightFromThisSession}kg", True, self.style.text_color)
+            reps_text = self.font.render(f"{self.repsFromThisSession}reps", True, self.style.text_color)
+            # Calculate positions
+            total_height = weight_text.get_height() + reps_text.get_height()
+            start_y = self.y + self.height//2 + (self.height//4 - total_height//2)
+            # Draw weight (top)
+            screen.blit(weight_text, 
+                    (self.x + (self.width - weight_text.get_width())//2, 
+                        start_y))
+            # Draw reps (bottom)
+            screen.blit(reps_text, 
+                    (self.x + (self.width - reps_text.get_width())//2, 
+                        start_y + weight_text.get_height()))
 
     def on_press(self):
         self.edit_state = "editReps"
