@@ -50,22 +50,22 @@ class StyleManager:
         Given a muscle group name, return its background and text color.
         """
         muscle_groups = [
-            "Chest", "Back", "Quads", "Hamstrings", "Shoulders", "Biceps",
-            "Triceps", "Abs", "Calves", "Glutes", "Forearms"
+            "Chest", "Back", "Quads", "Hamstrings", "Glutes", "Shoulders", "Biceps",
+            "Triceps", "Abs", "Calves", "Forearms"
         ]
 
         color_palette = [
-            (220, 20, 60),    # Crimson
-            (0, 128, 128),    # Teal
-            (255, 140, 0),    # Dark Orange
-            (75, 0, 130),     # Indigo
-            (34, 139, 34),    # Forest Green
-            (255, 105, 180),  # Hot Pink
-            (70, 130, 180),   # Steel Blue
-            (255, 215, 0),    # Gold
-            (138, 43, 226),   # Blue Violet
-            (0, 191, 255),    # Deep Sky Blue
-            (205, 92, 92)     # Indian Red
+            (255, 102, 102),  # Chest
+            (255, 178, 102),  # Back
+            (153, 255, 51),   # Quads
+            (51, 255, 51),    # Hamstrings
+            (51, 255, 153),   # Glutes
+            (102, 102, 255),  # Shoulders
+            (102, 255, 255),   # Biceps
+            (102, 178, 255),    # Triceps
+            (178, 102, 255),   # Abs
+            (255, 102, 255),    # Calves
+            (255, 102, 178)     # Forearms
         ]
 
         # Normalize input to match format

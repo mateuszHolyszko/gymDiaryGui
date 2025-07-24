@@ -8,6 +8,7 @@ from GUI.elements.SelectDropDown import SelectDropDown
 from GUI.Table import Table
 from GUI.elements.SessionCell import SessionCell
 from workout_db.sessions_db import SessionsDB
+from datetime import datetime
 
 class SessionMenu(Menu):
     def setup(self):
@@ -54,6 +55,7 @@ class SessionMenu(Menu):
     def setup_actions(self):
         """Configure all element actions"""
         self.selectProgram.on_finished_edit = self.load_program
+        self.saveSessionButton.on_press = self.saveSession
 
     def load_program(self):
         self.table.load_data_session( self.selectProgram.getSelectedOption() ,self.session.getSessionAsList( self.selectProgram.getSelectedOption() ),manager=self.manager) # Load initial program data
@@ -75,3 +77,8 @@ class SessionMenu(Menu):
             sessionPanel.set_neighbor("down", self.table.getSelectable(1))  # First slectable!!! element in table
         for elem in self.table.getElementsInRow(0): # First non header row
             elem.set_neighbor("up", self.selectProgram)
+
+    def saveSession(self):
+        JSONdata = self.table.get_session_data_JSON(self.selectProgram.getSelectedOption(), datetime.now().strftime("%d-%m-%Y") )
+        print(JSONdata)
+        self.session.add_session(JSONdata)

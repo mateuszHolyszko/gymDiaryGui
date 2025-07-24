@@ -370,3 +370,51 @@ class Table(Panel):
         # Focus on the new cell
         if hasattr(self.manager, 'focus_manager'):
             self.manager.focus_manager.set_focus(new_cell)
+
+    def get_session_data_JSON(self, program_name, date):
+        """Convert table data to JSON session format.
+        
+        Args:
+            program_name: Name of the training program
+            date: Date string in "dd-mm-yyyy" format
+            
+        Returns:
+            dict: Session data in JSON format matching storage structure in sessions.json
+        """
+        session_data = {
+            "date": date,
+            "program": program_name,
+            "exercises": []
+        }
+        
+        for row in self.elements_grid:
+            # Skip empty rows or rows without at least an exercise name
+            if not row or row[0] is None:
+                continue
+                
+            exercise_data = {
+                "name": row[0].text,  # Exercise name from first column
+                "sets": []
+            }
+            
+            # Process all SessionCells in the row (skip first and last columns)
+            for cell in row[1:-1]:  # Skip first column (exercise name) and last column (AddSet button)
+                if cell is None or not isinstance(cell, SessionCell):
+                    continue
+                    
+                # Only include the set if it has been edited
+                if getattr(cell, 'edit_state', None) == "hasBeenEdited":
+                    weight = getattr(cell, 'weightFromThisSession', 0)
+                    reps = getattr(cell, 'repsFromThisSession', 0)
+                    
+                    # Add the set data
+                    exercise_data["sets"].append({
+                        "weight": weight,
+                        "reps": reps
+                    })
+            
+            # Only add exercise if it has at least one set
+            if exercise_data["sets"]:
+                session_data["exercises"].append(exercise_data)
+        
+        return session_data

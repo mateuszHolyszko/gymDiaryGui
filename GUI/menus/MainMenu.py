@@ -9,6 +9,8 @@ from GUI.elements.InputField import InputField
 from GUI.Table import Table
 from workout_db.programs_db import ProgramsDB
 from GUI.elements.SessionCell import SessionCell
+from GUI.elements.Image.Image2D import Image2D
+from GUI.elements.Image.ImageCarousel import ImageCarousel
 
 
 class MainMenu(Menu):
@@ -22,17 +24,8 @@ class MainMenu(Menu):
         
         # Create content panel
         self.content = self.add_panel(Panel, x=0, y=0, width=screenWidth//2, height=screenHeight - self.nav_bar.height)
-        # Create table panel
-        self.table = self.add_panel(Table,
-                                     x=screenWidth//2
-                                     ,y=5
-                                     ,width=screenWidth//2 - 5
-                                     ,height=screenHeight - self.nav_bar.height - 10
-                                     ,rows=3
-                                     ,cols=3
-                                     ,padding=10
-                                     )
-        self.table.draw_table_lines = False 
+        # Create second panel
+        self.content2 = self.add_panel(Panel,x=screenWidth//2,y=5,width=screenWidth//2 - 5,height=screenHeight - self.nav_bar.height - 10)
         
         # Add elements (content panel)
         self.inputField = InputField(initial_value=50, min_value=0, max_value=100, step=5, manager=self.manager)
@@ -46,23 +39,12 @@ class MainMenu(Menu):
         self.content.add_element(self.inputField)
         self.content.add_element(self.btn)
 
-        # Add elements (table panel)
-        # Add header labels
-        self.table.add_element(Label("Name", width=120, height=40, manager=self.manager), 0, 0)
-        self.table.add_element(Label("Age", width=120, height=40, manager=self.manager), 0, 1)
-        self.table.add_element(Label("Action", width=120, height=40, manager=self.manager), 0, 2)
+        # Add elements (second panel)
+        #self.image = Image2D(image_path="GUI\elements\Image\images\\test1.jpg", width=200, height=200, manager=self.manager)
+        self.imageImageCarousel = ImageCarousel(folder_path="GUI\elements\Image\images\\", width=200, height=200, manager=self.manager, mode="selectable")
 
-        # Add input fields for row 1
-        self.table.add_element(InputField(initial_value=0, width=120, height=40, manager=self.manager), 1, 0)
-        self.table.add_element(InputField(initial_value=18, width=120, height=40, manager=self.manager), 1, 1)
-        #self.table.add_element(Button("Submit", width=120, height=40, manager=self.manager), 1, 2)
-
-        # Add another row (could be more input fields, labels, or buttons)
-        self.table.add_element(Label("Row 2", width=120, height=40, manager=self.manager), 2, 0)
-        self.table.add_element(InputField(initial_value=25, width=120, height=40, manager=self.manager), 2, 1)
-        self.table.add_element(SessionCell( manager=self.manager,parent_panel=self.table), 2, 2)
-
-        #self.table.enforceElementsSize()  # Ensure elements fit in their cells
+        #self.content2.add_element(self.image)
+        self.content2.add_element(self.imageImageCarousel)
         
         # Connect navigation between nav bar and content
         for nav_btn in self.nav_bar.buttons:
@@ -72,16 +54,15 @@ class MainMenu(Menu):
 
         # Connect navigation between content and table
         for content_btn in self.content.getElements():
-            content_btn.set_neighbor("right", self.table.elements_grid[1][0])  # First element in table
-        self.table.elements_grid[1][0].set_neighbor("left", self.content.getElements()[1])
+            content_btn.set_neighbor("right", self.content2.getElements()[0])  # First element in table
+        self.content2.getElements()[0].set_neighbor("left", self.content.getElements()[1])
 
         # Connect neighbors within (can be done via panel or manualy)
         self.content.setNeighbors()
-        self.table.setNeighbors()
+        self.content2.setNeighbors()
         
         # Set initial focus through manager
         self.set_initial_focus(self.nav_bar.buttons[0])
-        #self.set_initial_focus(self.table.elements_grid[1][0])  # Focus on first input field in table
         
         # Set up actions
         self.setup_actions()

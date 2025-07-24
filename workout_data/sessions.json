@@ -32,7 +32,6 @@
               "weight": 25,
               "reps": 10
             }
-
           ]
         }
       ]
@@ -126,6 +125,56 @@
         {
           "name": "Push Ups",
           "sets": []
+        }
+      ]
+    },
+    {
+      "date": "24-07-2025",
+      "program": "Push Day",
+      "exercises": [
+        {
+          "name": "Push Up",
+          "sets": [
+            {
+              "weight": 2.5,
+              "reps": 7
+            },
+            {
+              "weight": 1.25,
+              "reps": 5
+            }
+          ]
+        },
+        {
+          "name": "Pull Up",
+          "sets": [
+            {
+              "weight": 5.0,
+              "reps": 5
+            }
+          ]
+        },
+        {
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "weight": 10.0,
+              "reps": 12
+            },
+            {
+              "weight": 8.75,
+              "reps": 11
+            }
+          ]
+        },
+        {
+          "name": "Wrist Curl",
+          "sets": [
+            {
+              "weight": 6.25,
+              "reps": 2
+            }
+          ]
         }
       ]
     }
