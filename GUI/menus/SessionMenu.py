@@ -79,6 +79,8 @@ class SessionMenu(Menu):
             elem.set_neighbor("up", self.selectProgram)
 
     def saveSession(self):
-        JSONdata = self.table.get_session_data_JSON(self.selectProgram.getSelectedOption(), datetime.now().strftime("%d-%m-%Y") )
+        bodyweight = self.manager.context["bodyweight"]
+        print(bodyweight)
+        JSONdata = self.table.get_session_data_JSON(self.selectProgram.getSelectedOption(), datetime.now().strftime("%d-%m-%Y"), bodyweight )
         print(JSONdata)
         self.session.add_session(JSONdata)

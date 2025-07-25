@@ -81,3 +81,34 @@ class SessionsDB(WorkoutDatabase):
         # Debug: Print final table data
         print("Generated table data:", table)
         return table
+    
+    def get_last_session(self) -> Dict:
+        """Get the most recent session (by date)
+        Returns None if no sessions exist for the program.
+        """
+        sessions = self.get_all_sessions()
+        if not sessions:
+            return None
+
+        # Parse dates and find the session with the latest date
+        def parse_date(session):
+            return datetime.strptime(session["date"], "%d-%m-%Y")
+
+        return max(sessions, key=parse_date)
+    
+    def get_last_bodyweight(self) -> float:
+        """Get the most recent bodyweight recorded across all sessions.
+        Returns None if no sessions exist or no bodyweight is recorded.
+        """
+        try:
+            # Get the most recent session
+            last_session = self.get_last_session()
+            if last_session is None:
+                return None
+                
+            # Safely get bodyweight from session (returns None if key doesn't exist)
+            return last_session.get('bodyweight')
+            
+        except Exception as e:
+            print(f"Error retrieving last bodyweight: {str(e)}")
+            return None

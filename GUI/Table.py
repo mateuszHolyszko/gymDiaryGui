@@ -371,7 +371,7 @@ class Table(Panel):
         if hasattr(self.manager, 'focus_manager'):
             self.manager.focus_manager.set_focus(new_cell)
 
-    def get_session_data_JSON(self, program_name, date):
+    def get_session_data_JSON(self, program_name, date, bodyweight):
         """Convert table data to JSON session format.
         
         Args:
@@ -384,6 +384,7 @@ class Table(Panel):
         session_data = {
             "date": date,
             "program": program_name,
+            "bodyweight": bodyweight,
             "exercises": []
         }
         

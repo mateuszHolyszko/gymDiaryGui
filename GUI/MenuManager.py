@@ -6,6 +6,7 @@ class MenuManager:
         self.current_menu = None
         self.focus_manager = FocusManager()  # Central focus control
         self.menus = {}
+        self.context = {} # for some globalcontext
 
     def register_menu(self, name, menu_class):
         self.menus[name] = menu_class
