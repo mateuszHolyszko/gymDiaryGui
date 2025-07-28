@@ -215,6 +215,7 @@ class Table(Panel):
                 parent_panel=self
             )
             button_elem.set_style_override({'bg_color': StyleManager.get_muscle_group_color(exercise_target)['bg_color']})
+            button_elem.set_style_override({'text_color': (0,0,0)})
             self.elements_grid[r][0] = button_elem
             self.elements.append(button_elem)
 

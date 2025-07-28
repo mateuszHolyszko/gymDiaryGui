@@ -64,7 +64,9 @@ class MainMenu(Menu):
 
         # Add elements (Carousel panel)
         self.image1 = Image2D(image_path="GUI\elements\Image\images\\Front.png", height = 290 , width= 300*0.7, manager=self.manager)
+        self.image1.muscleGroups = ["Forearms", "Biceps", "Triceps","Shoulders","Chest","Back","Abs","Quads","Calves"]
         self.image2 = Image2D(image_path="GUI\elements\Image\images\\Back.png", height = 280 , width= 300*0.5, manager=self.manager)
+        self.image2.muscleGroups = ["Back","Shoulders","Triceps","Forearms","Glutes","Hamstrings","Calves"]
         self.imageImageCarousel = ImageCarousel(images=[], manager=self.manager, mode="random_timed", height = 300 , width= 300*0.7)
         self.CarouselPanel.add_element(self.imageImageCarousel)
         self.imageImageCarousel.add_image(self.image1)
@@ -72,11 +74,7 @@ class MainMenu(Menu):
 
         # Create volumeSummary panel
         self.volumeSummary = self.add_panel(Panel, x=self.imageImageCarousel.x - 200, y=self.imageImageCarousel.y,width=screenWidth//4, height=self.imageImageCarousel.height)
-        # Add elements (volumeSummary panel)
-        for targetMuscle in self.database.get_muscle_groups():
-            btn = Button(text=f"{targetMuscle}: (SUM)", width=150, height=30, manager=self.manager)
-            btn.set_style_override({'bg_color': StyleManager.get_muscle_group_color(targetMuscle)['bg_color']})
-            self.volumeSummary.add_element(btn)
+        self.update_carousel()
         
         # Connect navigation between nav bar and InputPanel
         for nav_btn in self.nav_bar.buttons:
@@ -103,8 +101,21 @@ class MainMenu(Menu):
         """Configure all element actions"""
         self.inputField.on_press = lambda: print(f"Selected value is {self.inputField.value}")
         self.btn.on_press = self.updateBodyWeight
+        self.imageImageCarousel.update = self.update_carousel
         
         
     def updateBodyWeight(self):
         self.manager.context["bodyweight"] = self.inputField.value
+
+    def update_carousel(self):
+        # Delete existing elements in volumeSummary panel
+        #print("Update carousel")
+        self.volumeSummary.clear_elements()
+        # Add elements (volumeSummary panel)
+        for targetMuscle in self.imageImageCarousel.get_image().muscleGroups:
+            btn = Button(text=f"{targetMuscle}: {self.session.get_sets_for_target_whole(targetMuscle)}", width=150, height=30, manager=self.manager)
+            btn.set_style_override({'bg_color': StyleManager.get_muscle_group_color(targetMuscle)['bg_color']})
+            self.volumeSummary.add_element(btn)
+
+    
         

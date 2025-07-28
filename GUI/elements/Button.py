@@ -114,8 +114,13 @@ class Button(Element):
         if self.is_focused:
             pygame.draw.rect(screen, style.border_color, 
                            (self.x, self.y, self.width, self.height), 2)
-                           
-        text = self.font.render(self.text, True, style.text_color)
+
+        # If bg_color is not black, font color should be black    
+        text_color = style.text_color
+        if bg_color != (0,0,0):
+            text_color = (0,0,0)
+
+        text = self.font.render(self.text, True, text_color)
         screen.blit(text, (
             self.x + (self.width - text.get_width())//2,
             self.y + (self.height - text.get_height())//2

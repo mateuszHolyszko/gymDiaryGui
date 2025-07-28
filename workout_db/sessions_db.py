@@ -112,3 +112,46 @@ class SessionsDB(WorkoutDatabase):
         except Exception as e:
             print(f"Error retrieving last bodyweight: {str(e)}")
             return None
+        
+    def get_sets_for_target_whole(self, targetMuscle: str) -> int:
+        """Get the total number of sets for exercises targeting a specific muscle group.
+        
+        Args:
+            targetMuscle: The muscle group to count sets for (e.g., "Chest", "Back")
+            
+        Returns:
+            int: Total number of sets across all programs' most recent sessions
+        """
+        programs_db = ProgramsDB()
+        total_sets = 0
+        
+        # Get all programs - returns dict like {"Strength Training": [...exercises], ...}
+        all_programs = programs_db.get_all_programs()
+        
+        # Iterate through each program
+        for program_name, exercises_data in all_programs.items():
+            # Get the most recent session for this program
+            sessions = self.get_sessions_by_program(program_name)
+            if not sessions:
+                continue
+                
+            # Find the most recent session
+            def parse_date(session):
+                return datetime.strptime(session["date"], "%d-%m-%Y")
+            latest_session = max(sessions, key=parse_date)
+            
+            # Convert to Session dataclass for easier handling
+            session_obj = Session.from_dict(latest_session)
+            
+            # Create set of exercise names that target our muscle
+            target_exercises = {
+                ex["name"] for ex in exercises_data 
+                if ex.get("muscle") == targetMuscle
+            }
+            
+            # Count sets for target exercises in this session
+            for exercise in session_obj.exercises:
+                if exercise.name in target_exercises:
+                    total_sets += len(exercise.sets)
+        
+        return total_sets

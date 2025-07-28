@@ -76,7 +76,7 @@ class SessionCell(Element):
         pygame.draw.rect(screen, StyleManager.get_muscle_group_color(self.excerciseTargetMuscle)["bg_color"], (self.x, self.y, self.width, self.height//4))
         pygame.draw.line(screen, self.style.border_color, (self.x, self.y+self.height//4), (self.x+self.width, self.y+self.height//4), 2)
         header_text_top = self.excerciseTargetMuscle
-        header_surf = self.font.render(header_text_top, True, StyleManager.get_muscle_group_color(self.excerciseTargetMuscle)["text_color"])
+        header_surf = self.font.render(header_text_top, True, (0,0,0))
         screen.blit(header_surf, (self.x + (self.width-header_surf.get_width())//2, self.y + (self.height//8-header_surf.get_height()//3)))
         # Bottom half: state-dependent
         if self.edit_state == "editReps":

@@ -73,6 +73,8 @@ class ImageCarousel(Element):
             
         self.current_index = (self.current_index + 1) % len(self.image_elements)
         self.last_switch_time = time.time()
+        #print("Switching")
+        self.update()
     
     def random_image(self):
         """Select a random image"""
@@ -82,6 +84,8 @@ class ImageCarousel(Element):
                 new_index = random.randint(0, len(self.image_elements)-1)
             self.current_index = new_index
         self.last_switch_time = time.time()
+        #print("Switching")
+        self.update()
     
     def render(self, screen: pygame.Surface):
         """Draw the current image, progress bar, and handle automatic switching"""
@@ -129,6 +133,9 @@ class ImageCarousel(Element):
         """Handle selection for selectable mode"""
         if self.mode == "selectable":
             self.next_image()
+
+    def update(self):
+        pass
     
     def set_position(self, x: int, y: int):
         """Sets position for carousel and re-centers all images"""
@@ -148,3 +155,6 @@ class ImageCarousel(Element):
         self.height = height
         for img in self.image_elements:
             self._center_image(img)
+
+    def get_image(self):
+        return self.image_elements[ self.current_index ] if self.image_elements else None

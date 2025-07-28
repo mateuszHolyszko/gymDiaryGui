@@ -30,6 +30,7 @@ class Image2D(Element):
         self.original_image = pygame.image.load(image_path).convert_alpha()
         self.processed_image = self._process_image(self.original_image)
         self.image = pygame.transform.scale(self.processed_image, (self.width, self.height))
+        self.muscleGroups=[] #List of muscle grups displayed on the image, roughly keep the order of how they appear on the image for better readability
 
     def _get_mapped_color(self, pixel_color):
         """Return the appropriate color based on the exact pixel color."""

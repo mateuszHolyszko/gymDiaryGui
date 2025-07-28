@@ -26,6 +26,10 @@ class Panel:
         """Returns a list of elements in the panel."""
         return [e for e in self.elements if e is not None]
     
+    def clear_elements(self):
+        """Clear all elements from the panel."""
+        self.elements = []
+    
     def setNeighbors(self):
         """Sets neighbors for all elements based on their layout."""
         elements = self.getElements()
