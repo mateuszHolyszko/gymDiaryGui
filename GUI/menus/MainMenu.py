@@ -12,6 +12,7 @@ from workout_db.sessions_db import SessionsDB
 from GUI.elements.SessionCell import SessionCell
 from GUI.elements.Image.Image2D import Image2D
 from GUI.elements.Image.ImageCarousel import ImageCarousel
+from GUI.style import StyleManager
 
 
 class MainMenu(Menu):
@@ -24,12 +25,13 @@ class MainMenu(Menu):
         # Add navigation bar
         self.nav_bar = self.add_panel(NavigationBar)
         
-        # Create content panel
-        self.content = self.add_panel(Panel, x=0, y=0, width=screenWidth//2, height=screenHeight - self.nav_bar.height)
-        # Create second panel
-        self.content2 = self.add_panel(Panel,x=screenWidth//2,y=5,width=screenWidth//2 - 5,height=screenHeight - self.nav_bar.height - 10)
+        # Create InputPanel panel
+        self.InputPanel = self.add_panel(Panel, x=0, y=0, width=screenWidth//4, height=screenHeight - self.nav_bar.height)
+        # Volume summary panel gets created after the CarouselPanel gets initiated, since its depended on CarouselPanel elements
+        # Create CarouselPanel panel
+        self.CarouselPanel = self.add_panel(Panel,x=screenWidth//2,y=5,width=screenWidth//2 - 5,height=screenHeight - self.nav_bar.height - 10)
         
-        # Add elements (content panel)
+        # Add elements (InputPanel panel)
         bodyweight = None
         # get bodyweight from main menu context, if its not there get it from last session
         try:
@@ -56,31 +58,40 @@ class MainMenu(Menu):
         self.btn = Button("Update bodyweight", width=200, height=50, manager=self.manager)
         self.label = Label(text="Label", width=200, height=50, manager=self.manager)
         
-        self.content.add_element(self.label)
-        self.content.add_element(self.inputField)
-        self.content.add_element(self.btn)
+        self.InputPanel.add_element(self.label)
+        self.InputPanel.add_element(self.inputField)
+        self.InputPanel.add_element(self.btn)
 
-        # Add elements (second panel)
-        #self.image = Image2D(image_path="GUI\elements\Image\images\\test1.jpg", width=200, height=200, manager=self.manager)
-        self.imageImageCarousel = ImageCarousel(folder_path="GUI\elements\Image\images\\", width=200, height=200, manager=self.manager, mode="selectable")
+        # Add elements (Carousel panel)
+        self.image1 = Image2D(image_path="GUI\elements\Image\images\\Front.png", height = 290 , width= 300*0.7, manager=self.manager)
+        self.image2 = Image2D(image_path="GUI\elements\Image\images\\Back.png", height = 280 , width= 300*0.5, manager=self.manager)
+        self.imageImageCarousel = ImageCarousel(images=[], manager=self.manager, mode="random_timed", height = 300 , width= 300*0.7)
+        self.CarouselPanel.add_element(self.imageImageCarousel)
+        self.imageImageCarousel.add_image(self.image1)
+        self.imageImageCarousel.add_image(self.image2)
 
-        #self.content2.add_element(self.image)
-        self.content2.add_element(self.imageImageCarousel)
+        # Create volumeSummary panel
+        self.volumeSummary = self.add_panel(Panel, x=self.imageImageCarousel.x - 200, y=self.imageImageCarousel.y,width=screenWidth//4, height=self.imageImageCarousel.height)
+        # Add elements (volumeSummary panel)
+        for targetMuscle in self.database.get_muscle_groups():
+            btn = Button(text=f"{targetMuscle}: (SUM)", width=150, height=30, manager=self.manager)
+            btn.set_style_override({'bg_color': StyleManager.get_muscle_group_color(targetMuscle)['bg_color']})
+            self.volumeSummary.add_element(btn)
         
-        # Connect navigation between nav bar and content
+        # Connect navigation between nav bar and InputPanel
         for nav_btn in self.nav_bar.buttons:
-            nav_btn.set_neighbor("up", self.content.getElements()[-1])  # Last element in content
-        self.content.getElements()[-1].set_neighbor("down", self.nav_bar.buttons[0])
+            nav_btn.set_neighbor("up", self.InputPanel.getElements()[-1])  # Last element in InputPanel
+        self.InputPanel.getElements()[-1].set_neighbor("down", self.nav_bar.buttons[0])
         self.nav_bar.buttons[0].activate()
 
-        # Connect navigation between content and table
-        for content_btn in self.content.getElements():
-            content_btn.set_neighbor("right", self.content2.getElements()[0])  # First element in table
-        self.content2.getElements()[0].set_neighbor("left", self.content.getElements()[1])
+        # Connect navigation between InputPanel and table
+        for InputPanel_btn in self.InputPanel.getElements():
+            InputPanel_btn.set_neighbor("right", self.CarouselPanel.getElements()[0])  # First element in table
+        self.CarouselPanel.getElements()[0].set_neighbor("left", self.InputPanel.getElements()[1])
 
         # Connect neighbors within (can be done via panel or manualy)
-        self.content.setNeighbors()
-        self.content2.setNeighbors()
+        self.InputPanel.setNeighbors()
+        self.CarouselPanel.setNeighbors()
         
         # Set initial focus through manager
         self.set_initial_focus(self.nav_bar.buttons[0])

@@ -1,14 +1,14 @@
-import pygame
-import os
 import random
 import time
+import pygame
 from GUI.elements.Element import Element
 from GUI.style import StyleManager
+from GUI.elements.Image.Image2D import Image2D
 
 class ImageCarousel(Element):
     def __init__(
         self,
-        folder_path: str = None,
+        images: list = None,
         x: int = 0,
         y: int = 0,
         width: int = 100,
@@ -17,7 +17,9 @@ class ImageCarousel(Element):
         parent_panel=None,
         layer: int = 0,
         mode: str = "random_timed",  # "random_timed", "random_static", "selectable"
-        switch_interval: float = 3.0,  # seconds between switches (for random_timed)
+        switch_interval: float = 12.0,  # seconds between switches (for random_timed)
+        progress_bar_height: int = 5,  # Height of the progress bar in pixels
+        progress_bar_color: tuple = (255, 255, 255),  # Color of the progress bar
     ):
         super().__init__(
             x=x,
@@ -34,112 +36,115 @@ class ImageCarousel(Element):
         self.style = StyleManager.current_style
         self.mode = mode
         self.switch_interval = switch_interval
-        self.last_switch_time = 0
+        self.last_switch_time = time.time()  # Initialize with current time
         self.current_index = 0
-        self.images = []
-        self.loaded_images = []
+        self.image_elements = []
+        self.progress_bar_height = progress_bar_height
+        self.progress_bar_color = progress_bar_color
         
-        # Load all valid images from folder
-        if folder_path and os.path.isdir(folder_path):
-            self.folder_path = folder_path
-            self.load_images()
-        
-        # Placeholder if no images loaded
-        if not self.images:
-            self.images.append(self.create_placeholder())
-    
-    def load_images(self):
-        """Load all valid image files from the folder"""
-        valid_extensions = ['.png', '.jpg', '.jpeg', '.bmp', '.gif']
-        self.images = []
-        
-        for filename in os.listdir(self.folder_path):
-            if any(filename.lower().endswith(ext) for ext in valid_extensions):
-                try:
-                    img_path = os.path.join(self.folder_path, filename)
-                    img = pygame.image.load(img_path).convert_alpha()
-                    img = pygame.transform.scale(img, (self.width, self.height))
-                    self.images.append(img)
-                except Exception as e:
-                    print(f"Error loading image {filename}: {e}")
+        # Add initial images if provided
+        if images:
+            for img in images:
+                self.add_image(img)
         
         # Shuffle if in random mode
-        if "random" in self.mode and self.images:
-            random.shuffle(self.images)
+        if "random" in self.mode and self.image_elements:
+            random.shuffle(self.image_elements)
     
-    def create_placeholder(self):
-        """Create a placeholder surface when no images are available"""
-        surface = pygame.Surface((self.width, self.height))
-        surface.fill(self.style.bg_color)
-        pygame.draw.rect(surface, self.style.border_color, (0, 0, self.width, self.height), 2)
-        font = pygame.font.SysFont("Arial", 12)
-        text = font.render("No Images", True, self.style.text_color)
-        surface.blit(text, (
-            (self.width - text.get_width()) // 2,
-            (self.height - text.get_height()) // 2
-        ))
-        return surface
+    def add_image(self, image: Image2D):
+        """Add an Image2D instance to the carousel"""
+        self._center_image(image)
+        self.image_elements.append(image)
+        
+        if "random" in self.mode:
+            random.shuffle(self.image_elements)
+    
+    def _center_image(self, image: Image2D):
+        """Center an image within the carousel's bounds"""
+        image.set_position(
+            self.x + (self.width - image.width) // 2,
+            self.y + (self.height - image.height) // 2
+        )
     
     def next_image(self):
         """Switch to next image in sequence"""
-        if not self.images:
+        if not self.image_elements:
             return
             
-        self.current_index = (self.current_index + 1) % len(self.images)
+        self.current_index = (self.current_index + 1) % len(self.image_elements)
         self.last_switch_time = time.time()
     
     def random_image(self):
         """Select a random image"""
-        if len(self.images) > 1:
+        if len(self.image_elements) > 1:
             new_index = self.current_index
-            while new_index == self.current_index and len(self.images) > 1:
-                new_index = random.randint(0, len(self.images)-1)
+            while new_index == self.current_index and len(self.image_elements) > 1:
+                new_index = random.randint(0, len(self.image_elements)-1)
             self.current_index = new_index
         self.last_switch_time = time.time()
     
     def render(self, screen: pygame.Surface):
-        """Draw the current image and handle automatic switching"""
+        """Draw the current image, progress bar, and handle automatic switching"""
         current_time = time.time()
         
         # Handle automatic switching for timed mode
         if self.mode == "random_timed" and current_time - self.last_switch_time > self.switch_interval:
             self.random_image()
         
-        # Draw current image
-        if self.images:
-            screen.blit(self.images[self.current_index], (self.x, self.y))
+        # Draw current image if available
+        if self.image_elements:
+            self.image_elements[self.current_index].render(screen)
+        
+        # Draw progress bar for random_timed mode
+        if self.mode == "random_timed" and self.image_elements:
+            progress = min(1.0, (current_time - self.last_switch_time) / self.switch_interval)
+            bar_width = int(self.width * progress)
+            
+            # Draw background (empty part of progress bar)
+            pygame.draw.rect(
+                screen, 
+                (50, 50, 50),  # Dark gray background
+                (self.x, self.y + self.height - self.progress_bar_height, 
+                 self.width, self.progress_bar_height)
+            )
+            
+            # Draw progress
+            pygame.draw.rect(
+                screen, 
+                self.progress_bar_color,
+                (self.x, self.y + self.height - self.progress_bar_height, 
+                 bar_width, self.progress_bar_height)
+            )
         
         # Draw border if selectable and focused
         if self.selectable and self.is_focused:
-            pygame.draw.rect(screen, self.style.highlight_color, 
-                           (self.x, self.y, self.width, self.height), 2)
+            pygame.draw.rect(
+                screen, 
+                self.style.highlight_color, 
+                (self.x, self.y, self.width, self.height), 
+                2
+            )
     
     def on_press(self):
         """Handle selection for selectable mode"""
         if self.mode == "selectable":
             self.next_image()
     
-    def reload_images(self):
-        """Reload images from folder"""
-        self.load_images()
-        if not self.images:
-            self.images.append(self.create_placeholder())
-        self.current_index = 0
-    
     def set_position(self, x: int, y: int):
-        """Sets position, treating values as offsets if parent exists"""
-        self._explicit_x = x
-        self._explicit_y = y
-        
-        if self.parent_panel:
-            self.x = self.parent_panel.x + x
-            self.y = self.parent_panel.y + y
-        else:
-            self.x = x
-            self.y = y
-
+        """Sets position for carousel and re-centers all images"""
+        super().set_position(x, y)
+        for img in self.image_elements:
+            self._center_image(img)
+    
     def update_panel_position(self):
         """Updates position when panel moves (if using offset mode)"""
-        if self.parent_panel:
-            self.x = self.parent_panel.x + self._explicit_x
-            self.y = self.parent_panel.y + self._explicit_y
+        super().update_panel_position()
+        for img in self.image_elements:
+            self._center_image(img)
+    
+    def set_size(self, width: int, height: int):
+        """Update carousel size and re-center all images"""
+        self.width = width
+        self.height = height
+        for img in self.image_elements:
+            self._center_image(img)
