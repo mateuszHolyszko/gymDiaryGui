@@ -55,10 +55,6 @@ class ProgramMenu(Menu):
         self.programsPanel.setNeighbors()
         self.table.setNeighbors()
         
-        # Set initial focus through manager
-        self.set_initial_focus(self.nav_bar.buttons[2])  # Focus on Program button
-        self.nav_bar.buttons[2].activate()
-        
         # Set up actions
         self.setup_actions()
         
@@ -76,3 +72,8 @@ class ProgramMenu(Menu):
                 if elem is not None:
                     elem.set_neighbor("left", self.programsPanel.getElements()[0])
         self.table.setNeighbors()
+
+    def set_initial_focus_on_switch(self):
+        # Set focus to the first nav bar button or any default element
+        self.set_initial_focus(self.nav_bar.buttons[2])
+        self.nav_bar.buttons[2].activate()

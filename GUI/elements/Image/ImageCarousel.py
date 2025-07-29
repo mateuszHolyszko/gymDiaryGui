@@ -3,7 +3,7 @@ import time
 import pygame
 from GUI.elements.Element import Element
 from GUI.style import StyleManager
-from GUI.elements.Image.Image2D import Image2D
+from GUI.elements.Image.Image2D_Graph import Image2D_Graph
 
 class ImageCarousel(Element):
     def __init__(
@@ -51,15 +51,15 @@ class ImageCarousel(Element):
         if "random" in self.mode and self.image_elements:
             random.shuffle(self.image_elements)
     
-    def add_image(self, image: Image2D):
-        """Add an Image2D instance to the carousel"""
+    def add_image(self, image: Image2D_Graph):
+        """Add an Image2D_Graph instance to the carousel"""
         self._center_image(image)
         self.image_elements.append(image)
         
         if "random" in self.mode:
             random.shuffle(self.image_elements)
     
-    def _center_image(self, image: Image2D):
+    def _center_image(self, image: Image2D_Graph):
         """Center an image within the carousel's bounds"""
         image.set_position(
             self.x + (self.width - image.width) // 2,

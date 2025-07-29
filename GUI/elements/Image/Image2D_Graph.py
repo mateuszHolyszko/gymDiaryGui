@@ -2,7 +2,7 @@ import pygame
 from GUI.elements.Element import Element
 from GUI.style import StyleManager
 
-class Image2D(Element):
+class Image2D_Graph(Element):
     def __init__(
         self,
         image_path: str = None,

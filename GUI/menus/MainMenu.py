@@ -10,7 +10,7 @@ from GUI.Table import Table
 from workout_db.programs_db import ProgramsDB
 from workout_db.sessions_db import SessionsDB
 from GUI.elements.SessionCell import SessionCell
-from GUI.elements.Image.Image2D import Image2D
+from GUI.elements.Image.Image2D_Graph import Image2D_Graph
 from GUI.elements.Image.ImageCarousel import ImageCarousel
 from GUI.style import StyleManager
 
@@ -63,9 +63,9 @@ class MainMenu(Menu):
         self.InputPanel.add_element(self.btn)
 
         # Add elements (Carousel panel)
-        self.image1 = Image2D(image_path="GUI\elements\Image\images\\Front.png", height = 290 , width= 300*0.7, manager=self.manager)
+        self.image1 = Image2D_Graph(image_path="GUI\elements\Image\images\\Front.png", height = 290 , width= 300*0.7, manager=self.manager)
         self.image1.muscleGroups = ["Forearms", "Biceps", "Triceps","Shoulders","Chest","Back","Abs","Quads","Calves"]
-        self.image2 = Image2D(image_path="GUI\elements\Image\images\\Back.png", height = 280 , width= 300*0.5, manager=self.manager)
+        self.image2 = Image2D_Graph(image_path="GUI\elements\Image\images\\Back.png", height = 280 , width= 300*0.5, manager=self.manager)
         self.image2.muscleGroups = ["Back","Shoulders","Triceps","Forearms","Glutes","Hamstrings","Calves"]
         self.imageImageCarousel = ImageCarousel(images=[], manager=self.manager, mode="random_timed", height = 300 , width= 300*0.7)
         self.CarouselPanel.add_element(self.imageImageCarousel)
@@ -73,7 +73,7 @@ class MainMenu(Menu):
         self.imageImageCarousel.add_image(self.image2)
 
         # Create volumeSummary panel
-        self.volumeSummary = self.add_panel(Panel, x=self.imageImageCarousel.x - 200, y=self.imageImageCarousel.y,width=screenWidth//4, height=self.imageImageCarousel.height)
+        self.volumeSummary = self.add_panel(Panel, x=self.imageImageCarousel.x - screenWidth//5, y=self.imageImageCarousel.y,width=screenWidth//4, height=self.imageImageCarousel.height)
         self.update_carousel()
         
         # Connect navigation between nav bar and InputPanel
@@ -90,9 +90,6 @@ class MainMenu(Menu):
         # Connect neighbors within (can be done via panel or manualy)
         self.InputPanel.setNeighbors()
         self.CarouselPanel.setNeighbors()
-        
-        # Set initial focus through manager
-        self.set_initial_focus(self.nav_bar.buttons[0])
         
         # Set up actions
         self.setup_actions()
@@ -116,6 +113,10 @@ class MainMenu(Menu):
             btn = Button(text=f"{targetMuscle}: {self.session.get_sets_for_target_whole(targetMuscle)}", width=150, height=30, manager=self.manager)
             btn.set_style_override({'bg_color': StyleManager.get_muscle_group_color(targetMuscle)['bg_color']})
             self.volumeSummary.add_element(btn)
+
+    def set_initial_focus_on_switch(self):
+        # Set focus to the first nav bar button or any default element
+        self.set_initial_focus(self.nav_bar.buttons[0])
 
     
         

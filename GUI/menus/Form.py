@@ -1,0 +1,41 @@
+from GUI.Menu import Menu
+from GUI.Panel import Panel
+from GUI.panels.navigation_bar import NavigationBar
+from GUI.elements.Button import Button
+
+class Form(Menu):
+    def setup(self):
+        """Setup panels, elements and actions"""
+        # Create choice_buttons_panel panel
+        self.choice_buttons_panel = self.add_panel(Panel, 50, 50, 700, 400, layout_type="horizontal")
+        
+        # Add elements
+        self.yes_btn = Button("Yes", width=200, height=50, manager=self.manager)
+        self.no_btn = Button("No", width=200, height=50, manager=self.manager)
+        
+        self.choice_buttons_panel.add_element(self.yes_btn)
+        self.choice_buttons_panel.add_element(self.no_btn)
+        
+        # Connect navigation 
+        self.choice_buttons_panel.setNeighbors()       
+        
+        # Set up actions
+        self.setup_actions()
+        
+    def setup_actions(self):
+        """Configure all element actions"""
+        self.yes_btn.on_press = self.yes_pressed
+        self.no_btn.on_press = self.no_pressed
+        
+        
+    def yes_pressed(self):
+        print("YES")
+        self.manager.switch_to("MainMenu")
+        
+    def no_pressed(self):
+        print("NO")
+        self.manager.switch_to("SessionMenu")
+
+    def set_initial_focus_on_switch(self):
+        # Set focus to the first nav bar button or any default element
+        self.set_initial_focus(self.choice_buttons_panel.getElements()[0])

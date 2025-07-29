@@ -28,9 +28,6 @@ class StatsMenu(Menu):
         self.start_btn.set_neighbor("down", self.settings_btn)
         self.settings_btn.set_neighbor("up", self.start_btn)
         
-        # Set initial focus through manager
-        self.set_initial_focus(self.nav_bar.buttons[3])  # Focus on Stats button
-        
         # Set up actions
         self.setup_actions()
         
@@ -46,3 +43,8 @@ class StatsMenu(Menu):
     def open_settings(self):
         print("Opening settings...")
         # Could switch to settings menu here
+
+    def set_initial_focus_on_switch(self):
+        # Set focus to the first nav bar button or any default element
+        self.set_initial_focus(self.nav_bar.buttons[3])
+        self.nav_bar.buttons[3].activate()

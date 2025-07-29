@@ -45,10 +45,6 @@ class SessionMenu(Menu):
         
         self.connectNeighbors()
         
-        # Set initial focus through manager
-        self.set_initial_focus(self.nav_bar.buttons[1])  # Focus on Session button
-        self.nav_bar.buttons[1].activate()
-        
         # Set up actions
         self.setup_actions()
         
@@ -79,8 +75,16 @@ class SessionMenu(Menu):
             elem.set_neighbor("up", self.selectProgram)
 
     def saveSession(self):
-        bodyweight = self.manager.context["bodyweight"]
-        print(bodyweight)
-        JSONdata = self.table.get_session_data_JSON(self.selectProgram.getSelectedOption(), datetime.now().strftime("%d-%m-%Y"), bodyweight )
-        print(JSONdata)
-        self.session.add_session(JSONdata)
+
+        self.manager.switch_to("Form")
+
+        # bodyweight = self.manager.context["bodyweight"]
+        # print(bodyweight)
+        # JSONdata = self.table.get_session_data_JSON(self.selectProgram.getSelectedOption(), datetime.now().strftime("%d-%m-%Y"), bodyweight )
+        # print(JSONdata)
+        # self.session.add_session(JSONdata)
+
+    def set_initial_focus_on_switch(self):
+        # Set focus to the first nav bar button or any default element
+        self.set_initial_focus(self.nav_bar.buttons[1])
+        self.nav_bar.buttons[1].activate()

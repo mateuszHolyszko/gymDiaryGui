@@ -8,13 +8,16 @@ class MenuManager:
         self.menus = {}
         self.context = {} # for some globalcontext
 
-    def register_menu(self, name, menu_class):
-        self.menus[name] = menu_class
+    def register_menu(self, name, menu_instance):
+        self.menus[name] = menu_instance
 
     def switch_to(self, menu_name):
         if menu_name in self.menus:
             self.focus_manager.clear_focus()
-            self.current_menu = self.menus[menu_name](self.screen, self)
+            self.current_menu = self.menus[menu_name]
+            # Set initial focus for the new menu
+            if hasattr(self.current_menu, "set_initial_focus_on_switch"):
+                self.current_menu.set_initial_focus_on_switch()
             return True
         return False
 

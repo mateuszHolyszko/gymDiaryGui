@@ -4,6 +4,7 @@ from GUI.menus.MainMenu import MainMenu
 from GUI.menus.SessionMenu import SessionMenu
 from GUI.menus.ProgramMenu import ProgramMenu
 from GUI.menus.StatsMenu import StatsMenu
+from GUI.menus.Form import Form
 
 def main():
     # Initialize pygame
@@ -15,11 +16,19 @@ def main():
     # Create menu manager
     manager = MenuManager(screen)
     
-    # Register all menus with string names
-    manager.register_menu("MainMenu", MainMenu)
-    manager.register_menu("SessionMenu", SessionMenu)
-    manager.register_menu("ProgramMenu", ProgramMenu)
-    manager.register_menu("StatsMenu", StatsMenu)
+    # Instantiate all menus
+    main_menu = MainMenu(screen, manager)
+    session_menu = SessionMenu(screen, manager)
+    program_menu = ProgramMenu(screen, manager)
+    stats_menu = StatsMenu(screen, manager)
+    form_menu = Form(screen, manager)
+    
+    # Register all menus with string names (pass instances)
+    manager.register_menu("MainMenu", main_menu)
+    manager.register_menu("SessionMenu", session_menu)
+    manager.register_menu("ProgramMenu", program_menu)
+    manager.register_menu("StatsMenu", stats_menu)
+    manager.register_menu("Form", form_menu)
     
     # Start with main menu
     manager.switch_to("MainMenu")
