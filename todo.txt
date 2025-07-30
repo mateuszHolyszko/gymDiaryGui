@@ -1,3 +1,5 @@
 -In programs, display programs, stas for program, like time since changed, last performed at ...
  and all excercises in database (Objects in excercises.py)
   , perhaps some statistics, like peak performance, last performed ..
+
+-Notyfication system thats not menu, over everything, seperete in main render

@@ -5,15 +5,21 @@ from GUI.elements.Button import Button
 from workout_db.programs_db import ProgramsDB
 from workout_db.sessions_db import SessionsDB
 from GUI.elements.SelectDropDown import SelectDropDown
+from GUI.elements.InputField import InputField
 from workout_db.exercises import Exercises
 import pygame
 from GUI.elements.Plotter import Plotter
+from GUI.style import StyleManager
 
 class StatsMenu(Menu):
     def setup(self):
         """Setup panels, elements and actions"""
         self.database = ProgramsDB()
         self.session = SessionsDB()
+        # Plotter values
+        self.x_vals = []
+        self.y_vals = []
+        self.query = None
 
         screenWidth, screenHeight = pygame.display.get_surface().get_size() # Get screen size
 
@@ -32,13 +38,15 @@ class StatsMenu(Menu):
         list_of_queries.append("Weight")
         
         self.query_btn = SelectDropDown(list_of_queries, width=200, height=25, manager=self.manager,drop_direction="up",layer=2)
-        self.weeks_btn = Button("Weeks", width=200, height=25, manager=self.manager)
+        # Input field wont be appended to panel since it will be used for getInput() method
+        self.week_input = InputField(initial_value=1, min_value=1, max_value=12, step=1, manager=self.manager,x=screenWidth//2-40,y=screenHeight//2) # Get max value from db?
+        self.weeks_btn = Button(f"{self.week_input.value} Weeks", width=200, height=25, manager=self.manager)
         
         self.queryTypePanel.add_element(self.query_btn)
         self.queryTypePanel.add_element(self.weeks_btn)
 
         # Add queryAxisPanel elements
-        self.Yaxis_weight_btn = Button("KG",width=100, height=50, manager=self.manager)
+        self.Yaxis_weight_btn = Button("Kg",width=100, height=50, manager=self.manager)
         self.Yaxis_reps_btn = Button("Reps",width=100, height=50, manager=self.manager)
         self.Yaxis_volume_btn = Button("Vol",width=100, height=50, manager=self.manager)
 
@@ -47,21 +55,22 @@ class StatsMenu(Menu):
         self.queryAxisPanel.add_element(self.Yaxis_volume_btn)
 
         # Add plotter
-        import math
-        x_vals = [i * 0.1 for i in range(63)]
-        y_vals = [math.sin(x) for x in x_vals]
-
-        plotter = Plotter(
-            x_values=x_vals,
-            y_values=y_vals,
+        # Get data for plotter
+        self.query = self.query_btn.getSelectedOption()
+        
+        self.plotter = Plotter(
+            x_values=[],
+            y_values=[],
             x=0,
             y=0,
             width=self.PlotterPanel.width,
             height=self.PlotterPanel.height,
             y_label="Amplitude",
-            x_label="Time (s)"
+            x_label="Date"
         )
-        self.PlotterPanel.add_element(plotter)
+        self.PlotterPanel.add_element(self.plotter)
+
+        self.set_plotter_data()
         
         # Connect navigation between nav bar and queryTypePanel
         for nav_btn in self.nav_bar.buttons:
@@ -83,27 +92,54 @@ class StatsMenu(Menu):
         
     def setup_actions(self):
         """Configure all element actions"""
-        self.query_btn.on_finished_edit = self.load_query
-        self.weeks_btn.on_press = self.load_weeks
+        self.query_btn.on_finished_edit = self.load_query_type
+        self.weeks_btn.on_press = self.weeks_press
 
-    def load_query(self):
+    def load_query_type(self):
         selected_query = self.query_btn.getSelectedOption()
         # check if muscle group was selected, if so, need to ask for a specifice excercise in a form
-        if selected_query in Exercises.getTargets():
+        if selected_query == "Weight":
+            self.query = "Weight"
+            print("Weight query selected")
+            self.plotter.change_plot_color(StyleManager.current_style.highlight_color)
+            self.set_plotter_data()
+            
+        elif selected_query in Exercises.getTargets():
             # Form
-            pass
-        elif selected_query == "Weight":
-            # Load weight query
-            pass
+            excerciseDropDown = SelectDropDown(options=Exercises.get_exercises_for_muscle(selected_query))
+            excerciseDropDown.getInput(self.manager.screen)
+            self.query = excerciseDropDown.getSelectedOption()
+            print(self.query)
+            self.plotter.change_plot_color(StyleManager.get_muscle_group_color(selected_query)["bg_color"])
+            self.set_plotter_data()
+                    
         else:
             print(f"Selected query: {selected_query} is unhandeled.")
 
     
-    def load_weeks(self):
-        pass
+    def weeks_press(self):
+        self.week_input.getInput(self.manager.screen)
+        self.weeks_btn.text = f"{self.week_input.value} Weeks"
+        # update query with new date values
+        self.set_plotter_data()
         
 
     def set_initial_focus_on_switch(self):
         # Set focus to the first nav bar button or any default element
         self.set_initial_focus(self.nav_bar.buttons[3])
         self.nav_bar.buttons[3].activate()
+
+    def set_plotter_data(self):
+        # Set plotter data, from the context of Menu make query to database and update x_vals and y_vals
+        if self.query == "Weight":
+            self.y_vals, self.x_vals = self.session.get_bodyweight_history(self.week_input.value)
+            self.x_vals.reverse()
+            self.y_vals.reverse()
+            print(f"Y values: {self.y_vals}, X values: {self.x_vals}")
+        else:
+            self.y_vals, self.x_vals = self.session.get_exercise_history(self.query, self.week_input.value)
+            self.y_vals = [entry['weight'] for entry in self.y_vals]
+            self.x_vals.reverse()
+            self.y_vals.reverse()
+            print(f"Y values: {self.y_vals}, X values: {self.x_vals}")
+        self.plotter.update_data(x_values=self.x_vals, y_values=self.y_vals)

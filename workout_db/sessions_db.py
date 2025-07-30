@@ -155,3 +155,111 @@ class SessionsDB(WorkoutDatabase):
                     total_sets += len(exercise.sets)
         
         return total_sets
+    
+    def get_bodyweight_history(self, weeks: int = None) -> tuple[List[float], List[str]]:
+        """Get historical bodyweight data with corresponding dates.
+        
+        Args:
+            weeks: Optional number of weeks to look back. If None, returns all data.
+            
+        Returns:
+            tuple: (bodyweights, dates) where:
+                - bodyweights: List of float bodyweight values (most recent first)
+                - dates: List of corresponding date strings in "DD-MM-YYYY" format
+        """
+        sessions = self.get_all_sessions()
+        bodyweights = []
+        dates = []
+        
+        # Get current date for comparison
+        current_date = datetime.now()
+        
+        for session in sessions:
+            if 'bodyweight' in session and session['bodyweight'] is not None:
+                try:
+                    session_date = datetime.strptime(session['date'], "%d-%m-%Y")
+                    
+                    # If weeks parameter is provided, check if session is within range
+                    if weeks is not None:
+                        time_delta = current_date - session_date
+                        if time_delta.days > weeks * 7:  # Convert weeks to days
+                            continue
+                    
+                    bodyweights.append(session['bodyweight'])
+                    dates.append(session['date'])
+                except ValueError:
+                    # Skip if date format is invalid
+                    continue
+        
+        # Sort by date (most recent first)
+        combined = sorted(zip(dates, bodyweights), 
+                        key=lambda x: datetime.strptime(x[0], "%d-%m-%Y"), 
+                        reverse=True)
+        if combined:
+            dates, bodyweights = zip(*combined)
+            return list(bodyweights), list(dates)
+        return [], []
+    
+    def get_exercise_history(self, exercise_name: str, weeks: int = None) -> tuple[List[dict], List[str]]:
+        """Get historical exercise performance data with corresponding dates.
+        
+        Args:
+            exercise_name: Name of exercise to track
+            weeks: Optional number of weeks to look back. If None, returns all data.
+            
+        Returns:
+            tuple: (performance_data, dates) where:
+                - performance_data: List of dicts with:
+                    - "weight": float
+                    - "reps": int  
+                    - "volume": weight*reps
+                - dates: List of corresponding session dates ("DD-MM-YYYY")
+        """
+        sessions = self.get_all_sessions()
+        performance_data = []
+        dates = []
+        
+        current_date = datetime.now()
+        
+        for session in sessions:
+            try:
+                session_date = datetime.strptime(session['date'], "%d-%m-%Y")
+                
+                # Check if session is within time range
+                if weeks is not None:
+                    time_delta = current_date - session_date
+                    if time_delta.days > weeks * 7:
+                        continue
+                
+                # Find the exercise in session
+                for exercise in session.get('exercises', []):
+                    if exercise['name'] == exercise_name:
+                        # Calculate best set (by volume)
+                        best_set = max(
+                            exercise.get('sets', []),
+                            key=lambda s: s['weight'] * s['reps'],
+                            default=None
+                        )
+                        
+                        if best_set:
+                            volume = best_set['weight'] * best_set['reps']
+                            performance_data.append({
+                                "weight": best_set['weight'],
+                                "reps": best_set['reps'],
+                                "volume": volume
+                            })
+                            dates.append(session['date'])
+                        break
+                        
+            except (ValueError, KeyError):
+                continue
+        
+        # Sort by date (newest first)
+        combined = sorted(zip(dates, performance_data),
+                        key=lambda x: datetime.strptime(x[0], "%d-%m-%Y"),
+                        reverse=True)
+        
+        if combined:
+            dates, performance_data = zip(*combined)
+            return list(performance_data), list(dates)
+        return [], []

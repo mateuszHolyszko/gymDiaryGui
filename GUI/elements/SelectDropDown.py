@@ -205,3 +205,56 @@ class SelectDropDown(Element):
     def getSelectedOption(self) -> str:
         """Get currently selected option"""
         return self.options[self.selected_index] if self.options else None
+    
+    def getInput(self, screen, prompt=None):
+        """
+        Blocking input method: lets user select an option using arrow keys and Enter.
+        Returns the selected option (str) or None if cancelled.
+        """
+        import pygame
+        clock = pygame.time.Clock()
+        running = True
+        original_index = self.selected_index
+        self.is_expanded = True  # Start with dropdown expanded
+        
+        # Store original screen background to restore later
+        original_screen = screen.copy()
+        
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    self.selected_index = original_index
+                    break
+                
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        self.is_expanded = False
+                        running = False
+                        break
+                    elif event.key == pygame.K_ESCAPE:
+                        self.selected_index = original_index
+                        self.is_expanded = False
+                        running = False
+                        break
+                    elif event.key == pygame.K_UP:
+                        self.selected_index = max(0, self.selected_index - 1)
+                    elif event.key == pygame.K_DOWN:
+                        self.selected_index = min(len(self.options) - 1, self.selected_index + 1)
+            
+            # Redraw
+            screen.blit(original_screen, (0, 0))  # Restore original screen
+            
+            if prompt:
+                font = pygame.font.SysFont("Arial", 18)
+                prompt_surf = font.render(str(prompt), True, (200, 200, 200))
+                screen.blit(prompt_surf, (self.x, self.y - 30))
+            
+            # Render the dropdown (both button and expanded options)
+            self._render_button(screen)
+            self._render_dropdown(screen)
+            
+            pygame.display.flip()
+            clock.tick(30)
+        
+        return self.getSelectedOption() if self.selected_index != original_index or running else None
