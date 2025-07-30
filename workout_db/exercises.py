@@ -69,6 +69,11 @@ class Exercises:
         return Exercises.EXERCISE_DB.get(exercise_name, "Unknown")
     
     @staticmethod
+    def getTargets() -> dict:
+        """Get all muscle groups and their corresponding exercises"""
+        return Exercises.TARGETS
+    
+    @staticmethod
     def get_exercises_for_muscle(target_muscle: str) -> list:
         """Get all exercises that target a specific muscle group"""
         if target_muscle not in Exercises.TARGETS:

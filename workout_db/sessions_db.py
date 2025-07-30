@@ -56,7 +56,7 @@ class SessionsDB(WorkoutDatabase):
         if not unique_sessions:
             return []
         
-        last_session = min(unique_sessions.values(), key=parse_date)
+        last_session = max(unique_sessions.values(), key=parse_date)
         
         # Debug: Print selected session
         print("Selected session:", last_session)

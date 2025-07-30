@@ -75,14 +75,12 @@ class SessionMenu(Menu):
             elem.set_neighbor("up", self.selectProgram)
 
     def saveSession(self):
-
+        bodyweight = self.manager.context["bodyweight"]
+        print(bodyweight)
+        JSONdata = self.table.get_session_data_JSON(self.selectProgram.getSelectedOption(), datetime.now().strftime("%d-%m-%Y"), bodyweight )
+        #print(JSONdata)
+        self.manager.context["session_data"] = JSONdata # temporaly storage, so we can access it in Form
         self.manager.switch_to("Form")
-
-        # bodyweight = self.manager.context["bodyweight"]
-        # print(bodyweight)
-        # JSONdata = self.table.get_session_data_JSON(self.selectProgram.getSelectedOption(), datetime.now().strftime("%d-%m-%Y"), bodyweight )
-        # print(JSONdata)
-        # self.session.add_session(JSONdata)
 
     def set_initial_focus_on_switch(self):
         # Set focus to the first nav bar button or any default element

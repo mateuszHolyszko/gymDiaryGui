@@ -58,7 +58,7 @@ def main():
             manager.current_menu.render(screen)
         
         pygame.display.flip()
-        clock.tick(60)  # 60 FPS
+        clock.tick(30)  # 30 FPS
 
     pygame.quit()
 

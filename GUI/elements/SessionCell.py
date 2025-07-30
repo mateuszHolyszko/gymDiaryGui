@@ -43,7 +43,9 @@ class SessionCell(Element):
         self.edit_state = "notEdited"  # 'notEdited', 'editReps', 'editWeight', 'hasBeenEdited'
         self.has_been_edited = False
         self.is_active = False  # For input mode
-        self.input_value = 0
+        # Split input_value into two separate fields
+        self.input_value_reps = self.repsFromThisSession
+        self.input_value_weight = self.weightFromThisSession
         self.input_min = 0
         self.input_max = 100
         self.input_step_reps = 1
@@ -81,14 +83,14 @@ class SessionCell(Element):
         # Bottom half: state-dependent
         if self.edit_state == "editReps":
             prompt = "Reps: "
-            value = str(self.input_value)
+            value = str(self.input_value_reps)
             color = self.style.active_bg_color if self.is_active else self.style.bg_color
             pygame.draw.rect(screen, color, (self.x, self.y+self.height//2, self.width, self.height//2))
             text = self.font.render(prompt+value, True, self.style.text_color)
             screen.blit(text, (self.x + (self.width-text.get_width())//2, self.y+self.height//2 + (self.height//4-text.get_height()//2)))
         elif self.edit_state == "editWeight":
             prompt = "Weight: "
-            value = str(self.input_value)
+            value = str(self.input_value_weight)
             color = self.style.active_bg_color if self.is_active else self.style.bg_color
             pygame.draw.rect(screen, color, (self.x, self.y+self.height//2, self.width, self.height//2))
             text = self.font.render(prompt+value, True, self.style.text_color)
@@ -116,7 +118,7 @@ class SessionCell(Element):
     def on_press(self):
         self.edit_state = "editReps"
         self.is_active = True
-        self.input_value = self.repsFromThisSession
+        #self.input_value_reps = self.repsFromThisSession
         self.input_min = 0
         self.input_max = 100
         self.input_step = 1
@@ -131,9 +133,8 @@ class SessionCell(Element):
         if self.edit_state == "editReps":
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    self.repsFromThisSession = self.input_value
+                    self.repsFromThisSession = self.input_value_reps
                     self.edit_state = "editWeight"
-                    self.input_value = self.weightFromThisSession
                     self.input_min = 0
                     self.input_max = 1000
                     self.input_step = 1
@@ -141,39 +142,38 @@ class SessionCell(Element):
                     return True
                 elif event.key == pygame.K_TAB:
                     self.edit_state = "editWeight"
-                    self.input_value = self.weightFromThisSession
                     self.input_min = 0
                     self.input_max = 1000
                     self.input_step = 1
                     self.is_active = True
                     return True
                 elif event.key == pygame.K_LEFT or event.key == pygame.K_COMMA:
-                    self.input_value = max(self.input_min, self.input_value - self.input_step)
+                    self.input_value_reps = max(self.input_min, self.input_value_reps - self.input_step_reps)
                     return True
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_PERIOD:
-                    self.input_value = min(self.input_max, self.input_value + self.input_step)
+                    self.input_value_reps = min(self.input_max, self.input_value_reps + self.input_step_reps)
                     return True
         elif self.edit_state == "editWeight":
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    self.weightFromThisSession = self.input_value
+                    self.weightFromThisSession = self.input_value_weight
                     self.edit_state = "hasBeenEdited"
                     self.has_been_edited = True
                     self.is_active = False
                     self.on_finished_edit()
                     return True
                 elif event.key == pygame.K_TAB:
-                    self.weightFromThisSession = self.input_value
+                    self.weightFromThisSession = self.input_value_weight
                     self.edit_state = "hasBeenEdited"
                     self.has_been_edited = True
                     self.is_active = False
                     self.on_finished_edit()
                     return True
                 elif event.key == pygame.K_LEFT or event.key == pygame.K_COMMA:
-                    self.input_value = max(self.input_min, self.input_value - self.input_step_weight)
+                    self.input_value_weight = max(self.input_min, self.input_value_weight - self.input_step_weight)
                     return True
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_PERIOD:
-                    self.input_value = min(self.input_max, self.input_value + self.input_step_weight)
+                    self.input_value_weight = min(self.input_max, self.input_value_weight + self.input_step_weight)
                     return True
         elif self.edit_state == "notEdited":
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
@@ -184,7 +184,7 @@ class SessionCell(Element):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.edit_state = "editReps"
                 self.is_active = True
-                self.input_value = self.repsFromThisSession
+                self.input_value_reps = self.repsFromThisSession
                 self.input_min = 0
                 self.input_max = 100
                 self.input_step = 1

@@ -26,6 +26,14 @@ class Panel:
         """Returns a list of elements in the panel."""
         return [e for e in self.elements if e is not None]
     
+    def getSelectableElements(self):
+        """Returns a list of elements in the panel."""
+        returnList = []
+        for element in self.elements:
+            if element.selectable:
+                returnList.append(element)
+        return returnList
+ 
     def clear_elements(self):
         """Clear all elements from the panel."""
         self.elements = []

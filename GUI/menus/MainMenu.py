@@ -26,7 +26,8 @@ class MainMenu(Menu):
         self.nav_bar = self.add_panel(NavigationBar)
         
         # Create InputPanel panel
-        self.InputPanel = self.add_panel(Panel, x=0, y=0, width=screenWidth//4, height=screenHeight - self.nav_bar.height)
+        height = (screenHeight - self.nav_bar.height)//2
+        self.InputPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//2, width=screenWidth//4, height=height)
         # Volume summary panel gets created after the CarouselPanel gets initiated, since its depended on CarouselPanel elements
         # Create CarouselPanel panel
         self.CarouselPanel = self.add_panel(Panel,x=screenWidth//2,y=5,width=screenWidth//2 - 5,height=screenHeight - self.nav_bar.height - 10)
@@ -63,17 +64,17 @@ class MainMenu(Menu):
         self.InputPanel.add_element(self.btn)
 
         # Add elements (Carousel panel)
-        self.image1 = Image2D_Graph(image_path="GUI\elements\Image\images\\Front.png", height = 290 , width= 300*0.7, manager=self.manager)
+        self.image1 = Image2D_Graph(image_path="GUI\elements\Image\images\\Front.png", height = 290 , width= 300*0.7, manager=self.manager,layer=2)
         self.image1.muscleGroups = ["Forearms", "Biceps", "Triceps","Shoulders","Chest","Back","Abs","Quads","Calves"]
-        self.image2 = Image2D_Graph(image_path="GUI\elements\Image\images\\Back.png", height = 280 , width= 300*0.5, manager=self.manager)
+        self.image2 = Image2D_Graph(image_path="GUI\elements\Image\images\\Back.png", height = 280 , width= 300*0.5, manager=self.manager,layer=2)
         self.image2.muscleGroups = ["Back","Shoulders","Triceps","Forearms","Glutes","Hamstrings","Calves"]
-        self.imageImageCarousel = ImageCarousel(images=[], manager=self.manager, mode="random_timed", height = 300 , width= 300*0.7)
+        self.imageImageCarousel = ImageCarousel(images=[], manager=self.manager, mode="random_timed", height = 300 , width= 300*0.7,layer=2)
         self.CarouselPanel.add_element(self.imageImageCarousel)
         self.imageImageCarousel.add_image(self.image1)
         self.imageImageCarousel.add_image(self.image2)
 
         # Create volumeSummary panel
-        self.volumeSummary = self.add_panel(Panel, x=self.imageImageCarousel.x - screenWidth//5, y=self.imageImageCarousel.y,width=screenWidth//4, height=self.imageImageCarousel.height)
+        self.volumeSummary = self.add_panel(Panel, x=self.imageImageCarousel.x - 200, y=self.imageImageCarousel.y,width=screenWidth//4, height=self.imageImageCarousel.height)
         self.update_carousel()
         
         # Connect navigation between nav bar and InputPanel

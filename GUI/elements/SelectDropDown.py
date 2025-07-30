@@ -15,7 +15,8 @@ class SelectDropDown(Element):
         selectable: bool = True,
         neighbors: dict = None,
         font_size: int = 20,
-        layer: int = 0
+        layer: int = 0,
+        drop_direction: str = "down"  # New parameter: "up" or "down"
     ):
         # Initialize with all required Element parameters
         super().__init__(
@@ -32,16 +33,21 @@ class SelectDropDown(Element):
         
         # Dropdown-specific properties
         self.options = options
-        self.selected_index = 0
+        self.selected_index = 0 
         self.is_expanded = False
         self.font = pygame.font.SysFont("Arial", font_size)
         self.dropdown_height = len(options) * height
+        self.drop_direction = drop_direction.lower()  # Store dropdown direction
+        
         
         # Visual properties
         self.style = StyleManager.current_style
         self.option_rects = []
         self.dropdown_layer = layer + 1  # Dropdown renders above main element
         self._main_center = (0, 0)  # Will be set by position_from_center
+
+        if self.drop_direction == "up":
+            self.selected_index = len(options) - 1  # Start with last option selected if dropdown opens upwards
 
     def position_from_center(self, center_x, center_y):
         """Position dropdown relative to center point"""
@@ -76,11 +82,18 @@ class SelectDropDown(Element):
         screen.blit(selected_text, (text_x, text_y))
         
         # Draw dropdown arrow (right-aligned)
-        arrow_points = [
-            (self.x + self.width - 20, self.y + self.height // 3),
-            (self.x + self.width - 10, self.y + self.height // 3),
-            (self.x + self.width - 15, self.y + 2 * self.height // 3)
-        ]
+        if self.drop_direction == "down":
+            arrow_points = [
+                (self.x + self.width - 20, self.y + self.height // 3),
+                (self.x + self.width - 10, self.y + self.height // 3),
+                (self.x + self.width - 15, self.y + 2 * self.height // 3)
+            ]
+        else:  # Up direction
+            arrow_points = [
+                (self.x + self.width - 20, self.y + 2 * self.height // 3),
+                (self.x + self.width - 10, self.y + 2 * self.height // 3),
+                (self.x + self.width - 15, self.y + self.height // 3)
+            ]
         pygame.draw.polygon(screen, text_color, arrow_points)
 
     def _render_dropdown(self, screen):
@@ -91,9 +104,13 @@ class SelectDropDown(Element):
         dropdown_surface = pygame.Surface((self.width, self.dropdown_height), pygame.SRCALPHA)
         dropdown_surface.fill((*self.style.bg_color, 235))  # Semi-transparent
         
-        # Calculate dropdown position (below main button)
-        dropdown_x = self.x
-        dropdown_y = self.y + self.height
+        # Calculate dropdown position based on direction
+        if self.drop_direction == "down":
+            dropdown_x = self.x
+            dropdown_y = self.y + self.height
+        else:  # Up direction
+            dropdown_x = self.x
+            dropdown_y = self.y - self.dropdown_height
         
         # Render each option
         for i, option in enumerate(self.options):
@@ -111,18 +128,26 @@ class SelectDropDown(Element):
             dropdown_surface.blit(option_text, (text_x, text_y))
             
             # Store clickable area
-            self.option_rects.append(pygame.Rect(
-                dropdown_x, 
-                dropdown_y + option_y, 
-                self.width, 
-                self.height
-            ))
+            if self.drop_direction == "down":
+                self.option_rects.append(pygame.Rect(
+                    dropdown_x, 
+                    dropdown_y + option_y, 
+                    self.width, 
+                    self.height
+                ))
+            else:  # Up direction
+                self.option_rects.append(pygame.Rect(
+                    dropdown_x, 
+                    dropdown_y + option_y, 
+                    self.width, 
+                    self.height
+                ))
         
         # Draw dropdown
         screen.blit(dropdown_surface, (dropdown_x, dropdown_y))
         
-        
-        
+        # Draw border around dropdown
+        pygame.draw.rect(screen, self.style.border_color, (dropdown_x, dropdown_y, self.width, self.dropdown_height), 1)
 
     def on_press(self):
         """Toggle dropdown expansion"""

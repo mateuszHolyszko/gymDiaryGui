@@ -372,6 +372,13 @@ class Table(Panel):
         if hasattr(self.manager, 'focus_manager'):
             self.manager.focus_manager.set_focus(new_cell)
 
+        # Update cells fromPrevious values
+        if  self.getElementsInRow(row_index)[-3] is not None and isinstance(self.getElementsInRow(row_index)[-3], SessionCell):
+            prev_weight = self.getElementsInRow(row_index)[-3].weightFromPreviousSession
+            prev_reps = self.getElementsInRow(row_index)[-3].repsFromPreviousSession
+            self.getElementsInRow(row_index)[-2].input_value_weight = prev_weight
+            self.getElementsInRow(row_index)[-2].input_value_reps = prev_reps
+
     def get_session_data_JSON(self, program_name, date, bodyweight):
         """Convert table data to JSON session format.
         

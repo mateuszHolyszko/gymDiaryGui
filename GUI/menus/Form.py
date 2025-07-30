@@ -2,10 +2,15 @@ from GUI.Menu import Menu
 from GUI.Panel import Panel
 from GUI.panels.navigation_bar import NavigationBar
 from GUI.elements.Button import Button
+from workout_db.sessions_db import SessionsDB
+from workout_db.programs_db import ProgramsDB
+from datetime import datetime
 
 class Form(Menu):
     def setup(self):
         """Setup panels, elements and actions"""
+        self.session = SessionsDB()
+
         # Create choice_buttons_panel panel
         self.choice_buttons_panel = self.add_panel(Panel, 50, 50, 700, 400, layout_type="horizontal")
         
@@ -30,6 +35,9 @@ class Form(Menu):
         
     def yes_pressed(self):
         print("YES")
+        JSONdata = self.manager.context["session_data"]
+        print(JSONdata)
+        self.session.add_session(JSONdata)
         self.manager.switch_to("MainMenu")
         
     def no_pressed(self):
