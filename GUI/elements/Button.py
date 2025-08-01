@@ -39,6 +39,7 @@ class Button(Element):
         # Handle style with font separately
         self._base_style = {
             'bg_color': StyleManager.current_style.bg_color,
+            'bg_color_notSelectable': StyleManager.current_style.bg_color_notSelectable,
             'lg_bg_color': StyleManager.current_style.lg_bg_color,
             'text_color': StyleManager.current_style.text_color,
             'border_color': StyleManager.current_style.border_color,
@@ -104,6 +105,8 @@ class Button(Element):
         
         if self.isActive:
             bg_color = style.active_bg_color
+        elif not self.selectable:
+            bg_color = style.bg_color_notSelectable
         elif self.is_focused:
             bg_color = style.highlight_color
         else:

@@ -4,6 +4,7 @@ import pygame
 @dataclass
 class ElementStyle:
     bg_color: tuple
+    bg_color_notSelectable: tuple
     lg_bg_color: tuple
     text_color: tuple
     border_color: tuple
@@ -18,6 +19,7 @@ class StyleManager:
     # Dark theme (white on black)
     DARK = ElementStyle(
         bg_color=(0, 0, 0),
+        bg_color_notSelectable=(50, 50, 50),
         lg_bg_color=(25, 25, 25),
         text_color=(255, 255, 255),
         border_color=(100, 100, 100),
@@ -29,6 +31,7 @@ class StyleManager:
     # Light theme (black on white)
     LIGHT = ElementStyle(
         bg_color=(255, 255, 255),
+        bg_color_notSelectable=(225, 225, 225),
         lg_bg_color=(230, 230, 230),
         text_color=(0, 0, 0),
         border_color=(200, 200, 200),

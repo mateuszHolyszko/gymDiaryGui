@@ -5,6 +5,7 @@ from GUI.menus.SessionMenu import SessionMenu
 from GUI.menus.ProgramMenu import ProgramMenu
 from GUI.menus.StatsMenu import StatsMenu
 from GUI.menus.Form import Form
+from GUI.Notifications import Notification
 
 def main():
     # Initialize pygame
@@ -13,8 +14,11 @@ def main():
     pygame.display.set_caption("Gym Diary")
     clock = pygame.time.Clock()
 
+    # Create notification system
+    notification = Notification(font_size=24, display_time=2.5)
+
     # Create menu manager
-    manager = MenuManager(screen)
+    manager = MenuManager(screen,notification)
     
     # Instantiate all menus
     main_menu = MainMenu(screen, manager)
@@ -56,6 +60,9 @@ def main():
         # Render current menu
         if manager.current_menu:
             manager.current_menu.render(screen)
+        
+        # Render notification (if active)
+        notification.render(screen)
         
         pygame.display.flip()
         clock.tick(30)  # 30 FPS

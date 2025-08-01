@@ -27,7 +27,8 @@ class MainMenu(Menu):
         
         # Create InputPanel panel
         height = (screenHeight - self.nav_bar.height)//2
-        self.InputPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//2, width=screenWidth//4, height=height)
+        self.LabelPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//2, width=screenWidth//4, height=height)
+        self.InputPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//2 + 50, width=screenWidth//4, height=height,layout_type="horizontal")
         # Volume summary panel gets created after the CarouselPanel gets initiated, since its depended on CarouselPanel elements
         # Create CarouselPanel panel
         self.CarouselPanel = self.add_panel(Panel,x=screenWidth//2,y=5,width=screenWidth//2 - 5,height=screenHeight - self.nav_bar.height - 10)
@@ -56,10 +57,10 @@ class MainMenu(Menu):
             except Exception as e:
                 print(f"Error retrieving last session: {str(e)}")
         self.inputField = InputField(bodyweight, min_value=0, max_value=150, step=0.25, manager=self.manager)
-        self.btn = Button("Update bodyweight", width=200, height=50, manager=self.manager)
-        self.label = Label(text="Label", width=200, height=50, manager=self.manager)
+        self.btn = Button("+", self.inputField.height, self.inputField.height, manager=self.manager)
+        self.label = Label(text="Update bodyweight", width=200, height=50, manager=self.manager)
         
-        self.InputPanel.add_element(self.label)
+        self.LabelPanel.add_element(self.label)
         self.InputPanel.add_element(self.inputField)
         self.InputPanel.add_element(self.btn)
 
@@ -104,6 +105,7 @@ class MainMenu(Menu):
         
     def updateBodyWeight(self):
         self.manager.context["bodyweight"] = self.inputField.value
+        self.manager.notification_system.show(f"Bodyweight updated to {self.inputField.value} kg", 3)
 
     def update_carousel(self):
         # Delete existing elements in volumeSummary panel
