@@ -1,3 +1,6 @@
+from GUI.Panel import Panel
+from GUI.Table import Table
+from GUI.panels.navigation_bar import NavigationBar
 class Menu:
     def __init__(self, screen, manager):
         self.screen = screen
@@ -21,6 +24,27 @@ class Menu:
         panel = panel_class(*args, **kwargs)
         self.panels.append(panel)
         return panel
+    
+    def add_panel_instance(self, panel_instance):
+        """Add an existing panel instance to the menu"""
+        if isinstance(panel_instance, (Panel,Table,NavigationBar)):
+            self.panels.append(panel_instance)
+        else:
+            raise TypeError("Expected a Panel instance")
+    
+    def remove_panel(self, panel):
+        """Remove a panel from the menu"""
+        if panel in self.panels:
+            self.panels.remove(panel)
+    
+    def remove_panels(self,except_panels=None):
+        """Remove all panels except specified ones"""
+        if except_panels is None:
+            except_panels = []
+        for panel in self.panels[:]:
+            if panel not in except_panels:
+                self.remove_panel(panel)
+
         
     def render(self, screen):
         # Collect all elements from all panels with their layer and panel info

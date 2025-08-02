@@ -81,7 +81,8 @@ class MainMenu(Menu):
         # Connect navigation between nav bar and InputPanel
         for nav_btn in self.nav_bar.buttons:
             nav_btn.set_neighbor("up", self.InputPanel.getElements()[-1])  # Last element in InputPanel
-        self.InputPanel.getElements()[-1].set_neighbor("down", self.nav_bar.buttons[0])
+        for btn in self.InputPanel.getSelectableElements():
+            btn.set_neighbor("down", self.nav_bar.buttons[0])
         self.nav_bar.buttons[0].activate()
 
         # Connect navigation between InputPanel and table

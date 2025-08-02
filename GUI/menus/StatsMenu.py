@@ -22,17 +22,17 @@ class StatsMenu(Menu):
         self.query = None
         self.queryAxisY = "weight"  # Default Y axis value
 
-        screenWidth, screenHeight = pygame.display.get_surface().get_size() # Get screen size
+        self.screenWidth, self.screenHeight = pygame.display.get_surface().get_size() # Get screen size
 
         # Add navigation bar
         self.nav_bar = self.add_panel(NavigationBar)
         
         # Create queryTypePanel panel
-        self.queryTypePanel = self.add_panel(Panel, x=0,y=self.nav_bar.y-(screenHeight// 6), width=screenWidth, height=screenHeight// 6, layout_type="horizontal")
+        self.queryTypePanel = self.add_panel(Panel, x=0,y=self.nav_bar.y-(self.screenHeight// 6), width=self.screenWidth, height=self.screenHeight// 6, layout_type="horizontal")
         # Create queryAxisPanel panel
-        self.queryAxisPanel = self.add_panel(Panel, x=0,y=0, width=screenWidth//5, height=screenHeight-self.nav_bar.height-self.queryTypePanel.height, layout_type="vertical")
+        self.queryAxisPanel = self.add_panel(Panel, x=0,y=0, width=self.screenWidth//5, height=self.screenHeight-self.nav_bar.height-self.queryTypePanel.height, layout_type="vertical")
         # Create plotter panel
-        self.PlotterPanel = self.add_panel(Panel, x=screenWidth//5,y=0, width=screenWidth-screenWidth//5, height=screenHeight-self.nav_bar.height-self.queryTypePanel.height)
+        self.PlotterPanel = self.add_panel(Panel, x=self.screenWidth//5,y=0, width=self.screenWidth-self.screenWidth//5, height=self.screenHeight-self.nav_bar.height-self.queryTypePanel.height)
         
         # Add queryTypePanel elements
         list_of_queries = Exercises.getTargets()
@@ -40,7 +40,7 @@ class StatsMenu(Menu):
         
         self.query_btn = SelectDropDown(list_of_queries, width=200, height=25, manager=self.manager,drop_direction="up",layer=2)
         # Input field wont be appended to panel since it will be used for getInput() method
-        self.week_input = InputField(initial_value=1, min_value=1, max_value=12, step=1, manager=self.manager,x=screenWidth//2-40,y=screenHeight//2) # Get max value from db?
+        self.week_input = InputField(initial_value=1, min_value=1, max_value=12, step=1, manager=self.manager,x=self.screenWidth//2-40,y=self.screenHeight//2) # Get max value from db?
         self.weeks_btn = Button(f"Search in {self.week_input.value} Weeks", width=200, height=25, manager=self.manager)
         
         self.queryTypePanel.add_element(self.query_btn)
@@ -119,8 +119,8 @@ class StatsMenu(Menu):
             
         elif selected_query in Exercises.getTargets():
             # Form
-            excerciseDropDown = SelectDropDown(options=Exercises.get_exercises_for_muscle(selected_query))
-            excerciseDropDown.getInput(self.manager.screen)
+            excerciseDropDown = SelectDropDown(x=self.screenWidth//2 - 200,y=self.screenHeight//2,options=Exercises.get_exercises_for_muscle(selected_query))
+            excerciseDropDown.getInput(self.manager.screen, prompt=f"Chose specific excercise for {selected_query} muscle group.")
             self.query = excerciseDropDown.getSelectedOption()
             print(self.query)
             self.queryAxisY = "weight" # Default Y axis value
@@ -147,7 +147,7 @@ class StatsMenu(Menu):
 
     
     def weeks_press(self):
-        self.week_input.getInput(self.manager.screen)
+        self.week_input.getInput(self.manager.screen, prompt="Enter how many weeks the query should be run for.")
         self.weeks_btn.text = f"{self.week_input.value} Weeks"
         # update query with new date values
         self.set_plotter_data()

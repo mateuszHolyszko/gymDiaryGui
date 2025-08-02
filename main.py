@@ -6,16 +6,20 @@ from GUI.menus.ProgramMenu import ProgramMenu
 from GUI.menus.StatsMenu import StatsMenu
 from GUI.menus.Form import Form
 from GUI.Notifications import Notification
+from GUI.Distortion import Distortion
 
 def main():
     # Initialize pygame
     pygame.init()
-    screen = pygame.display.set_mode((800, 600))
+    screen = pygame.display.set_mode((800, 480))
     pygame.display.set_caption("Gym Diary")
     clock = pygame.time.Clock()
 
     # Create notification system
     notification = Notification(font_size=24, display_time=2.5)
+
+    # Create distortion system
+    distortion = Distortion(800, 480, intensity=0.75)
 
     # Create menu manager
     manager = MenuManager(screen,notification)
@@ -63,9 +67,12 @@ def main():
         
         # Render notification (if active)
         notification.render(screen)
+
+        # Apply distortion effects (after everything else is rendered)
+        distortion.render(screen)
         
         pygame.display.flip()
-        clock.tick(30)  # 30 FPS
+        clock.tick(12)  # 12 FPS
 
     pygame.quit()
 

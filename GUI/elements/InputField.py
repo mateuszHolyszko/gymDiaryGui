@@ -135,7 +135,7 @@ class InputField(Element):
                     elif event.key == pygame.K_RIGHT or event.key == pygame.K_PERIOD:
                         self.value = min(self.max_value, self.value + self.step)
             # Redraw
-            screen.fill((30, 30, 30))
+            screen.fill((0, 0, 0))
             if prompt:
                 font = pygame.font.SysFont("Arial", 18)
                 prompt_surf = font.render(str(prompt), True, (200, 200, 200))

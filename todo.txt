@@ -3,3 +3,18 @@
   , perhaps some statistics, like peak performance, last performed ..
 
 -Notyfication system thats not menu, over everything, seperete in main render
+- Synchronisation jitter (tearing of the lines in the image)
+- Deamaged rolling rows
+- Moiré pattern?
+-- seperate distortion class for more dramatic distortions called for example on transitions or at larger time intervals
+
+
+-Raspberry Pi 4B/3B+/3B/Zero
+-Screen DPI - LCD IPS 5'' 800x480px for Raspberry Pi 4B/3B+/3B/Zero - Waveshare 16381
+-Enkoder obrotu (chyba jest)
+
+Zasilanie:
+-2x 18650 Li-ion batteries
+-TP4056 Charger Module (with protection)
+-MT3608 Boost Converter (3.7V → 5V 2A)
+-Power switch, case, wiring, and heat dissipation

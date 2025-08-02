@@ -37,7 +37,7 @@ class Form(Menu):
         print("YES")
         JSONdata = self.manager.context["session_data"]
         print(JSONdata)
-        #self.session.add_session(JSONdata)
+        self.session.add_session(JSONdata)
         self.manager.notification_system.show("Session saved successfully!", 3)
         self.manager.switch_to("MainMenu")
         

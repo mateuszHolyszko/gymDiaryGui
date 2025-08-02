@@ -14,7 +14,7 @@ class SessionCell(Element):
         parent_panel=None,
         selectable: bool = True,
         neighbors: dict = None,
-        font_size: int = 16,
+        font_size: int = 14,
         layer: int = 0,
         weight_previous: float = 0,
         reps_previous: int = 1,
@@ -66,6 +66,7 @@ class SessionCell(Element):
         pygame.draw.rect(screen, self.style.border_color, (self.x, self.y, self.width, self.height), 2)
         pygame.draw.line(screen, self.style.border_color, (self.x, self.y+self.height//2), (self.x+self.width, self.y+self.height//2), 2)
         # Top half: previous session
+        self.font = pygame.font.SysFont("Arial", 10) # Smaller font for range display
         if self.weightFromPreviousSession == 0 and self.repsFromPreviousSession == 0:
             header_text_bot = "New Set"
         else:
@@ -74,6 +75,7 @@ class SessionCell(Element):
         header_surf = self.font.render(header_text_bot, True, self.style.text_color)
         screen.blit(header_surf, (self.x + (self.width-header_surf.get_width())//2, 
                 self.y + (self.height//4+header_surf.get_height()//3)))
+        self.font = pygame.font.SysFont("Arial", 14) # revert
         # Divider in top Half
         pygame.draw.rect(screen, StyleManager.get_muscle_group_color(self.excerciseTargetMuscle)["bg_color"], (self.x, self.y, self.width, self.height//4))
         pygame.draw.line(screen, self.style.border_color, (self.x, self.y+self.height//4), (self.x+self.width, self.y+self.height//4), 2)
@@ -95,10 +97,10 @@ class SessionCell(Element):
             pygame.draw.rect(screen, color, (self.x, self.y+self.height//2, self.width, self.height//2))
             text = self.font.render(prompt+value, True, self.style.text_color)
             screen.blit(text, (self.x + (self.width-text.get_width())//2, self.y+self.height//2 + (self.height//4-text.get_height()//2)))
-        elif self.edit_state == "notEdited":
+        elif self.edit_state == "notEdited":            
             range_text = f"Range: {self.repRange[0]}-{self.repRange[1]}"
             text = self.font.render(range_text, True, self.style.text_color)
-            screen.blit(text, (self.x + (self.width-text.get_width())//2, self.y+self.height//2 + (self.height//4-text.get_height()//2)))
+            screen.blit(text, (self.x + (self.width-text.get_width())//2, self.y+self.height//2 + (self.height//4-text.get_height()//2)))            
         elif self.edit_state == "hasBeenEdited":
             # Create separate surfaces for weight and reps
             weight_text = self.font.render(f"{self.weightFromThisSession}kg", True, self.style.text_color)
