@@ -1,14 +1,14 @@
--In programs, display programs, stas for program, like time since changed, last performed at ...
- and all excercises in database (Objects in excercises.py)
-  , perhaps some statistics, like peak performance, last performed ..
+#SOFTWARE
 
--Notyfication system thats not menu, over everything, seperete in main render
+- In buttons, some sort of visual indication for where the neigbours are (if left neigbour not None alternative render on the edge or some gradient)
+
 - Synchronisation jitter (tearing of the lines in the image)
 - Deamaged rolling rows
 - Moiré pattern?
 -- seperate distortion class for more dramatic distortions called for example on transitions or at larger time intervals
 
 
+#HARDWARE
 -Raspberry Pi 4B/3B+/3B/Zero
 -Screen DPI - LCD IPS 5'' 800x480px for Raspberry Pi 4B/3B+/3B/Zero - Waveshare 16381
 -Enkoder obrotu (chyba jest)

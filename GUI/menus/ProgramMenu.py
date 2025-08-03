@@ -6,6 +6,9 @@ from GUI.panels.navigation_bar import NavigationBar
 from GUI.elements.Button import Button
 from GUI.elements.SelectDropDown import SelectDropDown
 from GUI.Table import Table
+from GUI.panels.ProgramMenu_ex_selection import TargetSelectionPanel
+from workout_db.exercises import Exercises
+from GUI.elements.Image.Image2D_Graph import Image2D_Graph
 
 class ProgramMenu(Menu):
     def __init__(self, *args, **kwargs):
@@ -31,10 +34,10 @@ class ProgramMenu(Menu):
         self.btn_ProgramMode.activate()
         
         # Create choose programs panel, but dont add it to menu =====================================================================
-        heightOfProgPanel = screenHeight - self.nav_bar.height - self.programs_excercieses_panel.height
-        self.programsPanel = Panel(x=0, y=self.programs_excercieses_panel.height, width=screenWidth//4, height=heightOfProgPanel,manager=self.manager)
+        heightAboveStaticElems = screenHeight - self.nav_bar.height - self.programs_excercieses_panel.height
+        self.programsPanel = Panel(x=0, y=self.programs_excercieses_panel.height, width=screenWidth//4, height=heightAboveStaticElems,manager=self.manager)
         # Create table panel
-        self.table = Table(x=screenWidth//4,y=5,width=screenWidth*3//4 - 5,height=heightOfProgPanel,rows=3,cols=3,padding=10,manager=self.manager)
+        self.table = Table(x=screenWidth//4,y=5,width=screenWidth*3//4 - 5,height=heightAboveStaticElems,rows=3,cols=3,padding=10,manager=self.manager)
         self.table.draw_table_lines = False 
         
         # Add elements
@@ -45,7 +48,22 @@ class ProgramMenu(Menu):
         self.table.load_data_program(self.database.get_program_data_as_table(programNames[0]),manager=self.manager) # Load initial program data
 
         # Excercises mode elements, but dont add it to menu:  =====================================================================
+        self.targetSelectionPanel = TargetSelectionPanel(x=0,y=self.programs_excercieses_panel.height+35, width=screenWidth//4, height=heightAboveStaticElems*0.7,manager=self.manager)
+        self.targetSelectionPanel.getElements()[0].activate()  # Activate first button by default
 
+        self.selectExercisePanel = Panel(x=25,y=25,width=screenWidth//5-25,height=50,manager=self.manager)
+        self.selectExercise = SelectDropDown(options=Exercises.get_exercises_for_muscle( self.targetSelectionPanel.active_target ), width=screenWidth//4, height=35, manager=self.manager, layer=2)
+        self.selectExercisePanel.add_element(self.selectExercise)
+
+        self.imagePanel = Panel(x=self.targetSelectionPanel.x+self.targetSelectionPanel.width, y=0, width=screenWidth-screenWidth//4, height=heightAboveStaticElems,manager=self.manager)
+        scale = 0.5
+        self.image1 = Image2D_Graph(image_path="GUI\elements\Image\images\\Arm.png", height = 350*scale , width= 165*scale, manager=self.manager,layer=2)
+        self.image1.muscleGroups = ["Shoulders","Biceps","Triceps","Forearms"]
+        self.image2 = Image2D_Graph(image_path="GUI\elements\Image\images\\Leg.png", height = 350*scale , width= 186*scale, manager=self.manager,layer=2)
+        self.image2.muscleGroups = ["Glutes","Quads","Hamstrings","Calves"]
+        self.image3 = Image2D_Graph(image_path="GUI\elements\Image\images\\FrontGroup.png", height = 350*scale , width= 341*scale, manager=self.manager,layer=2)
+        self.image3.muscleGroups = ["Shoulders","Chest","Back","Abs"]
+        self.imagePanel.add_element(self.image1)
         
         
         # Connect navigation between nav bar and PROGRAMS/EXERCISES panel
@@ -69,6 +87,7 @@ class ProgramMenu(Menu):
         self.selectProgram.on_finished_edit = self.load_program
         self.btn_ProgramMode.on_press = self.on_press_program_mode
         self.btn_ExcerciseMode.on_press = self.on_press_excercise_mode
+        self.targetSelectionPanel.on_target_change = self.on_target_change
 
     def remove_mode_panels(self):
         """Remove panels that are not navbar or programs/exercises panel"""
@@ -81,6 +100,10 @@ class ProgramMenu(Menu):
         self.remove_mode_panels()
         # Add panels relevant to program mode
         if mode == "programs":
+            # Detatch possible connection between excercise btn and excercise mode content
+            self.programs_excercieses_panel.getElements()[1].set_neighbor("up", None)
+
+            # Add instances
             self.add_panel_instance(self.programsPanel)
             self.add_panel_instance(self.table)
 
@@ -96,6 +119,22 @@ class ProgramMenu(Menu):
             self.programs_excercieses_panel.getElements()[0].set_neighbor("up", self.selectProgram)
 
         elif mode == "exercises":
+            # Detatch possible connection between program btn and program mode content
+            self.programs_excercieses_panel.getElements()[0].set_neighbor("up", None)
+
+            # Add instances
+            self.add_panel_instance(self.targetSelectionPanel)
+            self.add_panel_instance(self.selectExercisePanel)
+            self.add_panel_instance(self.imagePanel)
+
+            # Connect PROGRAMS/EXERCISES panel and targetSelectionPanel
+            self.targetSelectionPanel.getElements()[-1].set_neighbor("down", self.programs_excercieses_panel.getElements()[1])
+            self.programs_excercieses_panel.getElements()[1].set_neighbor("up", self.targetSelectionPanel.getElements()[-1])
+
+            # Connect targetSelectionPanel panel and selectExercisePanel
+            self.selectExercisePanel.getElements()[-1].set_neighbor("down", self.targetSelectionPanel.getElements()[0])
+            self.targetSelectionPanel.getElements()[0].set_neighbor("up", self.selectExercisePanel.getElements()[0])
+            self.targetSelectionPanel.getElements()[1].set_neighbor("up", self.selectExercisePanel.getElements()[0]) # since there are 2 cols
             print("TODO")
         else:
             print("Invalid mode")
@@ -126,3 +165,6 @@ class ProgramMenu(Menu):
         self.btn_ProgramMode.deactivate()
         self.btn_ExcerciseMode.activate()
         self.load_program_mode("exercises")
+
+    def on_target_change(self):
+        self.selectExercise.options = Exercises.get_exercises_for_muscle( self.targetSelectionPanel.active_target )

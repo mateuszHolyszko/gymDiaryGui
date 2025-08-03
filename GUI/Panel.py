@@ -94,7 +94,7 @@ class Panel:
         else:  # free layout
             return (self.x + self.width//2, self.y + self.height//2)
 
-    def render(self, screen):
+    def render(self, screen):        
         # Panel no longer needs to sort elements itself
         for element in self.elements:
             if getattr(element, 'parent_panel', None) == self:
