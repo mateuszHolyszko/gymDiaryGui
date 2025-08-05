@@ -1,7 +1,7 @@
 from typing import List, Dict
 from .models import Session
 from .database import WorkoutDatabase
-from datetime import datetime
+from datetime import datetime, timedelta
 from .programs_db import ProgramsDB
 
 class SessionsDB(WorkoutDatabase):
@@ -263,3 +263,124 @@ class SessionsDB(WorkoutDatabase):
             dates, performance_data = zip(*combined)
             return list(performance_data), list(dates)
         return [], []
+    
+    def get_last_performance(self, exercise_name: str) -> dict:
+        """Return the most recent performance for a given exercise.
+        
+        Returns:
+            dict with keys: 'sets', 'weight', 'reps', 'date' or None if not found.
+        """
+        sessions = self.get_all_sessions()
+        sessions_sorted = sorted(
+            sessions, key=lambda s: datetime.strptime(s["date"], "%d-%m-%Y"), reverse=True
+        )
+
+        for session in sessions_sorted:
+            for ex in session.get("exercises", []):
+                if ex["name"] == exercise_name and ex.get("sets"):
+                    first_set = ex["sets"][0]
+                    return {
+                        "sets": len(ex["sets"]),
+                        "weight": first_set["weight"],
+                        "reps": first_set["reps"],
+                        "date": session["date"]
+                    }
+        return None
+
+
+    def get_peak_performance(self, exercise_name: str) -> dict:
+        """Return the peak (highest volume) performance for a given exercise.
+        
+        Returns:
+            dict with keys: 'sets', 'weight', 'reps', 'date' or None if not found.
+        """
+        sessions = self.get_all_sessions()
+        best_volume = 0
+        best_result = None
+
+        for session in sessions:
+            for ex in session.get("exercises", []):
+                if ex["name"] == exercise_name and ex.get("sets"):
+                    first_set = ex["sets"][0]
+                    volume = first_set["weight"] * first_set["reps"]
+                    if volume > best_volume:
+                        best_volume = volume
+                        best_result = {
+                            "sets": len(ex["sets"]),
+                            "weight": first_set["weight"],
+                            "reps": first_set["reps"],
+                            "date": session["date"]
+                        }
+        return best_result
+
+
+    def get_total_sets_performed(self, exercise_name: str, weeks: int = 4) -> int:
+        """Return the total number of sets performed for a given exercise in the last month (default) or specified weeks.
+        
+        Args:
+            exercise_name: Name of exercise to count sets for
+            weeks: Time period to look back (default=4 weeks/1 month)
+            
+        Returns:
+            int: Total number of sets performed
+        """
+        sessions = self.get_all_sessions()
+        total_sets = 0
+        cutoff_date = datetime.now() - timedelta(weeks=weeks)
+
+        for session in sessions:
+            try:
+                session_date = datetime.strptime(session['date'], "%d-%m-%Y")
+                if session_date < cutoff_date:
+                    continue
+                    
+                for ex in session.get("exercises", []):
+                    if ex["name"] == exercise_name and ex.get("sets"):
+                        total_sets += len(ex["sets"])
+            except ValueError:
+                continue
+
+        return total_sets
+
+    def get_volume_change_percentage(self, exercise_name: str, weeks: int = 4) -> float:
+        """Return the percentage volume change from first to last recorded session for the exercise within the time period.
+        
+        Args:
+            exercise_name: Name of exercise to analyze
+            weeks: Time period to look back (default=4 weeks/1 month)
+            
+        Returns:
+            Optional[float]: Percentage change (positive/negative), or None if not enough data
+        """
+        sessions = self.get_all_sessions()
+        cutoff_date = datetime.now() - timedelta(weeks=weeks)
+        filtered = []
+
+        for session in sessions:
+            try:
+                session_date = datetime.strptime(session['date'], "%d-%m-%Y")
+                if session_date < cutoff_date:
+                    continue
+                    
+                for ex in session.get("exercises", []):
+                    if ex["name"] == exercise_name and ex.get("sets"):
+                        first_set = ex["sets"][0]
+                        volume = first_set["weight"] * first_set["reps"]
+                        filtered.append((session["date"], volume))
+                        break  # only take first appearance per session
+            except (ValueError, KeyError, IndexError):
+                continue
+
+        if len(filtered) < 2:
+            return None  # not enough data to compare
+
+        # Sort by date
+        filtered.sort(key=lambda x: datetime.strptime(x[0], "%d-%m-%Y"))
+        first_volume = filtered[0][1]
+        last_volume = filtered[-1][1]
+
+        if first_volume == 0:
+            return None  # avoid division by zero
+
+        percent_change = ((last_volume - first_volume) / first_volume) * 100
+        return round(percent_change, 2)

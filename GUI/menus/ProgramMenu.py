@@ -9,6 +9,7 @@ from GUI.Table import Table
 from GUI.panels.ProgramMenu_ex_selection import TargetSelectionPanel
 from workout_db.exercises import Exercises
 from GUI.elements.Image.Image2D_Graph import Image2D_Graph
+from GUI.panels.ProgramMenu_stats_exercise import ExerciseStatsPanel
 
 class ProgramMenu(Menu):
     def __init__(self, *args, **kwargs):
@@ -48,22 +49,26 @@ class ProgramMenu(Menu):
         self.table.load_data_program(self.database.get_program_data_as_table(programNames[0]),manager=self.manager) # Load initial program data
 
         # Excercises mode elements, but dont add it to menu:  =====================================================================
-        self.targetSelectionPanel = TargetSelectionPanel(x=0,y=self.programs_excercieses_panel.height+35, width=screenWidth//4, height=heightAboveStaticElems*0.7,manager=self.manager)
+        self.targetSelectionPanel = TargetSelectionPanel(x=screenWidth - screenWidth//4,y=self.programs_excercieses_panel.height+35, width=screenWidth//4, height=heightAboveStaticElems*0.7,manager=self.manager)
         self.targetSelectionPanel.getElements()[0].activate()  # Activate first button by default
 
-        self.selectExercisePanel = Panel(x=25,y=25,width=screenWidth//5-25,height=50,manager=self.manager)
-        self.selectExercise = SelectDropDown(options=Exercises.get_exercises_for_muscle( self.targetSelectionPanel.active_target ), width=screenWidth//4, height=35, manager=self.manager, layer=2)
+        self.selectExercisePanel = Panel(x=0,y=25,width=screenWidth,height=50,manager=self.manager)
+        self.selectExercise = SelectDropDown(options=Exercises.get_exercises_for_muscle( self.targetSelectionPanel.active_target ), width=screenWidth//4, height=35, manager=self.manager, layer=3)
         self.selectExercisePanel.add_element(self.selectExercise)
 
-        self.imagePanel = Panel(x=self.targetSelectionPanel.x+self.targetSelectionPanel.width, y=0, width=screenWidth-screenWidth//4, height=heightAboveStaticElems,manager=self.manager)
+        imagePanelWidth=screenWidth-screenWidth//4
+        self.imagePanel = Panel(x=screenWidth-imagePanelWidth, y=0, width=imagePanelWidth, height=heightAboveStaticElems,manager=self.manager)
         scale = 0.5
-        self.image1 = Image2D_Graph(image_path="GUI\elements\Image\images\\Arm.png", height = 350*scale , width= 165*scale, manager=self.manager,layer=2)
+        self.image1 = Image2D_Graph(image_path="GUI\elements\Image\images\\Arm.png", height = 350*scale , width= 165*scale, manager=self.manager,layer=2, specificMuscleGroup=self.targetSelectionPanel.active_target )
         self.image1.muscleGroups = ["Shoulders","Biceps","Triceps","Forearms"]
-        self.image2 = Image2D_Graph(image_path="GUI\elements\Image\images\\Leg.png", height = 350*scale , width= 186*scale, manager=self.manager,layer=2)
+        self.image2 = Image2D_Graph(image_path="GUI\elements\Image\images\\Leg.png", height = 350*scale , width= 210*scale, manager=self.manager,layer=2, specificMuscleGroup=self.targetSelectionPanel.active_target )
         self.image2.muscleGroups = ["Glutes","Quads","Hamstrings","Calves"]
-        self.image3 = Image2D_Graph(image_path="GUI\elements\Image\images\\FrontGroup.png", height = 350*scale , width= 341*scale, manager=self.manager,layer=2)
+        self.image3 = Image2D_Graph(image_path="GUI\elements\Image\images\\Torso.png", height = 350*scale , width= 291*scale, manager=self.manager,layer=2, specificMuscleGroup=self.targetSelectionPanel.active_target )
         self.image3.muscleGroups = ["Shoulders","Chest","Back","Abs"]
-        self.imagePanel.add_element(self.image1)
+        self.imagePanel.add_element(self.image3) # Defult, since chest is the defult target
+
+        self.statsPanel = ExerciseStatsPanel(x=0,y=self.targetSelectionPanel.y, width=screenWidth-(self.imagePanel.width - self.targetSelectionPanel.width), height=heightAboveStaticElems//1.5,manager=self.manager,queriedExercise=self.selectExercise.getSelectedOption() )
+        
         
         
         # Connect navigation between nav bar and PROGRAMS/EXERCISES panel
@@ -88,6 +93,7 @@ class ProgramMenu(Menu):
         self.btn_ProgramMode.on_press = self.on_press_program_mode
         self.btn_ExcerciseMode.on_press = self.on_press_excercise_mode
         self.targetSelectionPanel.on_target_change = self.on_target_change
+        self.selectExercise.on_finished_edit = self.on_finished_excercise_selection
 
     def remove_mode_panels(self):
         """Remove panels that are not navbar or programs/exercises panel"""
@@ -126,6 +132,7 @@ class ProgramMenu(Menu):
             self.add_panel_instance(self.targetSelectionPanel)
             self.add_panel_instance(self.selectExercisePanel)
             self.add_panel_instance(self.imagePanel)
+            self.add_panel_instance(self.statsPanel)
 
             # Connect PROGRAMS/EXERCISES panel and targetSelectionPanel
             self.targetSelectionPanel.getElements()[-1].set_neighbor("down", self.programs_excercieses_panel.getElements()[1])
@@ -167,4 +174,18 @@ class ProgramMenu(Menu):
         self.load_program_mode("exercises")
 
     def on_target_change(self):
-        self.selectExercise.options = Exercises.get_exercises_for_muscle( self.targetSelectionPanel.active_target )
+        self.selectExercise.updateOptions( Exercises.get_exercises_for_muscle( self.targetSelectionPanel.active_target ) )
+        self.on_finished_excercise_selection()
+        self.imagePanel.clear_elements() # Clear previous image
+        group = Exercises.get_group_for_muscle(self.targetSelectionPanel.active_target)
+        if group == "arms":
+            self.imagePanel.add_element(self.image1)
+        elif group == "legs":
+            self.imagePanel.add_element(self.image2)
+        else:
+            self.imagePanel.add_element(self.image3)
+        self.imagePanel.getElements()[0].updateSpecyficMuscleGroup( self.targetSelectionPanel.active_target ) 
+
+    def on_finished_excercise_selection(self):
+        self.statsPanel.queriedExercise = self.selectExercise.getSelectedOption()
+        self.statsPanel.update()

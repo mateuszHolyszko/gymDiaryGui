@@ -7,6 +7,14 @@ class Exercises:
     TARGETS = ["Chest", "Back", "Quads", "Hamstrings", "Shoulders", 
                "Biceps", "Triceps", "Abs", "Calves", "Glutes", "Forearms"]
     
+    # Group definitions
+    GROUPS = {
+        "torso_front": ["Chest", "Shoulders", "Abs"],
+        "torso_back": ["Back", "Shoulders"],
+        "legs": ["Quads", "Hamstrings", "Calves", "Glutes"],
+        "arms": ["Biceps", "Triceps", "Forearms"]
+    }
+    
     # Exercise database (exercise_name: primary_target)
     EXERCISE_DB = {
         # Chest exercises
@@ -74,11 +82,27 @@ class Exercises:
         return Exercises.TARGETS
     
     @staticmethod
+    def get_groups() -> dict:
+        """Get all muscle groups and their categories"""
+        return Exercises.GROUPS
+    
+    @staticmethod
     def get_exercises_for_muscle(target_muscle: str) -> list:
         """Get all exercises that target a specific muscle group"""
         if target_muscle not in Exercises.TARGETS:
             return []
         return [ex for ex, muscle in Exercises.EXERCISE_DB.items() if muscle == target_muscle]
+    
+    @staticmethod
+    def get_exercises_for_group(group_name: str) -> list:
+        """Get all exercises that belong to a specific group"""
+        if group_name not in Exercises.GROUPS:
+            return []
+        
+        exercises = []
+        for muscle in Exercises.GROUPS[group_name]:
+            exercises.extend(Exercises.get_exercises_for_muscle(muscle))
+        return exercises
     
     @staticmethod
     def get_all_exercises() -> list:
@@ -89,3 +113,18 @@ class Exercises:
     def exercise_exists(exercise_name: str) -> bool:
         """Check if an exercise exists in the database"""
         return exercise_name in Exercises.EXERCISE_DB
+    
+    @staticmethod
+    def get_group_for_muscle(target_muscle: str) -> str:
+        """Get the group name for a specific muscle target"""
+        for group, muscles in Exercises.GROUPS.items():
+            if target_muscle in muscles:
+                return group
+        return "Unknown"
+    
+    @staticmethod
+    def get_group_for_exercise(exercise_name: str) -> str:
+        """Get the group name for a specific exercise"""
+        muscle = Exercises.get_target_muscle(exercise_name)
+        return Exercises.get_group_for_muscle(muscle)
+        

@@ -13,6 +13,7 @@ class Image2D_Graph(Element):
         manager=None,
         parent_panel=None,
         layer: int = 0,
+        specificMuscleGroup=None  # Add this parameter
     ):
         super().__init__(
             x=x,
@@ -26,11 +27,12 @@ class Image2D_Graph(Element):
             layer=layer
         )
         
+        self.muscleGroups = [] #List of muscle grups displayed on the image, roughly keep the order of how they appear on the image for better readability
+        self.specificMuscleGroup = specificMuscleGroup  # If exist, such muscle target will be higlighted (the rest will be grayed out)
         self.style = StyleManager.current_style
         self.original_image = pygame.image.load(image_path).convert_alpha()
         self.processed_image = self._process_image(self.original_image)
         self.image = pygame.transform.scale(self.processed_image, (self.width, self.height))
-        self.muscleGroups=[] #List of muscle grups displayed on the image, roughly keep the order of how they appear on the image for better readability
 
     def _get_mapped_color(self, pixel_color):
         """Return the appropriate color based on the exact pixel color."""
@@ -52,6 +54,10 @@ class Image2D_Graph(Element):
         # Check for exact color matches
         rgb = (pixel_color.r, pixel_color.g, pixel_color.b)
         if rgb in color_mapping:
+            if self.specificMuscleGroup is not None:
+                if color_mapping[rgb] != self.specificMuscleGroup:
+                    muscle_color = StyleManager.gray_out_color( StyleManager.get_muscle_group_color(color_mapping[rgb])["bg_color"], 0.8 ) 
+                    return muscle_color
             muscle_color = StyleManager.get_muscle_group_color(color_mapping[rgb])["bg_color"]
             return muscle_color
         
@@ -108,3 +114,9 @@ class Image2D_Graph(Element):
         if self.parent_panel:
             self.x = self.parent_panel.x + self._explicit_x
             self.y = self.parent_panel.y + self._explicit_y
+
+    def updateSpecyficMuscleGroup(self, specificMuscleGroup):
+        """Update the specificMuscleGroup attribute."""
+        self.specificMuscleGroup = specificMuscleGroup
+        self.processed_image = self._process_image(self.original_image)
+        self.image = pygame.transform.scale(self.processed_image, (self.width, self.height))

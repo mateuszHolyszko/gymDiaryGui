@@ -433,6 +433,130 @@
           ]
         }
       ]
+    },
+    {
+      "date": "04-08-2025",
+      "program": "Strength Training",
+      "bodyweight": 70.25,
+      "exercises": [
+        {
+          "name": "Bench Press",
+          "sets": [
+            {
+              "weight": 106.25,
+              "reps": 16
+            },
+            {
+              "weight": 102.5,
+              "reps": 13
+            },
+            {
+              "weight": 95.75,
+              "reps": 9
+            },
+            {
+              "weight": 94.5,
+              "reps": 8
+            }
+          ]
+        },
+        {
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "weight": 30.0,
+              "reps": 17
+            },
+            {
+              "weight": 28.75,
+              "reps": 13
+            },
+            {
+              "weight": 26.25,
+              "reps": 10
+            }
+          ]
+        },
+        {
+          "name": "Bicep Curl",
+          "sets": [
+            {
+              "weight": 18.75,
+              "reps": 12
+            },
+            {
+              "weight": 16.25,
+              "reps": 15
+            },
+            {
+              "weight": 15.0,
+              "reps": 14
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "05-08-2025",
+      "program": "Strength Training",
+      "bodyweight": 70.0,
+      "exercises": [
+        {
+          "name": "Bench Press",
+          "sets": [
+            {
+              "weight": 105.0,
+              "reps": 15
+            },
+            {
+              "weight": 103.75,
+              "reps": 13
+            },
+            {
+              "weight": 100.75,
+              "reps": 11
+            },
+            {
+              "weight": 100.75,
+              "reps": 10
+            }
+          ]
+        },
+        {
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "weight": 28.75,
+              "reps": 16
+            },
+            {
+              "weight": 27.5,
+              "reps": 12
+            },
+            {
+              "weight": 25.0,
+              "reps": 9
+            }
+          ]
+        },
+        {
+          "name": "Bicep Curl",
+          "sets": [
+            {
+              "weight": 17.5,
+              "reps": 11
+            },
+            {
+              "weight": 16.25,
+              "reps": 14
+            },
+            {
+              "weight": 15.0,
+              "reps": 14
+            }
+          ]
+        }
+      ]
     }
   ]
 }

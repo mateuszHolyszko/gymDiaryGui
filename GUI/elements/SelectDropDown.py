@@ -206,6 +206,14 @@ class SelectDropDown(Element):
         """Get currently selected option"""
         return self.options[self.selected_index] if self.options else None
     
+    def updateOptions(self, new_options: list):
+        """Reset index, recalculate dropdown height, and update options"""
+        self.options = new_options
+        self.selected_index = 0
+        self.dropdown_height = len(new_options) * self.height
+        if self.drop_direction == "up":
+            self.selected_index = len(new_options) - 1
+    
     def getInput(self, screen, prompt=None):
         """
         Blocking input method: lets user select an option using arrow keys and Enter.

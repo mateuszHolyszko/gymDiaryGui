@@ -1,11 +1,15 @@
 #SOFTWARE
 
 - In buttons, some sort of visual indication for where the neigbours are (if left neigbour not None alternative render on the edge or some gradient)
+-- light sources list in menus for rendering light efects
 
 - Synchronisation jitter (tearing of the lines in the image)
 - Deamaged rolling rows
 - Moiré pattern?
 -- seperate distortion class for more dramatic distortions called for example on transitions or at larger time intervals
+
+
+-- scroll pane, scrolling with <>
 
 
 #HARDWARE
