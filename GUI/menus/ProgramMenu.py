@@ -38,7 +38,7 @@ class ProgramMenu(Menu):
         heightAboveStaticElems = screenHeight - self.nav_bar.height - self.programs_excercieses_panel.height
         self.programsPanel = Panel(x=0, y=self.programs_excercieses_panel.height, width=screenWidth//4, height=heightAboveStaticElems,manager=self.manager)
         # Create table panel
-        self.table = Table(x=screenWidth//4,y=5,width=screenWidth*3//4 - 5,height=heightAboveStaticElems,rows=3,cols=3,padding=10,manager=self.manager)
+        self.table = Table(x=screenWidth//4,y=5,width=screenWidth*3//4 - 5,height=heightAboveStaticElems-10,rows=3,cols=3,manager=self.manager)
         self.table.draw_table_lines = False 
         
         # Add elements

@@ -10,7 +10,7 @@ class TargetSelectionPanel(Table):
         cols = 2
         rows = (len(target_muscles) + cols - 1) // cols  # Ceiling division
 
-        super().__init__(x, y, width, height, manager, rows=rows, cols=cols, padding=10)
+        super().__init__(x, y, width, height, manager, rows=rows, cols=cols)
         self.active_target = "Chest"
 
         # Fill the grid with muscle buttons

@@ -29,6 +29,8 @@ class MenuManager:
         # Let focused element handle event first
         if self.focus_manager.current_focus and \
            hasattr(self.focus_manager.current_focus, 'handle_event'):
+            if hasattr(self.focus_manager.current_focus.parent_panel,'handle_event'):
+                self.focus_manager.current_focus.parent_panel.handle_event(event)
             return self.focus_manager.current_focus.handle_event(event)
         
         return False

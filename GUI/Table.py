@@ -8,8 +8,8 @@ from GUI.elements.Element import Element
 from GUI.style import StyleManager
 
 class Table(Panel):
-    def __init__(self, x, y, width, height, manager, rows=1, cols=1, padding=0):
-        super().__init__(x, y, width, height, manager, layout_type="grid", padding=padding)
+    def __init__(self, x, y, width, height, manager, rows=1, cols=1):
+        super().__init__(x, y, width, height, manager, layout_type="grid")
         self.draw_table_lines = True
         self.rows = rows
         self.cols = cols
@@ -70,17 +70,16 @@ class Table(Panel):
     
     def enforceElementsSize(self):
         """Ensure all elements fit within their grid cells."""
-        cell_width = (self.width - 2*self.padding) / self.cols
-        cell_height = (self.height - 2*self.padding) / self.rows
+        cell_width = self.width / self.cols
+        cell_height = self.height / self.rows
         for r in range(self.rows):
             for c in range(self.cols):
-                #print(self.elements_grid[r][c])
                 if self.elements_grid[r][c] is not None:
                     self.elements_grid[r][c].width = cell_width
                     self.elements_grid[r][c].height = cell_height
                     self.elements_grid[r][c].position_from_center(
-                        self.x + self.padding + (c + 0.5) * cell_width,
-                        self.y + self.padding + (r + 0.5) * cell_height
+                        self.x + (c + 0.5) * cell_width,
+                        self.y + (r + 0.5) * cell_height
                     )
                     
 
@@ -105,10 +104,10 @@ class Table(Panel):
                     elem.set_neighbor("right", self.elements_grid[r][c+1])
 
     def _get_element_center(self, row, col):
-        cell_width = (self.width - 2*self.padding) / self.cols
-        cell_height = (self.height - 2*self.padding) / self.rows
-        center_x = self.x + self.padding + (col + 0.5) * cell_width
-        center_y = self.y + self.padding + (row + 0.5) * cell_height
+        cell_width = self.width / self.cols
+        cell_height = self.height / self.rows
+        center_x = self.x + (col + 0.5) * cell_width
+        center_y = self.y + (row + 0.5) * cell_height
         return (center_x, center_y)
 
     def _reposition_elements(self):
@@ -122,20 +121,20 @@ class Table(Panel):
     def render(self, screen):
         # Draw table/grid lines if enabled
         if self.draw_table_lines:
-            cell_width = (self.width - 2*self.padding) / self.cols
-            cell_height = (self.height - 2*self.padding) / self.rows
+            cell_width = self.width / self.cols
+            cell_height = self.height / self.rows
             # Vertical lines
             for c in range(self.cols + 1):
-                x = int(self.x + self.padding + c * cell_width)
+                x = int(self.x + c * cell_width)
                 pygame.draw.line(screen, (180, 180, 180), 
-                            (x, self.y + self.padding), 
-                            (x, self.y + self.height - self.padding))
+                            (x, self.y), 
+                            (x, self.y + self.height))
             # Horizontal lines
             for r in range(self.rows + 1):
-                y = int(self.y + self.padding + r * cell_height)
+                y = int(self.y + r * cell_height)
                 pygame.draw.line(screen, (180, 180, 180), 
-                            (self.x + self.padding, y), 
-                            (self.x + self.width - self.padding, y))
+                            (self.x, y), 
+                            (self.x + self.width, y))
         
         # Render elements sorted by layer
         for element in sorted(self.getElements(), key=lambda e: e.layer):
@@ -150,13 +149,13 @@ class Table(Panel):
         self.elements_grid = [[None for _ in range(self.cols)] for _ in range(self.rows)]
         self.elements = []  # Clear existing elements
         
-        cell_width = (self.width - 2*self.padding) / self.cols
-        cell_height = (self.height - 2*self.padding) / self.rows
+        cell_width = self.width / self.cols
+        cell_height = self.height / self.rows
         
         for r, row in enumerate(data):
             for c, value in enumerate(row):
-                x = self.x + self.padding + c * cell_width
-                y = self.y + self.padding + r * cell_height
+                x = self.x + c * cell_width
+                y = self.y + r * cell_height
                 if r == 0:
                     elem = Label(
                         text=str(value), x=x, y=y, 
@@ -194,8 +193,8 @@ class Table(Panel):
         self.elements_grid = [[None for _ in range(self.cols)] for _ in range(self.rows)]
         self.elements = []
 
-        cell_width = (self.width - 2*self.padding) / self.cols
-        cell_height = (self.height - 2*self.padding) / self.rows
+        cell_width = self.width / self.cols
+        cell_height = self.height / self.rows
 
         for r, row in enumerate(data):
             if not isinstance(row, (list, tuple)) or len(row) == 0:
@@ -207,8 +206,8 @@ class Table(Panel):
             exercise_target = self.database.get_target(programName, exercise_name)
             button_elem = Button(
                 text=exercise_name,
-                x=self.x + self.padding,
-                y=self.y + self.padding + r * cell_height,
+                x=self.x,
+                y=self.y + r * cell_height,
                 width=cell_width,
                 height=cell_height,
                 manager=manager,
@@ -227,8 +226,8 @@ class Table(Panel):
                     weight, reps = row[c][0], row[c][1]
 
                 cell_elem = SessionCell(
-                    x=self.x + self.padding + c * cell_width,
-                    y=self.y + self.padding + r * cell_height,
+                    x=self.x + c * cell_width,
+                    y=self.y + r * cell_height,
                     width=cell_width,
                     height=cell_height,
                     manager=manager,
@@ -246,8 +245,8 @@ class Table(Panel):
             add_set_col = len(row)  # This will be the column after the last set
             add_set_button = Button(
                 text="+ Add Set",
-                x=self.x + self.padding + add_set_col * cell_width,
-                y=self.y + self.padding + r * cell_height,
+                x=self.x + add_set_col * cell_width,
+                y=self.y + r * cell_height,
                 width=cell_width,
                 height=cell_height,
                 manager=manager,
@@ -281,8 +280,8 @@ class Table(Panel):
                 break
         
         # Get current cell dimensions
-        cell_width = (self.width - 2*self.padding) / self.cols
-        cell_height = (self.height - 2*self.padding) / self.rows
+        cell_width = self.width / self.cols
+        cell_height = self.height / self.rows
         
         # Get exercise info from first cell in row
         exercise_button = self.elements_grid[row_index][0]
@@ -293,7 +292,7 @@ class Table(Panel):
         if last_set_col >= self.cols - 2:  # -2 because last column is AddSet button
             # Expand table by one column
             self.cols += 1
-            new_cell_width = (self.width - 2*self.padding) / self.cols
+            new_cell_width = self.width / self.cols
             
             # Update grid structure
             for r in range(self.rows):
@@ -307,10 +306,10 @@ class Table(Panel):
                 
                 # Update button position
                 add_set_button.width = new_cell_width
-                add_set_button.x = self.x + self.padding + (self.cols-1) * new_cell_width
+                add_set_button.x = self.x + (self.cols-1) * new_cell_width
                 add_set_button.position_from_center(
-                    self.x + self.padding + (self.cols-1 + 0.5) * new_cell_width,
-                    self.y + self.padding + (row_index + 0.5) * cell_height
+                    self.x + (self.cols-1 + 0.5) * new_cell_width,
+                    self.y + (row_index + 0.5) * cell_height
                 )
             
             # Position for new set is after last set
@@ -333,10 +332,10 @@ class Table(Panel):
             self.elements_grid[row_index][add_set_col] = None
             
             # Update button position
-            add_set_button.x = self.x + self.padding + (add_set_col + 1) * cell_width
+            add_set_button.x = self.x + (add_set_col + 1) * cell_width
             add_set_button.position_from_center(
-                self.x + self.padding + (add_set_col + 1 + 0.5) * cell_width,
-                self.y + self.padding + (row_index + 0.5) * cell_height
+                self.x + (add_set_col + 1 + 0.5) * cell_width,
+                self.y + (row_index + 0.5) * cell_height
             )
             
             # Position for new set is where AddSet button was
@@ -344,8 +343,8 @@ class Table(Panel):
         
         # Create new SessionCell at the calculated position
         new_cell = SessionCell(
-            x=self.x + self.padding + new_col * cell_width,
-            y=self.y + self.padding + row_index * cell_height,
+            x=self.x + new_col * cell_width,
+            y=self.y + row_index * cell_height,
             width=cell_width,
             height=cell_height,
             manager=self.manager,

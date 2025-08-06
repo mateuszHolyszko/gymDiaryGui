@@ -80,7 +80,11 @@ class ValueDisplay(Element):
         pygame.draw.rect(screen, style.bg_color, (self.x, self.y, self.width, self.height))
 
         # --- Render prompt (top 1/3) ---
-        prompt_surface = self.font.render(self.prompt, True, (0,0,0))
+        if self.bg_color_prompt is not None:
+            prompt_surface = self.font.render(self.prompt, True, (0,0,0))
+        else:
+            prompt_surface = self.font.render(self.prompt, True, (255,255,255))
+        
         prompt_y = self.y + (self.height // 6) - (prompt_surface.get_height() // 2)
         if self.bg_color_prompt is not None:
             pygame.draw.rect(screen, self.bg_color_prompt, (self.x,self.y,self.width,self.height//3))

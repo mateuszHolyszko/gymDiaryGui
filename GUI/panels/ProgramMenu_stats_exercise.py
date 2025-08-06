@@ -11,7 +11,7 @@ class ExerciseStatsPanel(Table):
         cols = 2
         rows = 2
 
-        super().__init__(x, y, width, height, manager, rows=rows, cols=cols, padding=10)
+        super().__init__(x, y, width, height, manager, rows=rows, cols=cols)
 
         # Create ValueDisplay elements for stats
         # Retrive stats from database

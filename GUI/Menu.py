@@ -1,6 +1,8 @@
 from GUI.Panel import Panel
 from GUI.Table import Table
 from GUI.panels.navigation_bar import NavigationBar
+from GUI.ScrollingTableVertical import ScrollingTableVertical
+from GUI.ScrollingPanelVertical import ScrollingPanelVertical
 class Menu:
     def __init__(self, screen, manager):
         self.screen = screen
@@ -47,13 +49,28 @@ class Menu:
 
         
     def render(self, screen):
-        # Collect all elements from all panels with their layer and panel info
-        all_elements = []
+        # Separate panels into two groups:
+        # 1. Panels that handle their own rendering (like scrolling tables)
+        # 2. Regular panels where we render elements individually
+        clipping_panels = []
+        regular_panels = []
+        
         for panel in self.panels:
+            if isinstance(panel, ScrollingTableVertical):
+                # Check if this is a special panel that needs to handle its own rendering
+                clipping_panels.append(panel)
+            else:
+                regular_panels.append(panel)
+        
+        # First render self-rendering panels (sorted by their own layer)
+        for panel in sorted(clipping_panels, key=lambda p: getattr(p, 'layer', 0)):
+            panel.render(screen)
+        # Then render all regular panel elements (sorted by layer)
+        all_elements = []
+        for panel in regular_panels:
             for element in panel.elements:
                 all_elements.append((element.layer, element))
-    
-        # Sort all elements by layer and render them
+        
         for layer, element in sorted(all_elements, key=lambda x: x[0]):
             element.render(screen)
 

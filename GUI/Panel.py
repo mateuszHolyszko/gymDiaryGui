@@ -15,12 +15,7 @@ class Panel:
         self.padding = padding
         self.elements = []
 
-    def handle_event(self, event):
-        """Handle events for all elements in the panel"""
-        for element, _ in self.elements:
-            if hasattr(element, 'handle_event') and element.handle_event(event):
-                return True
-        return False
+    
 
     def getElements(self):
         """Returns a list of elements in the panel."""
@@ -95,6 +90,7 @@ class Panel:
             return (self.x + self.width//2, self.y + self.height//2)
 
     def render(self, screen):        
+        # IMPORTANT: this is usualy bypased in menu, if needs to be called (for eg for clipping) it needs to be added to exepctions in Menu class
         # Panel no longer needs to sort elements itself
         for element in self.elements:
             if getattr(element, 'parent_panel', None) == self:

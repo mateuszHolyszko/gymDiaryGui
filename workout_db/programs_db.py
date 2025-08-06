@@ -159,3 +159,10 @@ class ProgramsDB(WorkoutDatabase):
         exercises[row_index][field] = new_value
         self._write_programs(programs)
         return True
+    
+    def get_exercises_in_program(self,program_name: str):
+        """Returns a list of exercises in a program"""
+        programs = self._read_programs()
+        if program_name not in programs:
+            return []
+        return programs[program_name]

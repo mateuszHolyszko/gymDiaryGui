@@ -3,6 +3,7 @@ from GUI.Menu import Menu
 from GUI.Panel import Panel
 from GUI.panels.navigation_bar import NavigationBar
 from GUI.elements.Button import Button
+from GUI.elements.ValueDisplay import ValueDisplay
 from GUI.elements.SelectDropDown import SelectDropDown
 from GUI.elements.Label import Label
 from GUI.elements.InputField import InputField
@@ -27,12 +28,27 @@ class MainMenu(Menu):
         
         # Create InputPanel panel
         height = (screenHeight - self.nav_bar.height)//2
-        self.LabelPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//2, width=screenWidth//4, height=height)
-        self.InputPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//2 + 50, width=screenWidth//4, height=height,layout_type="horizontal")
+        self.LabelPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//5, width=screenWidth//4, height=height)
+        self.InputPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//5 + 50, width=screenWidth//4, height=height,layout_type="horizontal")
         # Volume summary panel gets created after the CarouselPanel gets initiated, since its depended on CarouselPanel elements
         # Create CarouselPanel panel
         self.CarouselPanel = self.add_panel(Panel,x=screenWidth//2,y=5,width=screenWidth//2 - 5,height=screenHeight - self.nav_bar.height - 10)
         
+        # MetaDataDisplay panel
+        # Load metadata
+        meta = self._load_project_meta()
+        print(meta)
+        self.MetaDataDisplayPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//2 - 50, width=screenWidth//4, height=height)
+        self.metaDisplay = ValueDisplay(prompt="Project data", 
+            value=f"Ver Data: {meta['VersionData']}\n"
+              f"Ver: {meta['Version']}\n"
+              f"Branch: {meta['Branch']}\n"
+              f"Status: {meta['Status']}\n"
+              f"Author: {meta['Author']}",
+              height=150,
+              width=150)
+        self.MetaDataDisplayPanel.add_element(self.metaDisplay)
+
         # Add elements (InputPanel panel)
         bodyweight = None
         # get bodyweight from main menu context, if its not there get it from last session
@@ -122,5 +138,24 @@ class MainMenu(Menu):
         # Set focus to the first nav bar button or any default element
         self.set_initial_focus(self.nav_bar.buttons[0])
 
-    
+    def _load_project_meta(self):
+        """Load project metadata from project_meta.txt in parent directory"""
+        meta = {}
+        try:
+            # Go up one directory and read the file
+            with open("project_meta.txt", "r") as f:
+                for line in f.readlines():
+                    if ":" in line:
+                        key, value = line.strip().split(":", 1)
+                        meta[key.strip()] = value.strip().rstrip(",")
+        except FileNotFoundError:
+            print("Warning: project_meta.txt not found")
+            meta = {
+                "VersionData": "Unknown",
+                "Version": "Unknown",
+                "Branch": "Unknown",
+                "Status": "Unknown",
+                "Author": "Unknown"
+            }
+        return meta
         

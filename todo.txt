@@ -9,7 +9,8 @@
 -- seperate distortion class for more dramatic distortions called for example on transitions or at larger time intervals
 
 
--- scroll pane, scrolling with <>
+- in main menu display version author and so on
+- in clock display battery life
 
 
 #HARDWARE

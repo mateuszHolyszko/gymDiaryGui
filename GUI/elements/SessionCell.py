@@ -66,7 +66,6 @@ class SessionCell(Element):
         pygame.draw.rect(screen, self.style.border_color, (self.x, self.y, self.width, self.height), 2)
         pygame.draw.line(screen, self.style.border_color, (self.x, self.y+self.height//2), (self.x+self.width, self.y+self.height//2), 2)
         # Top half: previous session
-        self.font = pygame.font.SysFont("Arial", 10) # Smaller font for range display
         if self.weightFromPreviousSession == 0 and self.repsFromPreviousSession == 0:
             header_text_bot = "New Set"
         else:
@@ -75,7 +74,6 @@ class SessionCell(Element):
         header_surf = self.font.render(header_text_bot, True, self.style.text_color)
         screen.blit(header_surf, (self.x + (self.width-header_surf.get_width())//2, 
                 self.y + (self.height//4+header_surf.get_height()//3)))
-        self.font = pygame.font.SysFont("Arial", 14) # revert
         # Divider in top Half
         pygame.draw.rect(screen, StyleManager.get_muscle_group_color(self.excerciseTargetMuscle)["bg_color"], (self.x, self.y, self.width, self.height//4))
         pygame.draw.line(screen, self.style.border_color, (self.x, self.y+self.height//4), (self.x+self.width, self.y+self.height//4), 2)
