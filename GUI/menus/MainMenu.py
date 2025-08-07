@@ -40,8 +40,8 @@ class MainMenu(Menu):
         print(meta)
         self.MetaDataDisplayPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//2 - 50, width=screenWidth//4, height=height)
         self.metaDisplay = ValueDisplay(prompt="Project data", 
-            value=f"Ver Data: {meta['VersionData']}\n"
-              f"Ver: {meta['Version']}\n"
+            value=
+              f"Ver: {meta['Version']}: {meta['VersionData']}\n"
               f"Branch: {meta['Branch']}\n"
               f"Status: {meta['Status']}\n"
               f"Author: {meta['Author']}",
@@ -72,7 +72,7 @@ class MainMenu(Menu):
                     print("Warning: No sessions available")
             except Exception as e:
                 print(f"Error retrieving last session: {str(e)}")
-        self.inputField = InputField(bodyweight, min_value=0, max_value=150, step=0.25, manager=self.manager)
+        self.inputField = InputField(bodyweight, min_value=0, max_value=150, step=0.1, manager=self.manager)
         self.btn = Button("+", self.inputField.height, self.inputField.height, manager=self.manager)
         self.label = Label(text="Update bodyweight", width=200, height=50, manager=self.manager)
         

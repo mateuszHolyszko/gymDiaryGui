@@ -72,9 +72,13 @@ class InputField(Element):
             elif self.is_active:  # Only adjust value when active
                 if event.key == pygame.K_LEFT or event.key == pygame.K_COMMA:  # '<' key
                     self.value = max(self.min_value, self.value - self.step)
+                    # round floating numbers
+                    self.value = round(self.value, 2)
                     return True
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_PERIOD:  # '>' key
                     self.value = min(self.max_value, self.value + self.step)
+                    # round floating numbers
+                    self.value = round(self.value, 2)
                     return True
         
         return super().handle_event(event)
