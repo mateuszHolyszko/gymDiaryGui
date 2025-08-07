@@ -22,7 +22,7 @@ class StatsMenu(Menu):
         self.query = None
         self.queryAxisY = "weight"  # Default Y axis value
 
-        self.screenWidth, self.screenHeight = pygame.display.get_surface().get_size() # Get screen size
+        self.screenWidth, self.screenHeight = (800,480) # Get screen size
 
         # Add navigation bar
         self.nav_bar = self.add_panel(NavigationBar)

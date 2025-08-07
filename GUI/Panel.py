@@ -89,9 +89,9 @@ class Panel:
         else:  # free layout
             return (self.x + self.width//2, self.y + self.height//2)
 
-    def render(self, screen):        
+    def render(self, batch):        
         # IMPORTANT: this is usualy bypased in menu, if needs to be called (for eg for clipping) it needs to be added to exepctions in Menu class
         # Panel no longer needs to sort elements itself
         for element in self.elements:
             if getattr(element, 'parent_panel', None) == self:
-                element.render(screen)
+                element.render(batch)

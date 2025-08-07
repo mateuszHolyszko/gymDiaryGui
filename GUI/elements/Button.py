@@ -1,7 +1,7 @@
 import pygame
+import pyglet
 from .Element import Element
 from GUI.style import StyleManager, ElementStyle
-from dataclasses import asdict
 from copy import deepcopy
 
 class Button(Element):
@@ -31,12 +31,9 @@ class Button(Element):
             neighbors=neighbors,
             layer=layer
         )
-        
         self.text = text
-        self.font = pygame.font.SysFont("Arial", font_size)
+        self.font_size = font_size
         self.isActive = False
-
-        # Handle style with font separately
         self._base_style = {
             'bg_color': StyleManager.current_style.bg_color,
             'bg_color_notSelectable': StyleManager.current_style.bg_color_notSelectable,
@@ -47,7 +44,6 @@ class Button(Element):
             'active_bg_color': StyleManager.current_style.active_bg_color
         }
         self._style_overrides = style_override or {}
-        self._current_style = self._get_current_style()
 
     def activate(self):
         self.isActive = True
@@ -100,9 +96,8 @@ class Button(Element):
         """Reset to only using global style"""
         self._style_overrides = {}
 
-    def render(self, screen):
+    def render(self, batch):
         style = self.style
-        
         if self.isActive:
             bg_color = style.active_bg_color
         elif not self.selectable:
@@ -111,20 +106,24 @@ class Button(Element):
             bg_color = style.highlight_color
         else:
             bg_color = style.bg_color
-            
-        pygame.draw.rect(screen, bg_color, (self.x, self.y, self.width, self.height))
-        
+
+        #print(f"Button batch: {batch}")
+        rect = pyglet.shapes.Rectangle(self.x, self.y, self.width, self.height, color=bg_color[:3], batch=batch)
         if self.is_focused:
-            pygame.draw.rect(screen, style.border_color, 
-                           (self.x, self.y, self.width, self.height), 2)
+            border = pyglet.shapes.Rectangle(self.x, self.y, self.width, self.height, color=style.border_color[:3], batch=batch)
+            border.opacity = 255
+            border.width = 2
 
-        # If bg_color is not black, font color should be black    
-        text_color = style.text_color
-        if bg_color != (0,0,0):
-            text_color = (0,0,0)
-
-        text = self.font.render(self.text, True, text_color)
-        screen.blit(text, (
-            self.x + (self.width - text.get_width())//2,
-            self.y + (self.height - text.get_height())//2
-        ))
+        text_color = style.text_color if bg_color == (0,0,0) else (0,0,0)
+        label = pyglet.text.Label(
+            self.text,
+            font_name='Arial',
+            font_size=self.font_size,
+            color=text_color + (255,),
+            x=self.x + self.width // 2,
+            y=self.y + self.height // 2,
+            anchor_x='center',
+            anchor_y='center',
+            batch=batch
+        )
+        batch.draw()

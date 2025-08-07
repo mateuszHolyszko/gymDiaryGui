@@ -11,7 +11,7 @@ import pygame
 class Form(Menu):
     def setup(self):
         """Setup panels, elements and actions"""
-        screenWidth, screenHeight = pygame.display.get_surface().get_size() # Get screen size
+        screenWidth, screenHeight = (800,480) # Get screen size
         self.session = SessionsDB()
 
         # Create choice_buttons_panel panel

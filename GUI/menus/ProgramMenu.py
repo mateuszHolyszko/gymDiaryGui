@@ -19,7 +19,7 @@ class ProgramMenu(Menu):
     def setup(self):
         self.database = ProgramsDB()
         """Setup panels, elements and actions"""
-        screenWidth, screenHeight = pygame.display.get_surface().get_size() # Get screen size
+        screenWidth, screenHeight = (800,480) # Get screen size
 
         # Add navigation bar
         self.nav_bar = NavigationBar(manager=self.manager)

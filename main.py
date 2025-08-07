@@ -1,4 +1,6 @@
-import pygame
+import pyglet
+from pyglet.window import key
+
 from GUI.MenuManager import MenuManager
 from GUI.menus.MainMenu import MainMenu
 from GUI.menus.SessionMenu import SessionMenu
@@ -8,73 +10,62 @@ from GUI.menus.Form import Form
 from GUI.Notifications import Notification
 from GUI.Distortion import Distortion
 
-def main():
-    # Initialize pygame
-    pygame.init()
-    screen = pygame.display.set_mode((800, 480))
-    pygame.display.set_caption("Gym Diary")
-    clock = pygame.time.Clock()
+window_width, window_height = 800, 480
+window = pyglet.window.Window(width=window_width, height=window_height, caption="Gym Diary")
 
-    # Create notification system
-    notification = Notification(font_size=24, display_time=2.5)
+# Create notification and distortion systems
+notification = Notification(font_size=24, display_time=2.5)
+distortion = Distortion(window_width, window_height, intensity=0.75)
 
-    # Create distortion system
-    distortion = Distortion(800, 480, intensity=0.75)
+# Create menu manager
+manager = MenuManager(notification)
 
-    # Create menu manager
-    manager = MenuManager(screen,notification)
+# Instantiate all menus
+main_menu = MainMenu(manager)
+session_menu = SessionMenu(manager)
+program_menu = ProgramMenu(manager)
+stats_menu = StatsMenu(manager)
+form_menu = Form(manager)
+
+# Register all menus
+manager.register_menu("MainMenu", main_menu)
+manager.register_menu("SessionMenu", session_menu)
+manager.register_menu("ProgramMenu", program_menu)
+manager.register_menu("StatsMenu", stats_menu)
+manager.register_menu("Form", form_menu)
+
+# Start with main menu
+manager.switch_to("MainMenu")
+
+@window.event
+def on_draw():
+    window.clear()
+    batch = pyglet.graphics.Batch() # treat like window/screen
+    if manager.current_menu:
+        manager.current_menu.render(batch)
+    notification.render(batch)
+    #distortion.render(batch)
+    #print(f"main batch {batch._instance_count}")
+    #batch.draw() # draw() gets called in each element
     
-    # Instantiate all menus
-    main_menu = MainMenu(screen, manager)
-    session_menu = SessionMenu(screen, manager)
-    program_menu = ProgramMenu(screen, manager)
-    stats_menu = StatsMenu(screen, manager)
-    form_menu = Form(screen, manager)
-    
-    # Register all menus with string names (pass instances)
-    manager.register_menu("MainMenu", main_menu)
-    manager.register_menu("SessionMenu", session_menu)
-    manager.register_menu("ProgramMenu", program_menu)
-    manager.register_menu("StatsMenu", stats_menu)
-    manager.register_menu("Form", form_menu)
-    
-    # Start with main menu
-    manager.switch_to("MainMenu")
 
-    # Main game loop
-    running = True
-    while running:
-        # Handle events
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            
-            # Handle menu navigation keys globally
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    # Optional: Add back navigation logic if needed
-                    pass
-            
-            # Pass all events to menu manager
-            manager.handle_event(event)
-        
-        # Clear screen
-        screen.fill((0, 0, 0))  # Black background
-        
-        # Render current menu
-        if manager.current_menu:
-            manager.current_menu.render(screen)
-        
-        # Render notification (if active)
-        notification.render(screen)
+@window.event
+def on_key_press(symbol, modifiers):
+    # Map pyglet keys to your logic
+    event = type('Event', (), {})()  # Dummy event object
+    event.type = 'KEYDOWN'
+    event.symbol = symbol
+    event.modifiers = modifiers
+    # You may want to map pyglet key symbols to pygame-like keys if your code expects them
+    manager.handle_event(event)
 
-        # Apply distortion effects (after everything else is rendered)
-        distortion.render(screen)
-        
-        pygame.display.flip()
-        clock.tick(12)  # 12 FPS
+@window.event
+def on_close():
+    pyglet.app.exit()
 
-    pygame.quit()
+def update(dt):
+    pass
+pyglet.clock.schedule_interval(update, 1/12.0)  # 12 FPS
 
-if __name__ == "__main__":
-    main()
+pyglet.app.run()
+

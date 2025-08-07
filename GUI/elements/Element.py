@@ -26,7 +26,7 @@ class Element(ABC):
         self.layer = layer
 
     @abstractmethod
-    def render(self, screen: pygame.Surface):
+    def render(self, batch):
         """Draws the element at its (x, y) with Z-ordering."""
         pass
 
@@ -44,28 +44,25 @@ class Element(ABC):
         """Updates a neighbor (e.g., set_neighbor("up", other_button))."""
         self.neighbors[direction] = element
 
-    def handle_event(self, event: pygame.event.Event) -> bool:
-        """Handles keyboard events using the focus manager"""
+    def handle_event(self, event) -> bool:
         if not self.selectable or not self.is_focused:
             return False
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
+        if getattr(event, 'type', None) == 'KEYDOWN':
+            from pyglet.window import key
+            if event.symbol == key.RETURN:
                 if hasattr(self, 'on_press'):
                     self.on_press()
                     return True
-                    
-            # Handle arrow key navigation
-            elif event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT):
+            elif event.symbol in (key.UP, key.DOWN, key.LEFT, key.RIGHT):
                 direction = {
-                    pygame.K_UP: "up",
-                    pygame.K_DOWN: "down",
-                    pygame.K_LEFT: "left",
-                    pygame.K_RIGHT: "right",
-                }[event.key]
+                    key.UP: "up",
+                    key.DOWN: "down",
+                    key.LEFT: "left",
+                    key.RIGHT: "right",
+                }[event.symbol]
                 neighbor = self.neighbors.get(direction)
                 if neighbor and neighbor.selectable:
                     self.manager.focus_manager.set_focus(neighbor)
                     return True
-                    
         return False

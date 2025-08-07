@@ -1,4 +1,4 @@
-import pygame
+import pyglet
 from .Element import Element
 from GUI.style import StyleManager
 
@@ -24,16 +24,13 @@ class Label(Element):
             height=height,
             manager=manager,
             parent_panel=parent_panel,
-            selectable=False,  # Labels are always unselectable
-            neighbors=None,   # Labels don't participate in navigation
+            selectable=False,
+            neighbors=None,
             layer=layer
         )
-        
         self.text = text
         self.style = StyleManager.current_style
-        self.font = pygame.font.SysFont("Arial", font_size)
-        
-        # Allow custom colors, fall back to style manager defaults
+        self.font_size = font_size
         self._text_color = text_color if text_color else self.style.text_color
         self._bg_color = bg_color if bg_color else self.style.bg_color
 
@@ -49,22 +46,24 @@ class Label(Element):
         """Set custom background color (RGB tuple)."""
         self._bg_color = color
 
-    def render(self, screen: pygame.Surface):
-        """Draw the label with background and centered text."""
+    def render(self, batch):
         # Draw background
-        pygame.draw.rect(screen, self._bg_color, (self.x, self.y, self.width, self.height))
-        
-        # Render text
-        text_surface = self.font.render(self.text, True, self._text_color)
-        
-        # Center text in the label
-        text_x = self.x + (self.width - text_surface.get_width()) // 2
-        text_y = self.y + (self.height - text_surface.get_height()) // 2
-        
-        screen.blit(text_surface, (text_x, text_y))
+        bg = pyglet.shapes.Rectangle(self.x, self.y, self.width, self.height, color=self._bg_color[:3], batch=batch)
+        # Draw text centered
+        label = pyglet.text.Label(
+            self.text,
+            font_name='Arial',
+            font_size=self.font_size,
+            color=self._text_color + (255,),
+            x=self.x + self.width // 2,
+            y=self.y + self.height // 2,
+            anchor_x='center',
+            anchor_y='center',
+            batch=batch
+        )
+        batch.draw()
 
     def on_press(self):
-        """Labels are not selectable, so this should never be called."""
         pass
 
     def set_position(self, x: int, y: int):

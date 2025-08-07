@@ -6,7 +6,7 @@ from GUI.elements.Clock import Clock
 class NavigationBar(Panel):
     def __init__(self, manager, **kwargs):  # manager as explicit first argument
         # Calculate position (bottom of screen)
-        screen_width, screen_height = pygame.display.get_surface().get_size()
+        screen_width, screen_height = (800,480)
         super().__init__(
             x=0,
             y=screen_height - 50,

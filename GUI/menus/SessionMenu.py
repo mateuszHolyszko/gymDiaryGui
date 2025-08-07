@@ -16,7 +16,7 @@ class SessionMenu(Menu):
         self.database = ProgramsDB()
         self.session = SessionsDB()
         """Setup panels, elements and actions"""
-        screenWidth, screenHeight = pygame.display.get_surface().get_size() # Get screen size
+        screenWidth, screenHeight = (800,480) # Get screen size
 
         # Add navigation bar
         self.nav_bar = self.add_panel(NavigationBar)

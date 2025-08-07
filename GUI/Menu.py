@@ -4,8 +4,7 @@ from GUI.panels.navigation_bar import NavigationBar
 from GUI.ScrollingTableVertical import ScrollingTableVertical
 from GUI.ScrollingPanelVertical import ScrollingPanelVertical
 class Menu:
-    def __init__(self, screen, manager):
-        self.screen = screen
+    def __init__(self, manager):
         self.manager = manager
         self.panels = []
         self.setup()  # Automatically call setup during initialization
@@ -48,7 +47,7 @@ class Menu:
                 self.remove_panel(panel)
 
         
-    def render(self, screen):
+    def render(self, batch):
         # Separate panels into two groups:
         # 1. Panels that handle their own rendering (like scrolling tables)
         # 2. Regular panels where we render elements individually
@@ -64,7 +63,7 @@ class Menu:
         
         # First render self-rendering panels (sorted by their own layer)
         for panel in sorted(clipping_panels, key=lambda p: getattr(p, 'layer', 0)):
-            panel.render(screen)
+            panel.render(batch)
         # Then render all regular panel elements (sorted by layer)
         all_elements = []
         for panel in regular_panels:
@@ -72,7 +71,7 @@ class Menu:
                 all_elements.append((element.layer, element))
         
         for layer, element in sorted(all_elements, key=lambda x: x[0]):
-            element.render(screen)
+            element.render(batch)
 
     def set_initial_focus(self, element):
         """Delegate to manager's focus system"""

@@ -1,4 +1,5 @@
 import pygame
+import pyglet
 from .Element import Element
 from GUI.style import StyleManager
 from datetime import datetime, timedelta
@@ -6,7 +7,7 @@ from datetime import datetime, timedelta
 class Plotter(Element):
     def __init__(
         self,
-        x_values: list,  # List of date strings in format 'DD-MM-YYYY'
+        x_values: list,
         y_values: list,
         x: int = 0,
         y: int = 0,
@@ -32,34 +33,18 @@ class Plotter(Element):
             neighbors=neighbors,
             layer=layer
         )
-        
         self.x_values = x_values
         self.y_values = y_values
-        self.font = pygame.font.SysFont("Arial", font_size)
+        self.font_size = font_size
         self.style = StyleManager.current_style
         self.y_label = y_label
         self.x_label = x_label
         self.plotDataColor = self.style.highlight_color
-        
-        # Calculate padding for axis labels
-        self.padding = {
-            'left': 50,  # Increased to accommodate date labels
-            'right': 20,
-            'top': 30,
-            'bottom': 40  # Increased to accommodate rotated date labels
-        }
-        
-        # Calculate plot area dimensions
+        self.padding = {'left': 50, 'right': 20, 'top': 30, 'bottom': 40}
         self.plot_width = self.width - self.padding['left'] - self.padding['right']
         self.plot_height = self.height - self.padding['top'] - self.padding['bottom']
-        
-        # Convert date strings to datetime objects for processing
         self.date_objects = [datetime.strptime(date, '%d-%m-%Y') for date in x_values] if x_values else []
-        
-        # Initialize date range
         self._update_date_range()
-        
-        # Calculate Y data range
         self._update_y_range()
 
     def _update_date_range(self):
@@ -99,87 +84,90 @@ class Plotter(Element):
                 self.y_min = self.y_min - abs(self.y_min * 0.1)
                 self.y_max = self.y_max + abs(self.y_max * 0.1)
 
-    def render(self, screen):
-        """Render the plot with axes and data points"""
-        # Draw background
-        pygame.draw.rect(screen, self.style.bg_color, (self.x, self.y, self.width, self.height))
-        
-        # Calculate plot area position
+    def render(self, batch):
+        style = self.style
+        pyglet.shapes.Rectangle(self.x, self.y, self.width, self.height, color=style.bg_color[:3], batch=batch)
         plot_x = self.x + self.padding['left']
         plot_y = self.y + self.padding['top']
-        
-        # Draw y_label
         if self.y_label:
-            title_text = self.font.render(self.y_label, True, self.style.text_color)
-            title_x = self.x 
-            screen.blit(title_text, (title_x, self.y + 5))
-        
-        # Draw axes first so they appear behind the data
-        self._draw_axes(screen, plot_x, plot_y)
-        
-        # Plot data points if we have values
+            pyglet.text.Label(
+                self.y_label,
+                font_name='Arial',
+                font_size=self.font_size,
+                color=style.text_color + (255,),
+                x=self.x + 5,
+                y=self.y + self.height - 20,
+                anchor_x='left',
+                anchor_y='center',
+                batch=batch
+            )
+        self._draw_axes(batch, plot_x, plot_y)
         if self.x_values and self.y_values and len(self.x_values) == len(self.y_values):
-            self._plot_data(screen, plot_x, plot_y)
-        
-        # Draw labels last so they appear on top
-        self._draw_labels(screen, plot_x, plot_y)
+            self._plot_data(batch, plot_x, plot_y)
+        self._draw_labels(batch, plot_x, plot_y)
+        batch.draw()
 
-    def _draw_axes(self, screen, plot_x, plot_y):
-        """Draw the X and Y axes with tick marks"""
-        # Draw main axes
-        pygame.draw.line(
-            screen, self.style.text_color,
-            (plot_x, plot_y + self.plot_height),
-            (plot_x + self.plot_width, plot_y + self.plot_height),
-            2  # X-axis
+    def _draw_axes(self, batch, plot_x, plot_y):
+        style = self.style
+        # X axis
+        pyglet.shapes.Line(
+            plot_x, plot_y + self.plot_height,
+            plot_x + self.plot_width, plot_y + self.plot_height,
+            thickness=2, color=style.text_color[:3], batch=batch
         )
-        pygame.draw.line(
-            screen, self.style.text_color,
-            (plot_x, plot_y),
-            (plot_x, plot_y + self.plot_height),
-            2  # Y-axis
+        # Y axis
+        pyglet.shapes.Line(
+            plot_x, plot_y,
+            plot_x, plot_y + self.plot_height,
+            thickness=2, color=style.text_color[:3], batch=batch
         )
-        
-        # Draw X-axis ticks (date labels)
+        # X-axis ticks
         if self.all_dates:
             num_x_ticks = min(5, len(self.all_dates))
             step = max(1, len(self.all_dates) // num_x_ticks)
-            
             for i in range(0, len(self.all_dates), step):
                 date = self.all_dates[i]
-                # Calculate X position based on date's position in the full range
                 days_since_min = (date - self.date_min).days
                 total_days = (self.date_max - self.date_min).days
                 x_pos = plot_x + int((days_since_min / total_days) * self.plot_width) if total_days > 0 else plot_x
-                
-                # Draw tick mark
-                pygame.draw.line(
-                    screen, self.style.text_color,
-                    (x_pos, plot_y + self.plot_height),
-                    (x_pos, plot_y + self.plot_height + 5),
-                    1
+                pyglet.shapes.Line(
+                    x_pos, plot_y + self.plot_height,
+                    x_pos, plot_y + self.plot_height + 5,
+                    thickness=1, color=style.text_color[:3], batch=batch
                 )
-                
-                # Draw date label (short format: DD-MM)
                 date_str = date.strftime('%d-%m')
-                tick_text = self.font.render(date_str, True, self.style.text_color)
-                screen.blit(tick_text, (x_pos - tick_text.get_width() // 2, plot_y + self.plot_height + 7))
-        
-        # Draw Y-axis ticks
+                pyglet.text.Label(
+                    date_str,
+                    font_name='Arial',
+                    font_size=self.font_size,
+                    color=style.text_color + (255,),
+                    x=x_pos,
+                    y=plot_y + self.plot_height + 12,
+                    anchor_x='center',
+                    anchor_y='bottom',
+                    batch=batch
+                )
+        # Y-axis ticks
         num_y_ticks = 5
         for i in range(num_y_ticks + 1):
             y = plot_y + self.plot_height - (i * self.plot_height) // num_y_ticks
-            pygame.draw.line(
-                screen, self.style.text_color,
-                (plot_x - 5, y),
-                (plot_x, y),
-                1
+            pyglet.shapes.Line(
+                plot_x - 5, y,
+                plot_x, y,
+                thickness=1, color=style.text_color[:3], batch=batch
             )
-            
-            # Draw tick label
             value = self.y_min + (i * (self.y_max - self.y_min)) / num_y_ticks
-            tick_text = self.font.render(f"{value:.2f}", True, self.style.text_color)
-            screen.blit(tick_text, (plot_x - tick_text.get_width() - 8, y - tick_text.get_height() // 2))
+            pyglet.text.Label(
+                f"{value:.2f}",
+                font_name='Arial',
+                font_size=self.font_size,
+                color=style.text_color + (255,),
+                x=plot_x - 8,
+                y=y,
+                anchor_x='right',
+                anchor_y='center',
+                batch=batch
+            )
 
     def _format_date_label(self, date_str):
         """Format date string for display (DD-MM)"""
@@ -189,53 +177,54 @@ class Plotter(Element):
         except:
             return date_str[:5]  # Fallback to first 5 chars if format is wrong
 
-    def _draw_labels(self, screen, plot_x, plot_y):
-        """Draw the X and Y axis labels"""
-        # X-axis label
-        x_label_text = self.font.render(self.x_label, True, self.style.text_color)
-        screen.blit(x_label_text, (plot_x + (self.plot_width - x_label_text.get_width()) // 2, plot_y + self.plot_height + 25))
+    def _draw_labels(self, batch, plot_x, plot_y):
+        style = self.style
+        pyglet.text.Label(
+            self.x_label,
+            font_name='Arial',
+            font_size=self.font_size,
+            color=style.text_color + (255,),
+            x=plot_x + self.plot_width // 2,
+            y=plot_y + self.plot_height + 25,
+            anchor_x='center',
+            anchor_y='center',
+            batch=batch
+        )
 
-    def _plot_data(self, screen, plot_x, plot_y):
-        """Plot the actual data points"""
+    def _plot_data(self, batch, plot_x, plot_y):
+        style = self.style
         if not self.date_objects or not self.all_dates:
             return
-            
-        # Calculate Y scaling factor
         if self.y_max == self.y_min:
             y_scale = 0.5 * self.plot_height
             y_offset = 0
         else:
             y_scale = self.plot_height / (self.y_max - self.y_min)
             y_offset = self.y_min
-        
-        # Create a mapping from dates to their indices in the original data
         date_to_index = {date: i for i, date in enumerate(self.date_objects)}
-        
-        # Plot as connected line
         points = []
         for i, date in enumerate(self.date_objects):
-            # Calculate X position based on date's position in the full range
             days_since_min = (date - self.date_min).days
             total_days = (self.date_max - self.date_min).days
             x = plot_x + int((days_since_min / total_days) * self.plot_width) if total_days > 0 else plot_x
-            
-            # Get the corresponding Y value
             y_value = self.y_values[date_to_index[date]]
             y = plot_y + self.plot_height - int((y_value - y_offset) * y_scale)
             points.append((x, y))
-        
-        # Draw connecting lines
+        # Draw lines
         if len(points) > 1:
-            pygame.draw.lines(screen, self.plotDataColor, False, points, 2)
-        
+            for i in range(len(points) - 1):
+                pyglet.shapes.Line(
+                    points[i][0], points[i][1],
+                    points[i+1][0], points[i+1][1],
+                    thickness=2, color=self.plotDataColor[:3], batch=batch
+                )
         # Draw points
         point_radius = 3
         for x, y in points:
-            pygame.draw.circle(screen, self.plotDataColor, (x, y), point_radius)
-            pygame.draw.circle(screen, self.style.bg_color, (x, y), point_radius - 1)
+            pyglet.shapes.Circle(x, y, point_radius, color=self.plotDataColor[:3], batch=batch)
+            pyglet.shapes.Circle(x, y, point_radius-1, color=style.bg_color[:3], batch=batch)
 
-    def handle_event(self, event: pygame.event.Event) -> bool:
-        """Plotter typically doesn't handle events as it's not selectable"""
+    def handle_event(self, event) -> bool:
         return False
 
     def update_data(self, x_values, y_values):

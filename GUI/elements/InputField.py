@@ -1,4 +1,5 @@
 import pygame
+import pyglet
 from .Element import Element
 from GUI.style import StyleManager
 
@@ -25,62 +26,59 @@ class InputField(Element):
             height=height,
             manager=manager,
             parent_panel=parent_panel,
-            selectable=True,  # Input fields are selectable
+            selectable=True,
             neighbors=None,
             layer=layer
         )
-        
         self.value = initial_value
         self.min_value = min_value
         self.max_value = max_value
         self.step = step
         self.style = StyleManager.current_style
-        self.font = pygame.font.SysFont("Arial", font_size)
-        self.is_active = False  # Whether we're actively editing the value
+        self.font_size = font_size
+        self.is_active = False
 
-    def render(self, screen: pygame.Surface):
-        # Draw background
+    def render(self, batch):
         bg_color = self.style.active_bg_color if self.is_active else (
             self.style.highlight_color if self.is_focused else self.style.bg_color
         )
-        pygame.draw.rect(screen, bg_color, (self.x, self.y, self.width, self.height))
-        
-        # Draw border if focused
+        pyglet.shapes.Rectangle(self.x, self.y, self.width, self.height, color=bg_color[:3], batch=batch)
         if self.is_focused:
-            pygame.draw.rect(screen, self.style.border_color, 
-                          (self.x, self.y, self.width, self.height), 2)
-        
-        # Render value text
-        text = self.font.render(str(self.value), True, self.style.text_color)
-        screen.blit(text, (
-            self.x + (self.width - text.get_width()) // 2,
-            self.y + (self.height - text.get_height()) // 2
-        ))
+            border = pyglet.shapes.Rectangle(self.x, self.y, self.width, self.height, color=self.style.border_color[:3], batch=batch)
+            border.opacity = 255
+        label = pyglet.text.Label(
+            str(self.value),
+            font_name='Arial',
+            font_size=self.font_size,
+            color=self.style.text_color + (255,),
+            x=self.x + self.width // 2,
+            y=self.y + self.height // 2,
+            anchor_x='center',
+            anchor_y='center',
+            batch=batch
+        )
+        batch.draw()
 
-    def handle_event(self, event: pygame.event.Event) -> bool:
-        """Handle keyboard events for value adjustment and confirmation."""
+    def handle_event(self, event) -> bool:
         if not self.is_focused:
             return False
-
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
+        # Pyglet event: event.type == 'KEYDOWN', event.symbol
+        if getattr(event, 'type', None) == 'KEYDOWN':
+            from pyglet.window import key
+            if event.symbol == key.RETURN:
                 self.is_active = not self.is_active
-                if not self.is_active:  # Only trigger on_press when leaving active state
+                if not self.is_active:
                     self.on_press()
                 return True
-            
-            elif self.is_active:  # Only adjust value when active
-                if event.key == pygame.K_LEFT or event.key == pygame.K_COMMA:  # '<' key
+            elif self.is_active:
+                if event.symbol in (key.LEFT, key.COMMA):
                     self.value = max(self.min_value, self.value - self.step)
-                    # round floating numbers
                     self.value = round(self.value, 2)
                     return True
-                elif event.key == pygame.K_RIGHT or event.key == pygame.K_PERIOD:  # '>' key
+                elif event.symbol in (key.RIGHT, key.PERIOD):
                     self.value = min(self.max_value, self.value + self.step)
-                    # round floating numbers
                     self.value = round(self.value, 2)
                     return True
-        
         return super().handle_event(event)
 
     def on_press(self):

@@ -1,6 +1,6 @@
 import random
 import time
-import pygame
+import pyglet
 from GUI.elements.Element import Element
 from GUI.style import StyleManager
 from GUI.elements.Image.Image2D_Graph import Image2D_Graph
@@ -32,50 +32,46 @@ class ImageCarousel(Element):
             neighbors=None,
             layer=layer
         )
-        
         self.style = StyleManager.current_style
         self.mode = mode
         self.switch_interval = switch_interval
-        self.last_switch_time = time.time()  # Initialize with current time
+        self.last_switch_time = time.time()
         self.current_index = 0
         self.image_elements = []
         self.progress_bar_height = progress_bar_height
         self.progress_bar_color = progress_bar_color
-        
+
         # Add initial images if provided
         if images:
             for img in images:
                 self.add_image(img)
-        
+
         # Shuffle if in random mode
         if "random" in self.mode and self.image_elements:
             random.shuffle(self.image_elements)
-    
+
     def add_image(self, image: Image2D_Graph):
         """Add an Image2D_Graph instance to the carousel"""
         self._center_image(image)
         self.image_elements.append(image)
-        
         if "random" in self.mode:
             random.shuffle(self.image_elements)
-    
+
     def _center_image(self, image: Image2D_Graph):
         """Center an image within the carousel's bounds"""
         image.set_position(
             self.x + (self.width - image.width) // 2,
             self.y + (self.height - image.height) // 2
         )
-    
+
     def next_image(self):
         """Switch to next image in sequence"""
         if not self.image_elements:
             return
-            
         self.current_index = (self.current_index + 1) % len(self.image_elements)
         self.last_switch_time = time.time()
-        #print("Switching")
         self.update()
-    
+
     def random_image(self):
         """Select a random image"""
         if len(self.image_elements) > 1:
@@ -84,51 +80,52 @@ class ImageCarousel(Element):
                 new_index = random.randint(0, len(self.image_elements)-1)
             self.current_index = new_index
         self.last_switch_time = time.time()
-        #print("Switching")
         self.update()
-    
-    def render(self, screen: pygame.Surface):
-        """Draw the current image, progress bar, and handle automatic switching"""
+
+    def render(self, batch):
         current_time = time.time()
-        
         # Handle automatic switching for timed mode
         if self.mode == "random_timed" and current_time - self.last_switch_time > self.switch_interval:
             self.random_image()
-        
+
         # Draw current image if available
         if self.image_elements:
-            self.image_elements[self.current_index].render(screen)
-        
+            self.image_elements[self.current_index].render(batch)
+
         # Draw progress bar for random_timed mode
         if self.mode == "random_timed" and self.image_elements:
             progress = min(1.0, (current_time - self.last_switch_time) / self.switch_interval)
             bar_width = int(self.width * progress)
-            
             # Draw background (empty part of progress bar)
-            pygame.draw.rect(
-                screen, 
-                (50, 50, 50),  # Dark gray background
-                (self.x, self.y + self.height - self.progress_bar_height, 
-                 self.width, self.progress_bar_height)
+            pyglet.shapes.Rectangle(
+                self.x,
+                self.y + self.height - self.progress_bar_height,
+                self.width,
+                self.progress_bar_height,
+                color=(50, 50, 50),
+                batch=batch
             )
-            
             # Draw progress
-            pygame.draw.rect(
-                screen, 
-                self.progress_bar_color,
-                (self.x, self.y + self.height - self.progress_bar_height, 
-                 bar_width, self.progress_bar_height)
+            pyglet.shapes.Rectangle(
+                self.x,
+                self.y + self.height - self.progress_bar_height,
+                bar_width,
+                self.progress_bar_height,
+                color=self.progress_bar_color[:3],
+                batch=batch
             )
-        
+
         # Draw border if selectable and focused
         if self.selectable and self.is_focused:
-            pygame.draw.rect(
-                screen, 
-                self.style.highlight_color, 
-                (self.x, self.y, self.width, self.height), 
-                2
+            pyglet.shapes.Rectangle(
+                self.x,
+                self.y,
+                self.width,
+                self.height,
+                color=self.style.highlight_color[:3],
+                batch=batch
             )
-    
+
     def on_press(self):
         """Handle selection for selectable mode"""
         if self.mode == "selectable":
@@ -136,19 +133,19 @@ class ImageCarousel(Element):
 
     def update(self):
         pass
-    
+
     def set_position(self, x: int, y: int):
         """Sets position for carousel and re-centers all images"""
         super().set_position(x, y)
         for img in self.image_elements:
             self._center_image(img)
-    
+
     def update_panel_position(self):
         """Updates position when panel moves (if using offset mode)"""
         super().update_panel_position()
         for img in self.image_elements:
             self._center_image(img)
-    
+
     def set_size(self, width: int, height: int):
         """Update carousel size and re-center all images"""
         self.width = width
@@ -157,4 +154,4 @@ class ImageCarousel(Element):
             self._center_image(img)
 
     def get_image(self):
-        return self.image_elements[ self.current_index ] if self.image_elements else None
+        return self.image_elements[self.current_index] if self.image_elements else None
