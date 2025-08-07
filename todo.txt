@@ -1,0 +1,31 @@
+#SOFTWARE
+
+- In buttons, some sort of visual indication for where the neigbours are (if left neigbour not None alternative render on the edge or some gradient)
+-- light sources list in menus for rendering light efects
+
+- Synchronisation jitter (tearing of the lines in the image)
+- Deamaged rolling rows
+- Moiré pattern?
+-- seperate distortion class for more dramatic distortions called for example on transitions or at larger time intervals
+
+
+- in main menu display version author and so on
+- in clock display battery life
+- not diagram image processor
+- in main some sort of logo with author name under it
+
+
+#HARDWARE
+-usb z czytnikiem microSD
+
+-Raspberry Pi 4B/3B+/3B/Zero
+-Screen DPI - LCD IPS 5'' 800x480px for Raspberry Pi 4B/3B+/3B/Zero - Waveshare 16381
+-Enkoder obrotu (chyba jest)
+
+Zasilanie:
+-2x 18650 Li-ion batteries
+-TP4056 Charger Module (with protection)   }
+-MT3608 Boost Converter (3.7V → 5V 2A)     }---------- MP2636 -> wtedy ogniwa równolegle // 18650 osłona baterii litowej V3/V8 Power Bank 1 moduł ładowania
+-Power switch, case, wiring, and heat dissipation
+
+-fuse?

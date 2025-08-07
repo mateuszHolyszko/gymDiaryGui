@@ -16,6 +16,57 @@ class ProgramsDB(WorkoutDatabase):
         """Get a specific program by name"""
         programs = self._read_programs()
         return programs.get(program_name, [])
+    
+    def get_repRange(self, program_name: str, exercise_name: str) -> tuple:
+        """Get the rep range of an exercise in a program as a tuple of integers
+        
+        Args:
+            program_name: Name of the program to search
+            exercise_name: Name of the exercise to find
+            
+        Returns:
+            Tuple of (min_reps, max_reps) or None if not found
+        """
+        program = self.get_program(program_name)
+        if not program:
+            return None
+            
+        for exercise in program:
+            if exercise.get('name') == exercise_name:
+                rep_range_str = exercise.get('rep_range', '')
+                if not rep_range_str:
+                    return None
+                    
+                try:
+                    # Split the string by '-' and convert to integers
+                    min_rep, max_rep = map(int, rep_range_str.split('-'))
+                    return (min_rep, max_rep)
+                except (ValueError, AttributeError):
+                    # Handle cases where format is invalid
+                    return None
+                    
+        return None
+    
+    def get_target(self, program_name: str, exercise_name: str) -> str:
+        """Get the targeted muscle group of an exercise in a program as a string
+        
+        Args:
+            program_name: Name of the program to search
+            exercise_name: Name of the exercise to find
+            
+        Returns:
+            string or None if not found
+        """
+        program = self.get_program(program_name)
+        if not program:
+            return None
+            
+        for exercise in program:
+            if exercise.get('name') == exercise_name:
+                target_str = exercise.get('muscle', '')
+                if not target_str:
+                    return None
+                return target_str
 
     def add_program(self, program_name: str):
         """Add a new empty program"""
@@ -79,3 +130,39 @@ class ProgramsDB(WorkoutDatabase):
             table_data.append(row)
         
         return table_data
+    
+    def get_muscle_groups(self) -> List[str]:
+        """Returns a list of unique muscle"""
+        return list(["Chest", "Back", "Quads","Hamstrings", "Shoulders", "Biceps","Triceps", "Abs","Calves","Glutes","Forearms"])
+
+    def edit_exercise_field(self, program_name: str, row_index: int, col_index: int, new_value):
+        """
+        Edit a specific field in a program's exercise by row and column index.
+        col_index: 0=name, 1=rep_range, 2=muscle, 3=bodyweight
+        """
+        programs = self._read_programs()
+        if program_name not in programs:
+            return False
+        exercises = programs[program_name]
+        if row_index < 0 or row_index >= len(exercises):
+            return False
+        field_map = {0: "name", 1: "rep_range", 2: "muscle", 3: "bodyweight"}
+        field = field_map.get(col_index)
+        if field is None:
+            return False
+        # Convert value for boolean
+        if field == "bodyweight":
+            if isinstance(new_value, str):
+                new_value = new_value.lower() in ("true", "1", "yes")
+            else:
+                new_value = bool(new_value)
+        exercises[row_index][field] = new_value
+        self._write_programs(programs)
+        return True
+    
+    def get_exercises_in_program(self,program_name: str):
+        """Returns a list of exercises in a program"""
+        programs = self._read_programs()
+        if program_name not in programs:
+            return []
+        return programs[program_name]

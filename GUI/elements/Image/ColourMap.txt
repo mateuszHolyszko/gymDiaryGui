@@ -1,0 +1,11 @@
+#FF0000 - Chest
+#ff3400 - Back
+#0000ff - Quads
+#3434ff - Hamstrings
+#00ff00 - Biceps
+#34ff34 - Triceps
+#7dff7d - Shoulders
+#ffff9b - Forearms
+#ff7d37 - Calfs
+#7d34ff - Glutes
+#FFFF7D - Abs

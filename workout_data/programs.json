@@ -1,64 +1,58 @@
 {
   "programs": {
-    "A": [
+    "Strength Training": [
       {
-        "name": "Chest press",
+        "name": "Bench Press",
         "rep_range": "8-10",
         "muscle": "Chest",
         "bodyweight": false
       },
       {
-        "name": "Shoulder Press",
+        "name": "Overhead Press",
         "rep_range": "12-20",
         "muscle": "Shoulders",
         "bodyweight": false
       },
       {
-        "name": "Biceps curl",
+        "name": "Bicep Curl",
         "rep_range": "15-23",
         "muscle": "Biceps",
         "bodyweight": false
       }
     ],
-    "C": [
+    "Push Day": [
       {
-        "name": "firstexc",
+        "name": "Push Up",
         "rep_range": "8-12",
-        "muscle": "Back",
+        "muscle": "Chest",
         "bodyweight": false
       },
       {
-        "name": "secondTest",
+        "name": "Pull Up",
         "rep_range": "3-12",
-        "muscle": "Chest",
-        "bodyweight": false
+        "muscle": "Back",
+        "bodyweight": true
       },
       {
-        "name": "thirdtest",
+        "name": "Lateral Raise",
         "rep_range": "10-15",
-        "muscle": "Forearms",
-        "bodyweight": "No"
-      },
-      {
-        "name": "fourthTest",
-        "rep_range": "4-8",
-        "muscle": "Forearms",
+        "muscle": "Shoulders",
         "bodyweight": false
       },
       {
-        "name": "New Dummy Exercise",
+        "name": "Sit Up",
+        "rep_range": "4-8",
+        "muscle": "Abs",
+        "bodyweight": true
+      },
+      {
+        "name": "Wrist Curl",
         "rep_range": "8-12",
-        "muscle": "Chest",
+        "muscle": "Forearms",
         "bodyweight": false
       }
     ],
     "test2": [
-      {
-        "name": "squat",
-        "rep_range": "5-8",
-        "muscle": "Quads",
-        "bodyweight": "No"
-      },
       {
         "name": "testleg",
         "rep_range": "8-12",
@@ -67,8 +61,14 @@
       },
       {
         "name": "test",
-        "rep_range": "6-12",
-        "muscle": "Forearms",
+        "rep_range": "8-12",
+        "muscle": "Triceps",
+        "bodyweight": false
+      },
+      {
+        "name": "test2",
+        "rep_range": "6-10",
+        "muscle": "Shoulders",
         "bodyweight": false
       }
     ]
