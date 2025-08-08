@@ -1,4 +1,4 @@
-from GUI.Menu import Menu
+from GUI.Form import Form
 from GUI.Panel import Panel
 from GUI.panels.navigation_bar import NavigationBar
 from GUI.elements.Button import Button
@@ -8,7 +8,7 @@ from workout_db.programs_db import ProgramsDB
 from datetime import datetime
 import pygame
 
-class Form(Menu):
+class FormYesNo(Form):
     def setup(self):
         """Setup panels, elements and actions"""
         screenWidth, screenHeight = pygame.display.get_surface().get_size() # Get screen size
@@ -46,11 +46,12 @@ class Form(Menu):
         print(JSONdata)
         self.session.add_session(JSONdata)
         self.manager.notification_system.show("Session saved successfully!", 3)
-        self.manager.switch_to("MainMenu")
+        self.exit()
         
     def no_pressed(self):
         print("NO")
-        self.manager.switch_to("SessionMenu")
+        # Return to previous menu using Form's exit method
+        self.exit()
 
     def set_initial_focus_on_switch(self):
         # Set focus to the first nav bar button or any default element

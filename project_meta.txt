@@ -1,5 +1,5 @@
-VersionData:06/08/2025,
-Version:0.1,
-Branch:Rework,
+VersionData:08/08/2025,
+Version:0.2,
+Branch:moderngl,
 Status:Unstable,
 Author:Mateutek

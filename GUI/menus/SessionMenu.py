@@ -10,6 +10,7 @@ from GUI.Table import Table
 from GUI.elements.SessionCell import SessionCell
 from workout_db.sessions_db import SessionsDB
 from datetime import datetime
+from GUI.menus.FormYesNo import FormYesNo
 
 class SessionMenu(Menu):
     def setup(self):
@@ -89,7 +90,8 @@ class SessionMenu(Menu):
         JSONdata = self.table.get_session_data_JSON(self.selectProgram.getSelectedOption(), datetime.now().strftime("%d-%m-%Y"), bodyweight )
         #print(JSONdata)
         self.manager.context["session_data"] = JSONdata # temporaly storage, so we can access it in Form
-        self.manager.switch_to("Form")
+        form = FormYesNo(screen=self.screen,manager=self.manager, return_menu_instance=self)
+        self.manager.create_form(form,self)
 
     def set_initial_focus_on_switch(self):
         # Set focus to the first nav bar button or any default element

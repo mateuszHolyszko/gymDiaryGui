@@ -1,43 +1,77 @@
 import pygame
+import numpy as np
+import moderngl
+from pathlib import Path
+from pygame.locals import DOUBLEBUF, OPENGL
+
 from GUI.MenuManager import MenuManager
 from GUI.menus.MainMenu import MainMenu
 from GUI.menus.SessionMenu import SessionMenu
 from GUI.menus.ProgramMenu import ProgramMenu
 from GUI.menus.StatsMenu import StatsMenu
-from GUI.menus.Form import Form
+from GUI.menus.FormYesNo import Form
 from GUI.Notifications import Notification
-from GUI.Distortion import Distortion
 
 def main():
-    # Initialize pygame
+    # Initialize pygame with OpenGL support
     pygame.init()
-    screen = pygame.display.set_mode((800, 480))
+    screen_size = (800, 480)
+    pygame.display.set_mode(screen_size, DOUBLEBUF | OPENGL)
     pygame.display.set_caption("Gym Diary")
     clock = pygame.time.Clock()
 
-    # Create notification system
+    # === Setup moderngl context and shaders ===
+    ctx = moderngl.create_context()
+
+    # Load shaders from files
+    with open("GUI/Distortions/distortion.vert") as f:
+        vertex_shader = f.read()
+    with open("GUI/Distortions/distortion.frag") as f:
+        fragment_shader = f.read()
+
+    prog = ctx.program(vertex_shader=vertex_shader, fragment_shader=fragment_shader)
+    prog['time'] = 0.0
+    prog['intensity'] = 0.3  # Default distortion level
+    
+
+    # Fullscreen quad
+    vertices = np.array([
+        -1.0,  1.0, 0.0, 1.0,
+        -1.0, -1.0, 0.0, 0.0,
+         1.0,  1.0, 1.0, 1.0,
+         1.0, -1.0, 1.0, 0.0
+    ], dtype='f4')
+
+    vbo = ctx.buffer(vertices.tobytes())
+    vao = ctx.simple_vertex_array(prog, vbo, 'in_vert', 'in_uv')
+
+    # Create offscreen GUI surface
+    gui_surface = pygame.Surface(screen_size)
+
+    # Texture for shader input
+    texture = ctx.texture(screen_size, 3)
+    texture.repeat_x = False
+    texture.repeat_y = False
+
+    # Setup notification system
     notification = Notification(font_size=24, display_time=2.5)
 
-    # Create distortion system
-    distortion = Distortion(800, 480, intensity=0.75)
-
     # Create menu manager
-    manager = MenuManager(screen,notification)
-    
+    manager = MenuManager(gui_surface, notification)
+
     # Instantiate all menus
-    main_menu = MainMenu(screen, manager)
-    session_menu = SessionMenu(screen, manager)
-    program_menu = ProgramMenu(screen, manager)
-    stats_menu = StatsMenu(screen, manager)
-    form_menu = Form(screen, manager)
+    main_menu = MainMenu(gui_surface, manager)
+    session_menu = SessionMenu(gui_surface, manager)
+    program_menu = ProgramMenu(gui_surface, manager)
+    stats_menu = StatsMenu(gui_surface, manager)
+    form_menu = Form(gui_surface, manager)
     
     # Register all menus with string names (pass instances)
     manager.register_menu("MainMenu", main_menu)
     manager.register_menu("SessionMenu", session_menu)
     manager.register_menu("ProgramMenu", program_menu)
     manager.register_menu("StatsMenu", stats_menu)
-    manager.register_menu("Form", form_menu)
-    
+
     # Start with main menu
     manager.switch_to("MainMenu")
 
@@ -57,22 +91,26 @@ def main():
             
             # Pass all events to menu manager
             manager.handle_event(event)
-        
-        # Clear screen
-        screen.fill((0, 0, 0))  # Black background
-        
-        # Render current menu
-        if manager.current_menu:
-            manager.current_menu.render(screen)
-        
-        # Render notification (if active)
-        notification.render(screen)
 
-        # Apply distortion effects (after everything else is rendered)
-        distortion.render(screen)
-        
+        # === Draw GUI to offscreen surface ===
+        gui_surface.fill((0, 0, 0))
+        if manager.current_menu:
+            manager.current_menu.render(gui_surface)
+        notification.render(gui_surface)
+
+        # === Convert surface to texture ===
+        gui_rgb = pygame.surfarray.pixels3d(gui_surface).copy().swapaxes(0, 1)
+        texture.write(gui_rgb.tobytes())
+
+        # === Run shader ===
+        ctx.clear()
+        texture.use()
+        prog['time'].value = pygame.time.get_ticks() / 1000.0
+        vao.render(moderngl.TRIANGLE_STRIP)
+
+        # === Swap buffers ===
         pygame.display.flip()
-        clock.tick(12)  # 12 FPS
+        clock.tick(12)
 
     pygame.quit()
 

@@ -681,6 +681,160 @@
           ]
         }
       ]
+    },
+    {
+      "date": "08-08-2025",
+      "program": "Strength Training",
+      "bodyweight": 70.8,
+      "exercises": [
+        {
+          "name": "Bench Press",
+          "sets": [
+            {
+              "weight": 105.0,
+              "reps": 14
+            },
+            {
+              "weight": 105.0,
+              "reps": 14
+            },
+            {
+              "weight": 100.75,
+              "reps": 11
+            },
+            {
+              "weight": 100.75,
+              "reps": 10
+            }
+          ]
+        },
+        {
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "weight": 27.5,
+              "reps": 14
+            },
+            {
+              "weight": 27.5,
+              "reps": 11
+            },
+            {
+              "weight": 25.0,
+              "reps": 9
+            }
+          ]
+        },
+        {
+          "name": "Bicep Curl",
+          "sets": [
+            {
+              "weight": 20.0,
+              "reps": 12
+            },
+            {
+              "weight": 17.5,
+              "reps": 15
+            },
+            {
+              "weight": 15.0,
+              "reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "08-08-2025",
+      "program": "Push Day",
+      "bodyweight": 70.8,
+      "exercises": [
+        {
+          "name": "Push Up",
+          "sets": [
+            {
+              "weight": 5.0,
+              "reps": 11
+            },
+            {
+              "weight": 5.0,
+              "reps": 8
+            },
+            {
+              "weight": 3.75,
+              "reps": 6
+            },
+            {
+              "weight": 3.75,
+              "reps": 6
+            }
+          ]
+        },
+        {
+          "name": "Pull Up",
+          "sets": [
+            {
+              "weight": 7.5,
+              "reps": 9
+            },
+            {
+              "weight": 6.25,
+              "reps": 7
+            },
+            {
+              "weight": 3.75,
+              "reps": 6
+            }
+          ]
+        },
+        {
+          "name": "Lateral Raise",
+          "sets": [
+            {
+              "weight": 11.25,
+              "reps": 14
+            },
+            {
+              "weight": 10.0,
+              "reps": 12
+            },
+            {
+              "weight": 8.75,
+              "reps": 10
+            }
+          ]
+        },
+        {
+          "name": "Sit Up",
+          "sets": [
+            {
+              "weight": 15.0,
+              "reps": 13
+            },
+            {
+              "weight": 13.75,
+              "reps": 12
+            }
+          ]
+        },
+        {
+          "name": "Wrist Curl",
+          "sets": [
+            {
+              "weight": 15.0,
+              "reps": 14
+            },
+            {
+              "weight": 13.75,
+              "reps": 13
+            },
+            {
+              "weight": 12.5,
+              "reps": 12
+            }
+          ]
+        }
+      ]
     }
   ]
 }

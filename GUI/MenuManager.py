@@ -21,6 +21,14 @@ class MenuManager:
                 self.current_menu.set_initial_focus_on_switch()
             return True
         return False
+    
+    def create_form(self, formInstance, returnMenuInstance):
+        formInstance.return_menu_instance = returnMenuInstance
+        self.focus_manager.clear_focus()
+        self.current_menu = formInstance
+        if hasattr(self.current_menu, "set_initial_focus_on_switch"):
+            self.current_menu.set_initial_focus_on_switch()
+        return True
 
     def handle_event(self, event):
         if not self.current_menu:

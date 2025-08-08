@@ -5,11 +5,12 @@ from GUI.elements.Button import Button
 from workout_db.programs_db import ProgramsDB
 from workout_db.sessions_db import SessionsDB
 from GUI.elements.SelectDropDown import SelectDropDown
-from GUI.elements.InputField import InputField
+from GUI.menus.FromGetInputWeek import FormGetInputWeek
 from workout_db.exercises import Exercises
 import pygame
 from GUI.elements.Plotter import Plotter
 from GUI.style import StyleManager
+from GUI.menus.FormGetExerciseOptions import FormGetExerciseOptions
 
 class StatsMenu(Menu):
     def setup(self):
@@ -40,8 +41,9 @@ class StatsMenu(Menu):
         
         self.query_btn = SelectDropDown(list_of_queries, width=200, height=25, manager=self.manager,drop_direction="up",layer=2)
         # Input field wont be appended to panel since it will be used for getInput() method
-        self.week_input = InputField(initial_value=1, min_value=1, max_value=12, step=1, manager=self.manager,x=self.screenWidth//2-40,y=self.screenHeight//2) # Get max value from db?
-        self.weeks_btn = Button(f"Search in {self.week_input.value} Weeks", width=200, height=25, manager=self.manager)
+        
+        self.week_input_form = FormGetInputWeek(screen=self.screen,manager=self.manager, return_menu_instance=self) 
+        self.weeks_btn = Button(f"Search in {self.week_input_form.getValue()} Weeks", width=200, height=25, manager=self.manager)
         
         self.queryTypePanel.add_element(self.query_btn)
         self.queryTypePanel.add_element(self.weeks_btn)
@@ -119,9 +121,9 @@ class StatsMenu(Menu):
             
         elif selected_query in Exercises.getTargets():
             # Form
-            excerciseDropDown = SelectDropDown(x=self.screenWidth//2 - 200,y=self.screenHeight//2,options=Exercises.get_exercises_for_muscle(selected_query))
-            excerciseDropDown.getInput(self.manager.screen, prompt=f"Chose specific excercise for {selected_query} muscle group.")
-            self.query = excerciseDropDown.getSelectedOption()
+            form = FormGetExerciseOptions(screen=self.screen,manager=self.manager, return_menu_instance=self, selected_query=selected_query)
+            self.manager.create_form(form,self)
+            self.query = form.getSelectedOption()
             print(self.query)
             self.queryAxisY = "weight" # Default Y axis value
             self.plotter.y_label = self.queryAxisY
@@ -147,8 +149,10 @@ class StatsMenu(Menu):
 
     
     def weeks_press(self):
-        self.week_input.getInput(self.manager.screen, prompt="Enter how many weeks the query should be run for.")
-        self.weeks_btn.text = f"{self.week_input.value} Weeks"
+        self.manager.create_form(self.week_input_form,self)
+
+    def update_weeks(self):
+        self.weeks_btn.text = f"{self.week_input_form.getValue()} Weeks"
         # update query with new date values
         self.set_plotter_data()
         
@@ -161,12 +165,12 @@ class StatsMenu(Menu):
     def set_plotter_data(self):
         # Set plotter data, from the context of Menu make query to database and update x_vals and y_vals
         if self.query == "weight":
-            self.y_vals, self.x_vals = self.session.get_bodyweight_history(self.week_input.value)
+            self.y_vals, self.x_vals = self.session.get_bodyweight_history(self.week_input_form.getValue())
             self.x_vals.reverse()
             self.y_vals.reverse()
             print(f"Y values: {self.y_vals}, X values: {self.x_vals}")
         else:
-            self.y_vals, self.x_vals = self.session.get_exercise_history(self.query, self.week_input.value)
+            self.y_vals, self.x_vals = self.session.get_exercise_history(self.query, self.week_input_form.getValue())
             self.y_vals = [entry[self.queryAxisY] for entry in self.y_vals]
             self.x_vals.reverse()
             self.y_vals.reverse()
