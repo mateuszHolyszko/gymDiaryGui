@@ -1,5 +1,4 @@
 import pygame
-from workout_db.programs_db import ProgramsDB
 from GUI.Menu import Menu
 from GUI.Panel import Panel
 from GUI.panels.navigation_bar import NavigationBar
@@ -7,9 +6,9 @@ from GUI.elements.Button import Button
 from GUI.elements.SelectDropDown import SelectDropDown
 from GUI.Table import Table
 from GUI.panels.ProgramMenu_ex_selection import TargetSelectionPanel
-from workout_db.exercises import Exercises
 from GUI.elements.Image.Image2D_Graph import Image2D_Graph
 from GUI.panels.ProgramMenu_stats_exercise import ExerciseStatsPanel
+from workout_db_r.Target import Target
 
 class ProgramMenu(Menu):
     def __init__(self, *args, **kwargs):
@@ -17,7 +16,6 @@ class ProgramMenu(Menu):
         self.current_mode = "programs"  # Default mode, either "programs" or "exercises"
 
     def setup(self):
-        self.database = ProgramsDB()
         """Setup panels, elements and actions"""
         screenWidth, screenHeight = pygame.display.get_surface().get_size() # Get screen size
 
@@ -42,18 +40,18 @@ class ProgramMenu(Menu):
         self.table.draw_table_lines = False 
         
         # Add elements
-        programNames = self.database.get_all_program_names()
+        programNames = self.manager.queryTool.get_all_program_names()
         self.selectProgram = SelectDropDown(options=programNames, width=screenWidth//4, height=50, manager=self.manager, layer=2)
         self.programsPanel.add_element(self.selectProgram)
 
-        self.table.load_data_program(self.database.get_program_data_as_table(programNames[0]),manager=self.manager) # Load initial program data
+        self.table.load_data_program(self.manager.queryTool.get_program_table_data(programNames[0]),manager=self.manager) # Load initial program data
 
         # Excercises mode elements, but dont add it to menu:  =====================================================================
         self.targetSelectionPanel = TargetSelectionPanel(x=screenWidth - screenWidth//4,y=self.programs_excercieses_panel.height+35, width=screenWidth//4, height=heightAboveStaticElems*0.7,manager=self.manager)
         self.targetSelectionPanel.getElements()[0].activate()  # Activate first button by default
 
         self.selectExercisePanel = Panel(x=0,y=25,width=screenWidth,height=50,manager=self.manager)
-        self.selectExercise = SelectDropDown(options=Exercises.get_exercises_for_muscle( self.targetSelectionPanel.active_target ), width=screenWidth//4, height=35, manager=self.manager, layer=3)
+        self.selectExercise = SelectDropDown(options=self.manager.queryTool.get_exercise_names_by_target( self.targetSelectionPanel.active_target ), width=screenWidth//4, height=35, manager=self.manager, layer=3)
         self.selectExercisePanel.add_element(self.selectExercise)
 
         imagePanelWidth=screenWidth-screenWidth//4
@@ -142,13 +140,12 @@ class ProgramMenu(Menu):
             self.selectExercisePanel.getElements()[-1].set_neighbor("down", self.targetSelectionPanel.getElements()[0])
             self.targetSelectionPanel.getElements()[0].set_neighbor("up", self.selectExercisePanel.getElements()[0])
             self.targetSelectionPanel.getElements()[1].set_neighbor("up", self.selectExercisePanel.getElements()[0]) # since there are 2 cols
-            print("TODO")
         else:
             print("Invalid mode")
 
 
     def load_program(self):
-        self.table.load_data_program(self.database.get_program_data_as_table( self.selectProgram.getSelectedOption() ),manager=self.manager)
+        self.table.load_data_program(self.manager.queryTool.get_program_table_data( self.selectProgram.getSelectedOption() ),manager=self.manager)
         # Connect navigation between programsPanel and table
         for programsPanel_elem in self.programsPanel.getElements():
             programsPanel_elem.set_neighbor("right", self.table.elements_grid[1][0])  # First element in table
@@ -174,10 +171,11 @@ class ProgramMenu(Menu):
         self.load_program_mode("exercises")
 
     def on_target_change(self):
-        self.selectExercise.updateOptions( Exercises.get_exercises_for_muscle( self.targetSelectionPanel.active_target ) )
+        self.selectExercise.updateOptions( self.manager.queryTool.get_exercise_names_by_target( self.targetSelectionPanel.active_target ) )
         self.on_finished_excercise_selection()
         self.imagePanel.clear_elements() # Clear previous image
-        group = Exercises.get_group_for_muscle(self.targetSelectionPanel.active_target)
+        group =  Target.get_muscle_group(self.targetSelectionPanel.active_target)
+        #group = Exercises.get_group_for_muscle(self.targetSelectionPanel.active_target)
         if group == "arms":
             self.imagePanel.add_element(self.image1)
         elif group == "legs":

@@ -1,21 +1,15 @@
 import pygame
-from workout_db.programs_db import ProgramsDB
 from GUI.Menu import Menu
 from GUI.Panel import Panel
 from GUI.ScrollingTableVertical import ScrollingTableVertical
 from GUI.panels.navigation_bar import NavigationBar
 from GUI.elements.Button import Button
 from GUI.elements.SelectDropDown import SelectDropDown
-from GUI.Table import Table
-from GUI.elements.SessionCell import SessionCell
-from workout_db.sessions_db import SessionsDB
 from datetime import datetime
 from GUI.menus.FormYesNo import FormYesNo
 
 class SessionMenu(Menu):
     def setup(self):
-        self.database = ProgramsDB()
-        self.session = SessionsDB()
         """Setup panels, elements and actions"""
         screenWidth, screenHeight = pygame.display.get_surface().get_size() # Get screen size
 
@@ -26,7 +20,8 @@ class SessionMenu(Menu):
         self.sessionPanel = self.add_panel(Panel, x=0, y=0, width=screenWidth, height=screenHeight //8, layout_type="horizontal")
         # Create table panel
         table_y = 35
-        totalRows = len(self.database.get_exercises_in_program(self.database.get_all_program_names()[0]))
+        #totalRows = len(self.database.get_exercises_in_program(self.database.get_all_program_names()[0]))
+        totalRows = len(self.manager.queryTool.get_program_exercises_names(self.manager.queryTool.get_all_program_names()[0]) )
         rowHeight = 100
         windowHeight = screenHeight - self.nav_bar.height - self.sessionPanel.height - 25
         totalHeightOfTable = max(windowHeight, totalRows * rowHeight + table_y)
@@ -37,13 +32,13 @@ class SessionMenu(Menu):
         self.table.scroll_offset = self.table.max_offset
         
         # Add elements
-        programNames = self.database.get_all_program_names()
+        programNames = self.manager.queryTool.get_all_program_names()
         self.selectProgram = SelectDropDown(options=programNames, width=screenWidth//4, height=50, manager=self.manager, layer=3)
         self.saveSessionButton = Button(text="Save Session", width=screenWidth//4, height=50, manager=self.manager, layer=1)
         self.sessionPanel.add_element(self.selectProgram)
         self.sessionPanel.add_element(self.saveSessionButton)
 
-        self.table.load_data_session(programNames[0],self.session.getSessionAsList(programNames[0]),manager=self.manager) # Load initial program data
+        self.table.load_data_session(programNames[0],self.manager.queryTool.get_session_as_list(programNames[0]),manager=self.manager) # Load initial program data
         
         self.connectNeighbors()
         
@@ -56,8 +51,8 @@ class SessionMenu(Menu):
         self.saveSessionButton.on_press = self.saveSession
 
     def load_program(self):
-        self.table.load_data_session( self.selectProgram.getSelectedOption() ,self.session.getSessionAsList( self.selectProgram.getSelectedOption() ),manager=self.manager) # Load initial program data 
-        totalRows = len(self.database.get_exercises_in_program( self.selectProgram.getSelectedOption() ))
+        self.table.load_data_session( self.selectProgram.getSelectedOption() ,self.manager.queryTool.get_session_as_list( self.selectProgram.getSelectedOption() ),manager=self.manager) # Load initial program data 
+        totalRows = len(self.manager.queryTool.get_program_exercises_names( self.selectProgram.getSelectedOption() ))
         rowHeight = 100
         totalHeightOfTable = max(self.table.height, totalRows * rowHeight + self.table.y )
         self.table.changeDims(newTotalHeight=totalHeightOfTable)

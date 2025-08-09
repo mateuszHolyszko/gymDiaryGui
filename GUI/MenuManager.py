@@ -1,8 +1,9 @@
 from GUI.FocusManager import FocusManager
 
 class MenuManager:
-    def __init__(self, screen, notification_system):
+    def __init__(self, screen,queryTool, notification_system):
         self.screen = screen
+        self.queryTool = queryTool
         self.notification_system = notification_system
         self.current_menu = None
         self.focus_manager = FocusManager()  # Central focus control

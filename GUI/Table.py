@@ -3,7 +3,6 @@ from GUI.Panel import Panel
 from GUI.elements.Button import Button
 from GUI.elements.Label import Label
 from GUI.elements.SessionCell import SessionCell
-from workout_db.programs_db import ProgramsDB
 from GUI.elements.Element import Element
 from GUI.style import StyleManager
 
@@ -16,7 +15,6 @@ class Table(Panel):
         # Store elements as a 2D list: rows x cols
         self.elements_grid = [[None for _ in range(cols)] for _ in range(rows)]
         self.elements = []
-        self.database = ProgramsDB()
 
     def add_element(self, element, row, col):
         """Add element at specific row, col and reposition all."""
@@ -202,8 +200,9 @@ class Table(Panel):
 
             # Exercise name Button
             exercise_name = str(row[0])
-            exercise_repRange = self.database.get_repRange(programName, exercise_name)
-            exercise_target = self.database.get_target(programName, exercise_name)
+            exercise_repRange = self.manager.queryTool.get_exercise_rep_range(programName, exercise_name)
+            exercise_target = self.manager.queryTool.get_exercise_by_name(exercise_name).target
+            print(f"EXERCISE targer: {exercise_target}")
             button_elem = Button(
                 text=exercise_name,
                 x=self.x,
@@ -286,7 +285,7 @@ class Table(Panel):
         # Get exercise info from first cell in row
         exercise_button = self.elements_grid[row_index][0]
         exercise_name = exercise_button.text if exercise_button else "Unknown"
-        exercise_repRange = self.database.get_repRange(programName, exercise_name)
+        exercise_repRange = self.manager.queryTool.get_exercise_rep_range(programName, exercise_name)
         
         # Check if we need to expand the table
         if last_set_col >= self.cols - 2:  # -2 because last column is AddSet button

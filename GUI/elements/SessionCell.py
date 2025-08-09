@@ -1,7 +1,6 @@
 import pygame
 from .Element import Element
 from GUI.style import StyleManager
-from workout_db.exercises import Exercises
 
 class SessionCell(Element):
     def __init__(
@@ -38,7 +37,7 @@ class SessionCell(Element):
         self.repsFromThisSession = reps_previous
         self.repRange = rep_range
         self.exercise = exercise
-        self.excerciseTargetMuscle = Exercises.get_target_muscle(self.exercise) # Get based on excercise
+        self.excerciseTargetMuscle = self.manager.queryTool.get_exercise_by_name( self.exercise ).target # Get based on excercise
         self.font = pygame.font.SysFont("Arial", font_size)
         self.edit_state = "notEdited"  # 'notEdited', 'editReps', 'editWeight', 'hasBeenEdited'
         self.has_been_edited = False

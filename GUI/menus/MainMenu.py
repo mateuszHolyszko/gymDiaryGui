@@ -4,14 +4,9 @@ from GUI.Panel import Panel
 from GUI.panels.navigation_bar import NavigationBar
 from GUI.elements.Button import Button
 from GUI.elements.ValueDisplay import ValueDisplay
-from GUI.elements.SelectDropDown import SelectDropDown
 from GUI.elements.Image.Image2D import Image2D
 from GUI.elements.Label import Label
 from GUI.elements.InputField import InputField
-from GUI.Table import Table
-from workout_db.programs_db import ProgramsDB
-from workout_db.sessions_db import SessionsDB
-from GUI.elements.SessionCell import SessionCell
 from GUI.elements.Image.Image2D_Graph import Image2D_Graph
 from GUI.elements.Image.ImageCarousel import ImageCarousel
 from GUI.style import StyleManager
@@ -19,8 +14,6 @@ from GUI.style import StyleManager
 
 class MainMenu(Menu):
     def setup(self):
-        self.database = ProgramsDB()
-        self.session = SessionsDB()
         """Setup panels, elements and actions"""
         screenWidth, screenHeight = pygame.display.get_surface().get_size() # Get screen size
 
@@ -33,26 +26,25 @@ class MainMenu(Menu):
         self.InputPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 + 50, width=screenWidth//4, height=height,layout_type="horizontal")
         # Volume summary panel gets created after the CarouselPanel gets initiated, since its depended on CarouselPanel elements
         # Create CarouselPanel panel
-        self.CarouselPanel = self.add_panel(Panel,x=screenWidth//2,y=5,width=screenWidth//2 - 5,height=screenHeight - self.nav_bar.height - 10)
+        self.CarouselPanel = self.add_panel(Panel,x=screenWidth//1.7,y=25,width=screenWidth//2 - 5,height=screenHeight - self.nav_bar.height - 10)
         
         # MetaDataDisplay panel
         # Load metadata
         meta = self._load_project_meta()
         print(meta)
-        self.MetaDataDisplayPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - 100 , width=screenWidth//4, height=height)
+        self.MetaDataDisplayPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - 80 , width=screenWidth//4, height=height)
         self.metaDisplay = ValueDisplay(prompt="Project data", 
             value=
               f"Ver: {meta['Version']}: {meta['VersionData']}\n"
-              f"Branch: {meta['Branch']}\n"
               f"Status: {meta['Status']}\n"
               f"Author: {meta['Author']}",
-              height=150,
+              height=125,
               width=150)
         self.MetaDataDisplayPanel.add_element(self.metaDisplay)
 
         # Logo
-        self.logoPanel = self.add_panel(Panel, x=125, y=65 , width=5, height=5)
-        self.logo = Image2D(image_path="GUI\elements\Image\images\\Logo.png", height = 474//3.5 , width= 424//3.5, manager=self.manager,layer=2)
+        self.logoPanel = self.add_panel(Panel, x=self.MetaDataDisplayPanel.x, y=-20 , width=self.MetaDataDisplayPanel.width, height=self.MetaDataDisplayPanel.height)
+        self.logo = Image2D(image_path="GUI\elements\Image\images\\Logo.png", height = 474//3 , width= 424//3, manager=self.manager,layer=2)
         self.logoPanel.add_element(self.logo)
 
         # Add elements (InputPanel panel)
@@ -66,7 +58,7 @@ class MainMenu(Menu):
         except (KeyError, AttributeError) as e:
             # Fallback 1: Try getting bodyweight from last session
             try:
-                last_bodyweight = self.session.get_last_bodyweight()
+                last_bodyweight = self.manager.queryTool.get_last_bodyweight()
                 if last_bodyweight is not None:
                     bodyweight = last_bodyweight
                     if bodyweight is not None:
@@ -99,6 +91,11 @@ class MainMenu(Menu):
         # Create volumeSummary panel
         self.volumeSummary = self.add_panel(Panel, x=self.imageImageCarousel.x - 200, y=self.imageImageCarousel.y,width=screenWidth//4, height=self.imageImageCarousel.height)
         self.update_carousel()
+
+        # Create volumeLabel panel
+        self.volumeLabelPanel = self.add_panel(Panel, x=self.volumeSummary.x, y=self.imageImageCarousel.y-55,width=screenWidth//2, height=50)
+        self.volumeLabel = Label(text="Volume summary of 3 weeks", width=200, height=50, manager=self.manager)
+        self.volumeLabelPanel.add_element(self.volumeLabel)
         
         # Connect navigation between nav bar and InputPanel
         for nav_btn in self.nav_bar.buttons:
@@ -136,7 +133,7 @@ class MainMenu(Menu):
         self.volumeSummary.clear_elements()
         # Add elements (volumeSummary panel)
         for targetMuscle in self.imageImageCarousel.get_image().muscleGroups:
-            btn = Button(text=f"{targetMuscle}: {self.session.get_sets_for_target_whole(targetMuscle)}", width=150, height=30, manager=self.manager)
+            btn = Button(text=f"{targetMuscle}: {self.manager.queryTool.get_muscle_workload(muscle=targetMuscle,weeks=3)["total_sets"]}", width=150, height=30, manager=self.manager)
             btn.set_style_override({'bg_color': StyleManager.get_muscle_group_color(targetMuscle)['bg_color']})
             self.volumeSummary.add_element(btn)
 

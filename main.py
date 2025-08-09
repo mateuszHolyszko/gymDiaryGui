@@ -1,7 +1,6 @@
 import pygame
 import numpy as np
 import moderngl
-from pathlib import Path
 from pygame.locals import DOUBLEBUF, OPENGL
 
 from GUI.MenuManager import MenuManager
@@ -9,15 +8,22 @@ from GUI.menus.MainMenu import MainMenu
 from GUI.menus.SessionMenu import SessionMenu
 from GUI.menus.ProgramMenu import ProgramMenu
 from GUI.menus.StatsMenu import StatsMenu
-from GUI.menus.FormYesNo import Form
 from GUI.Notifications import Notification
 
+from workout_db_r.Database import Database
+from workout_db_r.Query import Query
+
 def main():
+    # Init database and query tool passed to manager
+    db = Database() 
+    query = Query(db)
+
+
     # Initialize pygame with OpenGL support
     pygame.init()
     screen_size = (800, 480)
     pygame.display.set_mode(screen_size, DOUBLEBUF | OPENGL)
-    pygame.display.set_caption("Gym Diary")
+    pygame.display.set_caption("Modular Activity Tracker")
     clock = pygame.time.Clock()
 
     # === Setup moderngl context and shaders ===
@@ -74,7 +80,7 @@ def main():
     notification = Notification(font_size=24, display_time=2.5)
 
     # Create menu manager
-    manager = MenuManager(gui_surface, notification)
+    manager = MenuManager(gui_surface,query,notification)
 
     # Instantiate all menus
     main_menu = MainMenu(gui_surface, manager)

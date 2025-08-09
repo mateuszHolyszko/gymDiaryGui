@@ -1,12 +1,12 @@
 import pygame
 from GUI.Table import Table
 from GUI.elements.Button import Button
-from workout_db.exercises import Exercises
 from GUI.style import StyleManager
+from workout_db_r.Target import Target
 
 class TargetSelectionPanel(Table):
     def __init__(self, x, y, width, height, manager):
-        target_muscles = Exercises.getTargets()
+        target_muscles = Target.MUSCLES
         cols = 2
         rows = (len(target_muscles) + cols - 1) // cols  # Ceiling division
 

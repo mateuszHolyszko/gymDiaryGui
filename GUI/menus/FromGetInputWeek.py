@@ -2,7 +2,6 @@ from GUI.Form import Form
 from GUI.elements.InputField import InputField
 from GUI.elements.Label import Label
 from GUI.Panel import Panel
-from workout_db.exercises import Exercises
 import pygame
 
 class FormGetInputWeek(Form):

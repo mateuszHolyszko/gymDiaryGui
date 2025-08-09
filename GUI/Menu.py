@@ -2,7 +2,6 @@ from GUI.Panel import Panel
 from GUI.Table import Table
 from GUI.panels.navigation_bar import NavigationBar
 from GUI.ScrollingTableVertical import ScrollingTableVertical
-from GUI.ScrollingPanelVertical import ScrollingPanelVertical
 class Menu:
     def __init__(self, screen, manager):
         self.screen = screen

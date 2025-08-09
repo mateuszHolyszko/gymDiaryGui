@@ -32,7 +32,7 @@ void main() {
     }
 
     // === Chromatic aberration ===
-    float shift = 0.02 * intensity;
+    float shift = 0.015 * intensity;
     float r = texture(tex, uv0 + vec2(shift, 0.0)).r;
     float g = texture(tex, uv0).g;
     float b = texture(tex, uv0 - vec2(shift, 0.0)).b;
@@ -42,10 +42,18 @@ void main() {
     float noise = (rand(uv0 * time) - 0.5) * 0.5 * intensity;
     color += noise;
 
-    // === Pronounced scanlines ===
-    float scanlineMask = mod(floor(uv0.y * 480.0), 2.0);
-    float scanlineStrength = mix(0.55, 1.0, scanlineMask);
-    color *= scanlineStrength;
+    // === Very Thick TV-Style Scanlines ===
+    float lines = 240.0; // Matches 480i resolution
+    float thickness = 0.3; // 0.5-1.0 range works best
+    float darkness = 0.3; // How dark the dark lines are
+
+    float scanline = cos(uv0.y * lines * 3.14159);
+    scanline = clamp(scanline * thickness + (1.0 - thickness), 0.0, 1.0);
+    color *= mix(darkness, 1.0, scanline);
+
+    // Add subtle phosphor glow between lines
+    vec3 glow = texture(tex, uv0 + vec2(0.0, 0.002)).rgb * 0.2;
+    color = max(color, glow);
 
     fragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
 }

@@ -3,16 +3,12 @@ from GUI.Panel import Panel
 from GUI.panels.navigation_bar import NavigationBar
 from GUI.elements.Button import Button
 from GUI.elements.Label import Label
-from workout_db.sessions_db import SessionsDB
-from workout_db.programs_db import ProgramsDB
-from datetime import datetime
 import pygame
 
 class FormYesNo(Form):
     def setup(self):
         """Setup panels, elements and actions"""
         screenWidth, screenHeight = pygame.display.get_surface().get_size() # Get screen size
-        self.session = SessionsDB()
 
         # Create choice_buttons_panel panel
         self.label_panel = self.add_panel(Panel, screenWidth//2 - screenWidth//4, 25, screenWidth//2, 50, layout_type="vertical")
@@ -44,7 +40,7 @@ class FormYesNo(Form):
         print("YES")
         JSONdata = self.manager.context["session_data"]
         print(JSONdata)
-        self.session.add_session(JSONdata)
+        self.manager.queryTool.add_session(JSONdata)
         self.manager.notification_system.show("Session saved successfully!", 3)
         self.exit()
         

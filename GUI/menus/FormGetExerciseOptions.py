@@ -2,7 +2,6 @@ from GUI.Form import Form
 from GUI.elements.SelectDropDown import SelectDropDown
 from GUI.elements.Label import Label
 from GUI.Panel import Panel
-from workout_db.exercises import Exercises
 import pygame
 
 class FormGetExerciseOptions(Form):
@@ -21,8 +20,8 @@ class FormGetExerciseOptions(Form):
         # Add elements
         self.label = Label(text="Specyfic Exercise:",width=200, height=50, manager=self.manager)
         self.label_panel.add_element(self.label)
-
-        self.exerciseDropDown = SelectDropDown(x=250,y=50,options=Exercises.get_exercises_for_muscle(self.selected_query),manager=self.manager)
+        
+        self.exerciseDropDown = SelectDropDown(x=250,y=50,options=self.manager.queryTool.get_exercise_names_by_target(self.selected_query),manager=self.manager)
         self.exercise_selection_panel.add_element(self.exerciseDropDown)
         
         # Connect navigation 

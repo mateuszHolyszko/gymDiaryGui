@@ -1,9 +1,7 @@
 from GUI.Table import Table
 from GUI.elements.Button import Button
 from GUI.elements.ValueDisplay import ValueDisplay
-from workout_db.exercises import Exercises
 from GUI.style import StyleManager
-from workout_db.sessions_db import SessionsDB
 
 class ExerciseStatsPanel(Table):
     def __init__(self, x, y, width, height, queriedExercise, manager):
@@ -15,16 +13,15 @@ class ExerciseStatsPanel(Table):
 
         # Create ValueDisplay elements for stats
         # Retrive stats from database
-        sessions = SessionsDB()
-        lastPerformance = sessions.get_last_performance(self.queriedExercise)
-        peakPerformance = sessions.get_peak_performance(self.queriedExercise)
-        totalSets = sessions.get_total_sets_performed(self.queriedExercise)
-        volumeChange = sessions.get_volume_change_percentage(self.queriedExercise)
+        lastPerformance = self.manager.queryTool.get_last_performance(self.queriedExercise)
+        peakPerformance = self.manager.queryTool.get_peak_performance(self.queriedExercise)
+        totalSets = self.manager.queryTool.get_total_sets_performed(self.queriedExercise)
+        volumeChange = self.manager.queryTool.get_volume_change(self.queriedExercise)
 
-        prompt_color =  StyleManager.get_muscle_group_color( Exercises.get_target_muscle(self.queriedExercise) )["bg_color"] 
+        prompt_color =  StyleManager.get_muscle_group_color( self.manager.queryTool.get_exercise_by_name( self.queriedExercise ).target )["bg_color"] 
         self.lastPerformanceDisplay = ValueDisplay(prompt="Last Performance", value=f"date: {lastPerformance["date"]}\nsets: {lastPerformance["sets"]}\nreps: {lastPerformance["reps"]}\nweight: {lastPerformance["weight"]}",width=width//cols,height=height//rows, manager=self.manager, bg_color_prompt=prompt_color)
         self.add_element(self.lastPerformanceDisplay,0,0)
-        self.peakPerformanceDisplay = ValueDisplay(prompt="Peak Performance", value=f"date: {peakPerformance["date"]}\nsets: {peakPerformance["sets"]}\nreps: {peakPerformance["reps"]}\nweight: {peakPerformance["weight"]}",width=width//cols,height=height//rows, manager=self.manager, bg_color_prompt=prompt_color)
+        self.peakPerformanceDisplay = ValueDisplay(prompt="Peak Performance", value=f"date: {peakPerformance["date"]}\nreps: {peakPerformance["reps"]}\nweight: {peakPerformance["weight"]}",width=width//cols,height=height//rows, manager=self.manager, bg_color_prompt=prompt_color)
         self.add_element(self.peakPerformanceDisplay,1,0)
         self.totalSetsDisplay = ValueDisplay(prompt="Total Sets", value=f"{totalSets} sets performed\nin last month",width=width//cols,height=height//rows, manager=self.manager, bg_color_prompt=prompt_color)
         self.add_element(self.totalSetsDisplay,0,1)
@@ -57,21 +54,21 @@ class ExerciseStatsPanel(Table):
         self.enforceElementsSize()
 
     def update(self):
-        sessions = SessionsDB()
-        lastPerformance = sessions.get_last_performance(self.queriedExercise)
-        peakPerformance = sessions.get_peak_performance(self.queriedExercise)
-        totalSets = sessions.get_total_sets_performed(self.queriedExercise)
-        volumeChange = sessions.get_volume_change_percentage(self.queriedExercise)
+        lastPerformance = self.manager.queryTool.get_last_performance(self.queriedExercise)
+        peakPerformance = self.manager.queryTool.get_peak_performance(self.queriedExercise)
+        totalSets = self.manager.queryTool.get_total_sets_performed(self.queriedExercise)
+        volumeChange = self.manager.queryTool.get_volume_change(self.queriedExercise)
 
-        prompt_color =  StyleManager.get_muscle_group_color( Exercises.get_target_muscle(self.queriedExercise) )["bg_color"]
+        #print(self.queriedExercise)
+        prompt_color =  StyleManager.get_muscle_group_color( self.manager.queryTool.get_exercise_by_name( self.queriedExercise ).target )["bg_color"]
         for element in self.getElements():
             element.bg_color_prompt = prompt_color
         if lastPerformance is not None:
-            self.lastPerformanceDisplay.value=f"date: {lastPerformance["date"]}\nsets: {lastPerformance["sets"]}\nreps: {lastPerformance["reps"]}\nweight: {lastPerformance["weight"]}"
+            self.lastPerformanceDisplay.value=f"date: {lastPerformance["date"]}\nreps: {lastPerformance["reps"]}\nweight: {lastPerformance["weight"]}"
         else:
             self.lastPerformanceDisplay.value="No data available"
         if peakPerformance is not None:
-            self.peakPerformanceDisplay.value=f"date: {peakPerformance["date"]}\nsets: {peakPerformance["sets"]}\nreps: {peakPerformance["reps"]}\nweight: {peakPerformance["weight"]}"
+            self.peakPerformanceDisplay.value=f"date: {peakPerformance["date"]}\nreps: {peakPerformance["reps"]}\nweight: {peakPerformance["weight"]}"
         else:
             self.peakPerformanceDisplay.value="No data available"
         if totalSets is not None:

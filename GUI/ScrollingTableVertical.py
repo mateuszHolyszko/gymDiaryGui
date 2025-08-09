@@ -69,7 +69,7 @@ class ScrollingTableVertical(Table):
         viewport.fill((0, 0, 0, 0))
         
         # Blit visible portion
-        viewport.blit(virtual_surface, (self.x, self.y), (self.x,self.y + self.scroll_offset, self.width, self.height))
+        viewport.blit(virtual_surface, (self.x, self.y), (self.x, self.y + self.scroll_offset, self.width, self.height))
         
         # Blit to screen
         screen.blit(viewport, (self.x, self.y))
@@ -92,6 +92,45 @@ class ScrollingTableVertical(Table):
             thumb_y = scroll_bar_top + scroll_ratio * (scroll_bar_height - thumb_height)
 
             pygame.draw.rect(screen, (200, 200, 200), (scroll_bar_x, thumb_y, scroll_bar_width, thumb_height))
+
+        # ---- Up/Down scroll indicators ----
+        indicator_color = (255, 255, 255)  # white lines & triangles
+        line_length = self.width // 5  # make them not full width
+        triangle_width = line_length
+        triangle_height = 5  # height of the triangle
+
+        # Top indicator (scrolling up possible)
+        if self.scroll_offset > 0:
+            
+            # Triangle pointing upward
+            tri_x = self.x + self.width // 2
+            tri_y = self.y + 35
+            pygame.draw.polygon(screen, indicator_color, [
+                (tri_x, tri_y),  # tip
+                (tri_x - triangle_width // 2, tri_y + triangle_height),
+                (tri_x + triangle_width // 2, tri_y + triangle_height)
+            ])
+            # Line
+            pygame.draw.line(screen, indicator_color,
+                             (self.x, tri_y - 2),
+                             (self.width, tri_y - 1), 2)
+
+        # Bottom indicator (scrolling down possible)
+        if self.scroll_offset < self.max_offset:
+            base_y = self.y + self.height - 1
+            # Triangle pointing downward
+            tri_x = self.x + self.width // 2
+            tri_y = base_y - triangle_height
+            pygame.draw.polygon(screen, indicator_color, [
+                (tri_x, tri_y + triangle_height),  # tip
+                (tri_x - triangle_width // 2, tri_y),
+                (tri_x + triangle_width // 2, tri_y)
+            ])
+            # Line
+            pygame.draw.line(screen, indicator_color,
+                             (self.x, tri_y + triangle_height + 2),
+                             (self.width, tri_y + triangle_height + 2), 2)
+
 
     def changeDims(self,newTotalHeight):
         self.totalHeight = newTotalHeight
