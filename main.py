@@ -26,13 +26,22 @@ def main():
     # Load shaders from files
     with open("GUI/Distortions/distortion.vert") as f:
         vertex_shader = f.read()
+    with open("GUI/Distortions/lighting.frag") as f:
+        lighting_frag = f.read()
     with open("GUI/Distortions/distortion.frag") as f:
-        fragment_shader = f.read()
+        distortion_frag = f.read()
+    with open("GUI/Distortions/barrel.frag") as f:
+        barrel_frag = f.read()
 
-    prog = ctx.program(vertex_shader=vertex_shader, fragment_shader=fragment_shader)
-    prog['time'] = 0.0
-    prog['intensity'] = 0.3  # Default distortion level
-    
+    # Create shader programs for each pass
+    prog_lighting   = ctx.program(vertex_shader=vertex_shader, fragment_shader=lighting_frag)
+    prog_distortion = ctx.program(vertex_shader=vertex_shader, fragment_shader=distortion_frag)
+    prog_barrel     = ctx.program(vertex_shader=vertex_shader, fragment_shader=barrel_frag)
+
+    # Initialize some default uniform values
+    prog_distortion['time'] = 0.0
+    prog_distortion['intensity'] = 0.2
+    prog_lighting['time'] = 0.0
 
     # Fullscreen quad
     vertices = np.array([
@@ -41,17 +50,25 @@ def main():
          1.0,  1.0, 1.0, 1.0,
          1.0, -1.0, 1.0, 0.0
     ], dtype='f4')
-
     vbo = ctx.buffer(vertices.tobytes())
-    vao = ctx.simple_vertex_array(prog, vbo, 'in_vert', 'in_uv')
+
+    vao_lighting   = ctx.simple_vertex_array(prog_lighting,   vbo, 'in_vert', 'in_uv')
+    vao_distortion = ctx.simple_vertex_array(prog_distortion, vbo, 'in_vert', 'in_uv')
+    vao_barrel     = ctx.simple_vertex_array(prog_barrel,     vbo, 'in_vert', 'in_uv')
 
     # Create offscreen GUI surface
     gui_surface = pygame.Surface(screen_size)
 
-    # Texture for shader input
-    texture = ctx.texture(screen_size, 3)
-    texture.repeat_x = False
-    texture.repeat_y = False
+    # Texture for GUI input
+    texture_gui = ctx.texture(screen_size, 3)
+    texture_gui.repeat_x = False
+    texture_gui.repeat_y = False
+
+    # Create intermediate framebuffers for passes
+    tex_pass1 = ctx.texture(screen_size, 3)
+    tex_pass2 = ctx.texture(screen_size, 3)
+    fbo_pass1 = ctx.framebuffer(color_attachments=[tex_pass1])
+    fbo_pass2 = ctx.framebuffer(color_attachments=[tex_pass2])
 
     # Setup notification system
     notification = Notification(font_size=24, display_time=2.5)
@@ -64,7 +81,6 @@ def main():
     session_menu = SessionMenu(gui_surface, manager)
     program_menu = ProgramMenu(gui_surface, manager)
     stats_menu = StatsMenu(gui_surface, manager)
-    form_menu = Form(gui_surface, manager)
     
     # Register all menus with string names (pass instances)
     manager.register_menu("MainMenu", main_menu)
@@ -100,13 +116,37 @@ def main():
 
         # === Convert surface to texture ===
         gui_rgb = pygame.surfarray.pixels3d(gui_surface).copy().swapaxes(0, 1)
-        texture.write(gui_rgb.tobytes())
+        texture_gui.write(gui_rgb.tobytes())
 
-        # === Run shader ===
+        current_time = pygame.time.get_ticks() / 1000.0
+
+        # === Pass 1: Lighting ===
+        fbo_pass2.use()
         ctx.clear()
-        texture.use()
-        prog['time'].value = pygame.time.get_ticks() / 1000.0
-        vao.render(moderngl.TRIANGLE_STRIP)
+        tex_pass1.use()
+        prog_lighting['time'].value = current_time
+        if manager.focus_manager.current_focus:
+            fx, fy = manager.focus_manager.current_focus.x, manager.focus_manager.current_focus.y
+            fw, fh = manager.focus_manager.current_focus.width, manager.focus_manager.current_focus.height
+            # Normalize
+            prog_lighting['focus_pos'].value = (fx / screen_size[0], fy / screen_size[1])
+            prog_lighting['focus_size'].value = (fw / screen_size[0], fh / screen_size[1])
+        else:
+            prog_lighting['focus_size'].value = (0.0, 0.0)
+        vao_lighting.render(moderngl.TRIANGLE_STRIP)
+
+        # === Pass 2: Distortions ===
+        fbo_pass1.use()
+        ctx.clear()
+        texture_gui.use()
+        prog_distortion['time'].value = current_time
+        vao_distortion.render(moderngl.TRIANGLE_STRIP)
+
+        # === Pass 3: CRT barrel distortion ===
+        ctx.screen.use()
+        ctx.clear()
+        tex_pass2.use()
+        vao_barrel.render(moderngl.TRIANGLE_STRIP)
 
         # === Swap buffers ===
         pygame.display.flip()

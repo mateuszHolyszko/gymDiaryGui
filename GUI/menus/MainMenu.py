@@ -5,6 +5,7 @@ from GUI.panels.navigation_bar import NavigationBar
 from GUI.elements.Button import Button
 from GUI.elements.ValueDisplay import ValueDisplay
 from GUI.elements.SelectDropDown import SelectDropDown
+from GUI.elements.Image.Image2D import Image2D
 from GUI.elements.Label import Label
 from GUI.elements.InputField import InputField
 from GUI.Table import Table
@@ -28,8 +29,8 @@ class MainMenu(Menu):
         
         # Create InputPanel panel
         height = (screenHeight - self.nav_bar.height)//2
-        self.LabelPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//5, width=screenWidth//4, height=height)
-        self.InputPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//5 + 50, width=screenWidth//4, height=height,layout_type="horizontal")
+        self.LabelPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2, width=screenWidth//4, height=height)
+        self.InputPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 + 50, width=screenWidth//4, height=height,layout_type="horizontal")
         # Volume summary panel gets created after the CarouselPanel gets initiated, since its depended on CarouselPanel elements
         # Create CarouselPanel panel
         self.CarouselPanel = self.add_panel(Panel,x=screenWidth//2,y=5,width=screenWidth//2 - 5,height=screenHeight - self.nav_bar.height - 10)
@@ -38,7 +39,7 @@ class MainMenu(Menu):
         # Load metadata
         meta = self._load_project_meta()
         print(meta)
-        self.MetaDataDisplayPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - height//2 - 50, width=screenWidth//4, height=height)
+        self.MetaDataDisplayPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - 100 , width=screenWidth//4, height=height)
         self.metaDisplay = ValueDisplay(prompt="Project data", 
             value=
               f"Ver: {meta['Version']}: {meta['VersionData']}\n"
@@ -48,6 +49,11 @@ class MainMenu(Menu):
               height=150,
               width=150)
         self.MetaDataDisplayPanel.add_element(self.metaDisplay)
+
+        # Logo
+        self.logoPanel = self.add_panel(Panel, x=125, y=65 , width=5, height=5)
+        self.logo = Image2D(image_path="GUI\elements\Image\images\\Logo.png", height = 474//3.5 , width= 424//3.5, manager=self.manager,layer=2)
+        self.logoPanel.add_element(self.logo)
 
         # Add elements (InputPanel panel)
         bodyweight = None

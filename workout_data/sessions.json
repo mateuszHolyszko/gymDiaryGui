@@ -835,6 +835,68 @@
           ]
         }
       ]
+    },
+    {
+      "date": "09-08-2025",
+      "program": "Strength Training",
+      "bodyweight": 70.5,
+      "exercises": [
+        {
+          "name": "Bench Press",
+          "sets": [
+            {
+              "weight": 105.0,
+              "reps": 14
+            },
+            {
+              "weight": 105.0,
+              "reps": 14
+            },
+            {
+              "weight": 102.0,
+              "reps": 12
+            },
+            {
+              "weight": 102.0,
+              "reps": 10
+            }
+          ]
+        },
+        {
+          "name": "Overhead Press",
+          "sets": [
+            {
+              "weight": 27.5,
+              "reps": 15
+            },
+            {
+              "weight": 27.5,
+              "reps": 11
+            },
+            {
+              "weight": 25.0,
+              "reps": 9
+            }
+          ]
+        },
+        {
+          "name": "Bicep Curl",
+          "sets": [
+            {
+              "weight": 20.0,
+              "reps": 13
+            },
+            {
+              "weight": 17.5,
+              "reps": 16
+            },
+            {
+              "weight": 15.0,
+              "reps": 15
+            }
+          ]
+        }
+      ]
     }
   ]
 }

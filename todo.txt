@@ -1,7 +1,9 @@
 #SOFTWARE
 
 - In buttons, some sort of visual indication for where the neigbours are (if left neigbour not None alternative render on the edge or some gradient)
--- light sources list in menus for rendering light efects
+- Rework elements render, add to render queue (based on layer)
+- Rework 2D diagram, add image processor
+- Redo database
 
 - Synchronisation jitter (tearing of the lines in the image)
 - Deamaged rolling rows

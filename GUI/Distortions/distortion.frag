@@ -13,23 +13,8 @@ float rand(vec2 co) {
 }
 
 void main() {
-    // Put this distortion in whole after .frag?
-    // === CRT tube distortion ===
-    vec2 center = vec2(0.5, 0.5);
-    vec2 off_center = uv - center;
-
-    // Barrel distortion: 0.3 controls curvature strength
-    off_center *= 1.0 + 0.3 * pow(abs(off_center.yx), vec2(2.5));
-
-    vec2 uv0 = center + off_center;
-
-    // Outside screen → gray border
-    if (uv0.x > 1.0 || uv0.x < 0.0 || uv0.y > 1.0 || uv0.y < 0.0) {
-        fragColor = vec4(0.1, 0.1, 0.1, 1.0);
-        return;
-    }
-
     // === Simple per-row sync jitter ===
+    vec2 uv0 = uv; // Keep original UVs for distortion effects
     float rowIndex = floor(uv0.y * 240.0);
     float tStep = floor(time * 10.0);
     vec2 seed = vec2(rowIndex, tStep);
@@ -47,14 +32,14 @@ void main() {
     }
 
     // === Chromatic aberration ===
-    float shift = 0.01 * intensity;
+    float shift = 0.02 * intensity;
     float r = texture(tex, uv0 + vec2(shift, 0.0)).r;
     float g = texture(tex, uv0).g;
     float b = texture(tex, uv0 - vec2(shift, 0.0)).b;
     vec3 color = vec3(r, g, b);
 
     // === Noise ===
-    float noise = (rand(uv0 * time) - 0.5) * 0.3 * intensity;
+    float noise = (rand(uv0 * time) - 0.5) * 0.5 * intensity;
     color += noise;
 
     // === Pronounced scanlines ===
