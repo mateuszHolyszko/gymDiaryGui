@@ -31,13 +31,6 @@ class ScrollingTableVertical(Table):
                 return True  # Event handled
                 
         return False
-    
-    def _get_element_center(self, row, col):
-        """Override to use cell_height and account for scroll_offset."""
-        cell_width = self.width / self.cols
-        center_x = self.x + (col + 0.5) * cell_width
-        center_y = self.y + (row + 0.5) * self.cell_height - self.scroll_offset
-        return (center_x, center_y)
 
     def enforceElementsSize(self):
         """Override Table's version to use cell_height and totalHeight."""
@@ -48,8 +41,8 @@ class ScrollingTableVertical(Table):
                 if elem:
                     elem.width = cell_width
                     elem.height = self.cell_height
-                    center_x, center_y = self._get_element_center(r, c)
-                    elem.position_from_center(center_x, center_y)
+                    elem.x = self.x + c * cell_width
+                    elem.y = self.y + r * self.cell_height
 
     def _reposition_elements(self):
         """Override to skip Table's logic and use our own."""
@@ -62,11 +55,20 @@ class ScrollingTableVertical(Table):
         
         # Render elements with scroll compensation
         for element in self.getElements():
+        # Temporarily adjust coordinates so they're relative to the table's top-left
+            original_x, original_y = element.x, element.y
+            element.x -= self.x
+            element.y -= self.y
             element.render(virtual_surface)
-
+            element.x, element.y = original_x, original_y  # restore absolute positions
         # Create and clear viewport
+        # Create viewport and blit visible portion
         viewport = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        viewport.fill((0, 0, 0, 0))
+        viewport.blit(
+            virtual_surface,
+            (0, 0),  # draw at top-left of viewport
+            (0, self.scroll_offset, self.width, self.height)  # grab only the visible region
+        )
         
         # Blit visible portion
         viewport.blit(virtual_surface, (self.x, self.y), (self.x, self.y + self.scroll_offset, self.width, self.height))
@@ -104,7 +106,7 @@ class ScrollingTableVertical(Table):
             
             # Triangle pointing upward
             tri_x = self.x + self.width // 2
-            tri_y = self.y + 35
+            tri_y = self.y
             pygame.draw.polygon(screen, indicator_color, [
                 (tri_x, tri_y),  # tip
                 (tri_x - triangle_width // 2, tri_y + triangle_height),

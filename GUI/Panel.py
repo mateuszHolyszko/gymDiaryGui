@@ -5,6 +5,7 @@ class Panel:
         manager,
         layout_type="vertical",
         padding=0,
+        drawBorder = True
     ):
         self.x = x
         self.y = y
@@ -14,6 +15,7 @@ class Panel:
         self.layout_type = layout_type
         self.padding = padding
         self.elements = []
+        self.drawBorder = drawBorder
 
     
 

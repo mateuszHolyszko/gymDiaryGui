@@ -19,13 +19,13 @@ class SessionMenu(Menu):
         # Create choose session panel
         self.sessionPanel = self.add_panel(Panel, x=0, y=0, width=screenWidth, height=screenHeight //8, layout_type="horizontal")
         # Create table panel
-        table_y = 35
         #totalRows = len(self.database.get_exercises_in_program(self.database.get_all_program_names()[0]))
         totalRows = len(self.manager.queryTool.get_program_exercises_names(self.manager.queryTool.get_all_program_names()[0]) )
         rowHeight = 100
-        windowHeight = screenHeight - self.nav_bar.height - self.sessionPanel.height - 25
-        totalHeightOfTable = max(windowHeight, totalRows * rowHeight + table_y)
-        self.table = ScrollingTableVertical(x=0,y=table_y,width=screenWidth-20,height=windowHeight,totalHeight=totalHeightOfTable,manager=self.manager,cell_height=rowHeight)
+        windowHeight = screenHeight - self.nav_bar.height - self.sessionPanel.height - 10
+        table_y = self.nav_bar.y - windowHeight - 5
+        totalHeightOfTable = max(windowHeight, totalRows * rowHeight)
+        self.table = ScrollingTableVertical(x=0,y=table_y,width=screenWidth-20,height=windowHeight+5,totalHeight=totalHeightOfTable,manager=self.manager,cell_height=rowHeight)
         self.add_panel_instance(self.table)
         self.table.draw_table_lines = False 
         # when init we are coming from navbar so offset self.table.max_offset
@@ -54,7 +54,7 @@ class SessionMenu(Menu):
         self.table.load_data_session( self.selectProgram.getSelectedOption() ,self.manager.queryTool.get_session_as_list( self.selectProgram.getSelectedOption() ),manager=self.manager) # Load initial program data 
         totalRows = len(self.manager.queryTool.get_program_exercises_names( self.selectProgram.getSelectedOption() ))
         rowHeight = 100
-        totalHeightOfTable = max(self.table.height, totalRows * rowHeight + self.table.y )
+        totalHeightOfTable = max(self.table.height, totalRows * rowHeight )
         self.table.changeDims(newTotalHeight=totalHeightOfTable)
         self.connectNeighbors()
         print(f"y={self.table.y}, height={self.table.height}, totalHeight={self.table.totalHeight}, lastRowCell y={self.table.getElements()[-1].y},last row cell height={self.table.getElements()[-1].height}")

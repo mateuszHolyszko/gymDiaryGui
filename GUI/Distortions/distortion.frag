@@ -13,13 +13,14 @@ float rand(vec2 co) {
 }
 
 void main() {
-    // === Simple per-row sync jitter ===
     vec2 uv0 = uv; // Keep original UVs for distortion effects
+    // === Simple per-row sync jitter ===
+    
     float rowIndex = floor(uv0.y * 240.0);
     float tStep = floor(time * 10.0);
     vec2 seed = vec2(rowIndex, tStep);
 
-    if (rand(seed) < 0.04) {
+    if (rand(seed) < 0.02) {
         float dir = rand(seed + 10.0) < 0.5 ? -1.0 : 1.0;
         uv0.x += dir / 320.0;
     }
@@ -52,7 +53,7 @@ void main() {
     color *= mix(darkness, 1.0, scanline);
 
     // Add subtle phosphor glow between lines
-    vec3 glow = texture(tex, uv0 + vec2(0.0, 0.002)).rgb * 0.2;
+    vec3 glow = texture(tex, uv0 + vec2(0.0, 0.01)).rgb * 0.2;
     color = max(color, glow);
 
     fragColor = vec4(clamp(color, 0.0, 1.0), 1.0);

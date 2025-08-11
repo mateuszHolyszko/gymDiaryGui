@@ -10,6 +10,9 @@
 - Moiré pattern?
 -- seperate distortion class for more dramatic distortions called for example on transitions or at larger time intervals
 
+----- shader -> when white pixel, phosphor lighting effect !!!!!
+--- actually draw panel outline (remember panel render() method gets bypassed 80% of the time, perhaps do a seperate pass in menu)
+
 
 - in main menu display version author and so on
 - in clock display battery life

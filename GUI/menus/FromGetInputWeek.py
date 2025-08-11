@@ -11,10 +11,10 @@ class FormGetInputWeek(Form):
 
         # Create weekInputField_panel panel
         self.label_panel = self.add_panel(Panel, screenWidth//2 - screenWidth//4, 25, screenWidth//2, 50, layout_type="vertical")
-        self.weekInputField_panel = self.add_panel(Panel, screenWidth//2- screenWidth//4, 100, screenWidth//2, 50, layout_type="horizontal")
+        self.weekInputField_panel = self.add_panel(Panel, screenWidth//2- screenWidth//8, 100, screenWidth//4, 50, layout_type="horizontal")
         
         # Add elements
-        self.label = Label(text="How many weeks to query:",width=200, height=50, manager=self.manager)
+        self.label = Label(text="How many weeks to query:",width=200, height=40, manager=self.manager)
         self.label_panel.add_element(self.label)
 
         self.weekInputField = InputField(initial_value=1, min_value=1, max_value=12, step=1, manager=self.manager,x=screenWidth//2-40,y=screenHeight//2) # Get max value from db?

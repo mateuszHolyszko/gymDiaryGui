@@ -26,36 +26,35 @@ class ProgramMenu(Menu):
         # Chose PROGRAMS/EXERCISES panel
         self.programs_excercieses_panel = Panel(x=0, y=screenHeight - self.nav_bar.height - 50, width=screenWidth, height=50, layout_type="horizontal",manager=self.manager)
         self.add_panel_instance(self.programs_excercieses_panel)
-        self.btn_ProgramMode = Button(width=screenWidth//6, height=50, text="Programs", manager=self.manager)
-        self.btn_ExcerciseMode = Button(width=screenWidth//6, height=50, text="Excercises", manager=self.manager)
+        self.btn_ProgramMode = Button(width=screenWidth//8, height=35, text="Programs", manager=self.manager)
+        self.btn_ExcerciseMode = Button(width=screenWidth//8, height=35, text="Excercises", manager=self.manager)
         self.programs_excercieses_panel.add_element(self.btn_ProgramMode)
         self.programs_excercieses_panel.add_element(self.btn_ExcerciseMode)
         self.btn_ProgramMode.activate()
         
         # Create choose programs panel, but dont add it to menu =====================================================================
-        heightAboveStaticElems = screenHeight - self.nav_bar.height - self.programs_excercieses_panel.height
-        self.programsPanel = Panel(x=0, y=self.programs_excercieses_panel.height, width=screenWidth//4, height=heightAboveStaticElems,manager=self.manager)
+        self.programsPanel = Panel(x=0, y=0, width=screenWidth//4, height=65,manager=self.manager)
         # Create table panel
-        self.table = Table(x=screenWidth//4,y=5,width=screenWidth*3//4 - 5,height=heightAboveStaticElems-10,rows=3,cols=3,manager=self.manager)
+        self.table = Table(x=self.programsPanel.width,y=0,width=screenWidth*3//4,height=self.programs_excercieses_panel.y,rows=3,cols=3,manager=self.manager)
         self.table.draw_table_lines = False 
         
         # Add elements
         programNames = self.manager.queryTool.get_all_program_names()
-        self.selectProgram = SelectDropDown(options=programNames, width=screenWidth//4, height=50, manager=self.manager, layer=2)
+        self.selectProgram = SelectDropDown(options=programNames, width=self.programsPanel.width - 4, height=45, manager=self.manager, layer=2, drop_direction="down")
         self.programsPanel.add_element(self.selectProgram)
 
         self.table.load_data_program(self.manager.queryTool.get_program_table_data(programNames[0]),manager=self.manager) # Load initial program data
 
         # Excercises mode elements, but dont add it to menu:  =====================================================================
-        self.targetSelectionPanel = TargetSelectionPanel(x=screenWidth - screenWidth//4,y=self.programs_excercieses_panel.height+35, width=screenWidth//4, height=heightAboveStaticElems*0.7,manager=self.manager)
+        self.targetSelectionPanel = TargetSelectionPanel(x=screenWidth - screenWidth//4,y=50, width=screenWidth//4, height=self.programs_excercieses_panel.y-50,manager=self.manager)
         self.targetSelectionPanel.getElements()[0].activate()  # Activate first button by default
 
-        self.selectExercisePanel = Panel(x=0,y=25,width=screenWidth,height=50,manager=self.manager)
+        self.selectExercisePanel = Panel(x=0,y=0,width=screenWidth,height=50,manager=self.manager)
         self.selectExercise = SelectDropDown(options=self.manager.queryTool.get_exercise_names_by_target( self.targetSelectionPanel.active_target ), width=screenWidth//4, height=35, manager=self.manager, layer=3)
         self.selectExercisePanel.add_element(self.selectExercise)
 
-        imagePanelWidth=screenWidth-screenWidth//4
-        self.imagePanel = Panel(x=screenWidth-imagePanelWidth, y=0, width=imagePanelWidth, height=heightAboveStaticElems,manager=self.manager)
+        imagePanelWidth=self.targetSelectionPanel.x - 350 # 350 - stats panel width
+        self.imagePanel = Panel(x=self.targetSelectionPanel.x - imagePanelWidth, y=self.targetSelectionPanel.y, width=imagePanelWidth, height=self.targetSelectionPanel.height,manager=self.manager)
         scale = 0.5
         self.image1 = Image2D_Graph(image_path="GUI\elements\Image\images\\Arm.png", height = 350*scale , width= 165*scale, manager=self.manager,layer=2, specificMuscleGroup=self.targetSelectionPanel.active_target )
         self.image1.muscleGroups = ["Shoulders","Biceps","Triceps","Forearms"]
@@ -65,7 +64,7 @@ class ProgramMenu(Menu):
         self.image3.muscleGroups = ["Shoulders","Chest","Back","Abs"]
         self.imagePanel.add_element(self.image3) # Defult, since chest is the defult target
 
-        self.statsPanel = ExerciseStatsPanel(x=0,y=self.targetSelectionPanel.y, width=screenWidth-(self.imagePanel.width - self.targetSelectionPanel.width), height=heightAboveStaticElems//1.5,manager=self.manager,queriedExercise=self.selectExercise.getSelectedOption() )
+        self.statsPanel = ExerciseStatsPanel(x=0,y=self.targetSelectionPanel.y, width=350, height=self.programs_excercieses_panel.y-50,manager=self.manager,queriedExercise=self.selectExercise.getSelectedOption() )
         
         
         

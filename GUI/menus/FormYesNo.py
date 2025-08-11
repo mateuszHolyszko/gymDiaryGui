@@ -12,14 +12,14 @@ class FormYesNo(Form):
 
         # Create choice_buttons_panel panel
         self.label_panel = self.add_panel(Panel, screenWidth//2 - screenWidth//4, 25, screenWidth//2, 50, layout_type="vertical")
-        self.choice_buttons_panel = self.add_panel(Panel, screenWidth//2- screenWidth//4, 100, screenWidth//2, 50, layout_type="horizontal")
+        self.choice_buttons_panel = self.add_panel(Panel, screenWidth//2- screenWidth//8, 100, screenWidth//4, 50, layout_type="horizontal")
         
         # Add elements
-        self.label = Label("Are you sure?",width=200, height=50, manager=self.manager)
+        self.label = Label("Are you sure?",width=200, height=40, manager=self.manager)
         self.label_panel.add_element(self.label)
 
-        self.yes_btn = Button("Yes", width=200, height=50, manager=self.manager)
-        self.no_btn = Button("No", width=200, height=50, manager=self.manager)
+        self.yes_btn = Button("Yes", width=80, height=40, manager=self.manager)
+        self.no_btn = Button("No", width=80, height=40, manager=self.manager)
         
         self.choice_buttons_panel.add_element(self.yes_btn)
         self.choice_buttons_panel.add_element(self.no_btn)

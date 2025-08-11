@@ -126,27 +126,37 @@ def main():
 
         current_time = pygame.time.get_ticks() / 1000.0
 
-        # === Pass 1: Lighting ===
-        fbo_pass2.use()
-        ctx.clear()
-        tex_pass1.use()
-        prog_lighting['time'].value = current_time
-        if manager.focus_manager.current_focus:
-            fx, fy = manager.focus_manager.current_focus.x, manager.focus_manager.current_focus.y
-            fw, fh = manager.focus_manager.current_focus.width, manager.focus_manager.current_focus.height
-            # Normalize
-            prog_lighting['focus_pos'].value = (fx / screen_size[0], fy / screen_size[1])
-            prog_lighting['focus_size'].value = (fw / screen_size[0], fh / screen_size[1])
-        else:
-            prog_lighting['focus_size'].value = (0.0, 0.0)
-        vao_lighting.render(moderngl.TRIANGLE_STRIP)
-
-        # === Pass 2: Distortions ===
+        # === Pass 1: Distortions ===
         fbo_pass1.use()
         ctx.clear()
         texture_gui.use()
         prog_distortion['time'].value = current_time
         vao_distortion.render(moderngl.TRIANGLE_STRIP)
+
+        # === Pass 2: Lighting (now after distortion) ===
+        fbo_pass2.use()
+        ctx.clear()
+        tex_pass1.use()
+        prog_lighting['time'].value = current_time
+
+        if manager.focus_manager.current_focus:
+            fx, fy = manager.focus_manager.current_focus.x, manager.focus_manager.current_focus.y
+            fw, fh = manager.focus_manager.current_focus.width, manager.focus_manager.current_focus.height
+            prog_lighting['focus_pos'].value = (fx / screen_size[0], fy / screen_size[1])
+            prog_lighting['focus_size'].value = (fw / screen_size[0], fh / screen_size[1])
+
+            # NEW: parent panel bounds
+            px = manager.focus_manager.current_focus.parent_panel.x
+            py = manager.focus_manager.current_focus.parent_panel.y
+            pw = manager.focus_manager.current_focus.parent_panel.width
+            ph = manager.focus_manager.current_focus.parent_panel.height
+            prog_lighting['clip_pos'].value  = (px / screen_size[0], py / screen_size[1])
+            prog_lighting['clip_size'].value = (pw / screen_size[0], ph / screen_size[1])
+        else:
+            prog_lighting['focus_size'].value = (0.0, 0.0)
+            prog_lighting['clip_size'].value  = (0.0, 0.0)
+
+        vao_lighting.render(moderngl.TRIANGLE_STRIP)
 
         # === Pass 3: CRT barrel distortion ===
         ctx.screen.use()

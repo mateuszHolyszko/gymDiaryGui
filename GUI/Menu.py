@@ -2,6 +2,7 @@ from GUI.Panel import Panel
 from GUI.Table import Table
 from GUI.panels.navigation_bar import NavigationBar
 from GUI.ScrollingTableVertical import ScrollingTableVertical
+import pygame
 class Menu:
     def __init__(self, screen, manager):
         self.screen = screen
@@ -63,12 +64,21 @@ class Menu:
         
         # First render self-rendering panels (sorted by their own layer)
         for panel in sorted(clipping_panels, key=lambda p: getattr(p, 'layer', 0)):
+            # # Draw panel borders (if drawBorder is True)
+            if panel.drawBorder:
+                border_rect = pygame.Rect(panel.x, panel.y, panel.width, panel.height)
+                pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 1)  # 1px thick border
             panel.render(screen)
         # Then render all regular panel elements (sorted by layer)
         all_elements = []
         for panel in regular_panels:
+            # Add elements to render queue
             for element in panel.elements:
                 all_elements.append((element.layer, element))
+            # Draw panel borders (if drawBorder is True)
+            if panel.drawBorder:
+                border_rect = pygame.Rect(panel.x, panel.y, panel.width, panel.height)
+                pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 1)  # 1px thick border
         
         for layer, element in sorted(all_elements, key=lambda x: x[0]):
             element.render(screen)

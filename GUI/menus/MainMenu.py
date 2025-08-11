@@ -21,29 +21,30 @@ class MainMenu(Menu):
         self.nav_bar = self.add_panel(NavigationBar)
         
         # Create InputPanel panel
-        height = (screenHeight - self.nav_bar.height)//2
-        self.LabelPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2, width=screenWidth//4, height=height)
-        self.InputPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 + 50, width=screenWidth//4, height=height,layout_type="horizontal")
+        self.InputPanel = self.add_panel(Panel, x=0, y=screenHeight-self.nav_bar.height-60, width=328, height=60,layout_type="horizontal")
+        self.LabelPanel = self.add_panel(Panel, x=0, y=self.InputPanel.y - 60, width=328, height=60)
+    
         # Volume summary panel gets created after the CarouselPanel gets initiated, since its depended on CarouselPanel elements
         # Create CarouselPanel panel
-        self.CarouselPanel = self.add_panel(Panel,x=screenWidth//1.7,y=25,width=screenWidth//2 - 5,height=screenHeight - self.nav_bar.height - 10)
+        CarouselPanel_height = self.nav_bar.y - 50
+        CarouselPanel_width = 250
+        self.CarouselPanel = self.add_panel(Panel,x=screenWidth - CarouselPanel_width,y=screenHeight - self.nav_bar.height -CarouselPanel_height,width=CarouselPanel_width,height=CarouselPanel_height,drawBorder=True)
         
         # MetaDataDisplay panel
         # Load metadata
         meta = self._load_project_meta()
-        print(meta)
-        self.MetaDataDisplayPanel = self.add_panel(Panel, x=50, y=(screenHeight - self.nav_bar.height)//2 - 80 , width=screenWidth//4, height=height)
+        self.MetaDataDisplayPanel = self.add_panel(Panel, x=0, y=0, width=328, height=115, drawBorder=False)
         self.metaDisplay = ValueDisplay(prompt="Project data", 
             value=
               f"Ver: {meta['Version']}: {meta['VersionData']}\n"
               f"Status: {meta['Status']}\n"
               f"Author: {meta['Author']}",
-              height=125,
-              width=150)
+              height=self.MetaDataDisplayPanel.height,
+              width=self.MetaDataDisplayPanel.width)
         self.MetaDataDisplayPanel.add_element(self.metaDisplay)
 
         # Logo
-        self.logoPanel = self.add_panel(Panel, x=self.MetaDataDisplayPanel.x, y=-20 , width=self.MetaDataDisplayPanel.width, height=self.MetaDataDisplayPanel.height)
+        self.logoPanel = self.add_panel(Panel, x=0, y=self.MetaDataDisplayPanel.height , width=self.MetaDataDisplayPanel.width, height=self.LabelPanel.y-self.MetaDataDisplayPanel.height, drawBorder=True)
         self.logo = Image2D(image_path="GUI\elements\Image\images\\Logo.png", height = 474//3 , width= 424//3, manager=self.manager,layer=2)
         self.logoPanel.add_element(self.logo)
 
@@ -70,9 +71,9 @@ class MainMenu(Menu):
                     print("Warning: No sessions available")
             except Exception as e:
                 print(f"Error retrieving last session: {str(e)}")
-        self.inputField = InputField(bodyweight, min_value=0, max_value=150, step=0.1, manager=self.manager)
-        self.btn = Button("+", self.inputField.height, self.inputField.height, manager=self.manager)
-        self.label = Label(text="Update bodyweight", width=200, height=50, manager=self.manager)
+        self.inputField = InputField(bodyweight,width=60, height=40, min_value=0, max_value=150, step=0.1, manager=self.manager)
+        self.btn = Button("+", width=self.inputField.width, height=self.inputField.height, manager=self.manager)
+        self.label = Label(text="Update bodyweight", width=100, height=50, manager=self.manager)
         
         self.LabelPanel.add_element(self.label)
         self.InputPanel.add_element(self.inputField)
@@ -89,12 +90,13 @@ class MainMenu(Menu):
         self.imageImageCarousel.add_image(self.image2)
 
         # Create volumeSummary panel
-        self.volumeSummary = self.add_panel(Panel, x=self.imageImageCarousel.x - 200, y=self.imageImageCarousel.y,width=screenWidth//4, height=self.imageImageCarousel.height)
+        volSumPanelWidth = self.CarouselPanel.x - self.InputPanel.width
+        self.volumeSummary = self.add_panel(Panel, x=self.CarouselPanel.x - volSumPanelWidth, y=self.CarouselPanel.y,width=volSumPanelWidth, height=self.CarouselPanel.height)
         self.update_carousel()
 
         # Create volumeLabel panel
-        self.volumeLabelPanel = self.add_panel(Panel, x=self.volumeSummary.x, y=self.imageImageCarousel.y-55,width=screenWidth//2, height=50)
-        self.volumeLabel = Label(text="Volume summary of 3 weeks", width=200, height=50, manager=self.manager)
+        self.volumeLabelPanel = self.add_panel(Panel, x=self.volumeSummary.x, y=0,width=self.CarouselPanel.width + self.volumeSummary.width, height=50)
+        self.volumeLabel = Label(text="Volume summary of 3 weeks", width=200, height=40, manager=self.manager)
         self.volumeLabelPanel.add_element(self.volumeLabel)
         
         # Connect navigation between nav bar and InputPanel
