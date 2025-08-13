@@ -1,5 +1,5 @@
-VersionData:11/08/2025,
-Version:0.2.3,
-Branch:moderngl,
+VersionData:13/08/2025,
+Version:0.2.4,
+Branch:DML app,
 Status:Unstable,
 Author:Mateutek

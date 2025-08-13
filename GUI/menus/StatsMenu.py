@@ -100,7 +100,7 @@ class StatsMenu(Menu):
             self.query = "weight"
             self.queryAxisY = "weight"
             print("weight query selected")
-            self.plotter.change_plot_color(StyleManager.current_style.highlight_color)
+            self.plotter.change_plot_color(StyleManager.current_style.text_color)
             self.set_plotter_data()
             # Deactivate Reps and Volume buttons and activate KG
             self.Yaxis_reps_btn.selectable = False
@@ -118,26 +118,6 @@ class StatsMenu(Menu):
             # Form
             form = FormGetExerciseOptions(screen=self.screen,manager=self.manager, return_menu_instance=self, selected_query=selected_query)
             self.manager.create_form(form,self)
-            self.query = form.getSelectedOption()
-            print(self.query)
-            self.queryAxisY = "weight" # Default Y axis value
-            self.plotter.y_label = self.queryAxisY
-            self.Yaxis_weight_btn.activate()
-            self.Yaxis_reps_btn.deactivate()
-            self.Yaxis_volume_btn.deactivate()
-            self.plotter.change_plot_color(StyleManager.get_muscle_group_color(selected_query)["bg_color"])
-            self.set_plotter_data()
-            # Activate Reps and Volume buttons
-            self.Yaxis_reps_btn.selectable = True
-            self.Yaxis_volume_btn.selectable = True
-            # Redo neighbors
-            # Reconnect queryTypePanel and queryAxisPanel
-            for type_btn in self.queryTypePanel.getElements():
-                type_btn.set_neighbor("up", self.queryAxisPanel.getSelectableElements()[-1])
-            self.queryAxisPanel.getSelectableElements()[-1].set_neighbor("down", self.queryTypePanel.getElements()[0])
-
-            self.queryTypePanel.setNeighbors()
-            self.queryAxisPanel.setNeighbors()
                     
         else:
             print(f"Selected query: {selected_query} is unhandeled.")
@@ -151,6 +131,26 @@ class StatsMenu(Menu):
         # update query with new date values
         self.set_plotter_data()
         
+    def update_ploter_on_edit_finished(self,selected_query):
+        print(self.query)
+        self.queryAxisY = "weight" # Default Y axis value
+        self.plotter.y_label = self.queryAxisY
+        self.Yaxis_weight_btn.activate()
+        self.Yaxis_reps_btn.deactivate()
+        self.Yaxis_volume_btn.deactivate()
+        self.plotter.change_plot_color(StyleManager.get_muscle_group_color(selected_query)["bg_color"])
+        self.set_plotter_data()
+        # Activate Reps and Volume buttons
+        self.Yaxis_reps_btn.selectable = True
+        self.Yaxis_volume_btn.selectable = True
+        # Redo neighbors
+        # Reconnect queryTypePanel and queryAxisPanel
+        for type_btn in self.queryTypePanel.getElements():
+            type_btn.set_neighbor("up", self.queryAxisPanel.getSelectableElements()[-1])
+        self.queryAxisPanel.getSelectableElements()[-1].set_neighbor("down", self.queryTypePanel.getElements()[0])
+
+        self.queryTypePanel.setNeighbors()
+        self.queryAxisPanel.setNeighbors()
 
     def set_initial_focus_on_switch(self):
         # Set focus to the first nav bar button or any default element

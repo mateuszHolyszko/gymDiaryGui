@@ -9,6 +9,7 @@ from GUI.menus.SessionMenu import SessionMenu
 from GUI.menus.ProgramMenu import ProgramMenu
 from GUI.menus.StatsMenu import StatsMenu
 from GUI.Notifications import Notification
+from GUI.ScrollingTableVertical import ScrollingTableVertical
 
 from workout_db_r.Database import Database
 from workout_db_r.Query import Query
@@ -139,8 +140,11 @@ def main():
         tex_pass1.use()
         prog_lighting['time'].value = current_time
 
-        if manager.focus_manager.current_focus:
+        if manager.focus_manager.current_focus:                
             fx, fy = manager.focus_manager.current_focus.x, manager.focus_manager.current_focus.y
+            # if its scrolling table, needs to translate y to viewport pos
+            if isinstance(manager.focus_manager.current_focus.parent_panel, ScrollingTableVertical):
+                fy = fy - manager.focus_manager.current_focus.parent_panel.scroll_offset
             fw, fh = manager.focus_manager.current_focus.width, manager.focus_manager.current_focus.height
             prog_lighting['focus_pos'].value = (fx / screen_size[0], fy / screen_size[1])
             prog_lighting['focus_size'].value = (fw / screen_size[0], fh / screen_size[1])

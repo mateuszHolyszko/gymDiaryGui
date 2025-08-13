@@ -36,7 +36,10 @@ class FormGetExerciseOptions(Form):
 
     def on_finished_edit(self):
         self.manager.notification_system.show(f"Exercise {self.exerciseDropDown.getSelectedOption()} choosen", 3)
+        self.return_menu_instance.query = self.exerciseDropDown.getSelectedOption()
+        self.return_menu_instance.update_ploter_on_edit_finished(self.selected_query)
         self.exit()
+        print("exiting ex form")
 
     def set_initial_focus_on_switch(self):
         # Set focus to the first nav bar button or any default element

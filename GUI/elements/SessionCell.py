@@ -48,7 +48,9 @@ class SessionCell(Element):
         self.input_min = 0
         self.input_max = 100
         self.input_step_reps = 1
-        self.input_step_weight = 1.25
+        self.input_step_weight = self.manager.queryTool.get_exercise_by_name( self.exercise ).weight_inc
+        if self.input_step_weight is None or self.input_step_weight == 0:
+            self.input_step_weight = 1.25
         self.style = StyleManager.current_style
 
     def render(self, screen):
