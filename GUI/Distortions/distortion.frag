@@ -14,8 +14,8 @@ float rand(vec2 co) {
 
 void main() {
     vec2 uv0 = uv; // Keep original UVs for distortion effects
+
     // === Simple per-row sync jitter ===
-    
     float rowIndex = floor(uv0.y * 240.0);
     float tStep = floor(time * 10.0);
     vec2 seed = vec2(rowIndex, tStep);
@@ -45,8 +45,8 @@ void main() {
 
     // === Very Thick TV-Style Scanlines ===
     float lines = 240.0; // Matches 480i resolution
-    float thickness = 0.3; // 0.5-1.0 range works best
-    float darkness = 0.3; // How dark the dark lines are
+    float thickness = 0.3;
+    float darkness = 0.3;
 
     float scanline = cos(uv0.y * lines * 3.14159);
     scanline = clamp(scanline * thickness + (1.0 - thickness), 0.0, 1.0);

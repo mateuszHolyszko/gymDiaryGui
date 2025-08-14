@@ -18,12 +18,12 @@ class StyleManager:
     
     # Dark theme (white on black)
     DARK = ElementStyle(
-        bg_color=(0, 0, 0),
+        bg_color=(30, 30, 30),
         bg_color_notSelectable=(50, 50, 50),
-        lg_bg_color=(25, 25, 25),
+        lg_bg_color=(55, 55, 55),
         text_color=(255, 255, 255),
         border_color=(100, 100, 100),
-        highlight_color=(50, 50, 50),
+        highlight_color=(80, 80, 80),
         active_bg_color=(30, 80, 180),
         font=pygame.font.SysFont("Arial", 20)
     )

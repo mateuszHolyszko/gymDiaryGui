@@ -1,5 +1,5 @@
 VersionData:13/08/2025,
-Version:0.2.4,
-Branch:DML app,
+Version:0.2.5,
+Branch:Pie chart,
 Status:Unstable,
 Author:Mateutek

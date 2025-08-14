@@ -4,6 +4,7 @@ import moderngl
 from pygame.locals import DOUBLEBUF, OPENGL
 
 from GUI.MenuManager import MenuManager
+from GUI.style import StyleManager
 from GUI.menus.MainMenu import MainMenu
 from GUI.menus.SessionMenu import SessionMenu
 from GUI.menus.ProgramMenu import ProgramMenu
@@ -33,6 +34,7 @@ def main():
     # Load shaders from files
     with open("GUI/Distortions/distortion.vert") as f:
         vertex_shader = f.read()
+   
     with open("GUI/Distortions/lighting.frag") as f:
         lighting_frag = f.read()
     with open("GUI/Distortions/distortion.frag") as f:
@@ -41,10 +43,11 @@ def main():
         barrel_frag = f.read()
 
     # Create shader programs for each pass
+    
     prog_lighting   = ctx.program(vertex_shader=vertex_shader, fragment_shader=lighting_frag)
     prog_distortion = ctx.program(vertex_shader=vertex_shader, fragment_shader=distortion_frag)
     prog_barrel     = ctx.program(vertex_shader=vertex_shader, fragment_shader=barrel_frag)
-
+    
     # Initialize some default uniform values
     prog_distortion['time'] = 0.0
     prog_distortion['intensity'] = 0.2
@@ -116,7 +119,7 @@ def main():
             manager.handle_event(event)
 
         # === Draw GUI to offscreen surface ===
-        gui_surface.fill((0, 0, 0))
+        gui_surface.fill(StyleManager.DARK.bg_color)
         if manager.current_menu:
             manager.current_menu.render(gui_surface)
         notification.render(gui_surface)
@@ -161,6 +164,9 @@ def main():
             prog_lighting['clip_size'].value  = (0.0, 0.0)
 
         vao_lighting.render(moderngl.TRIANGLE_STRIP)
+
+        bg = StyleManager.DARK.bg_color
+        bg_normalized = (bg[0]/255.0, bg[1]/255.0, bg[2]/255.0)
 
         # === Pass 3: CRT barrel distortion ===
         ctx.screen.use()

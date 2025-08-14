@@ -1,6 +1,6 @@
 import dearpygui.dearpygui as dpg
-from EditApp.exercises_tab import build_exercises_tab
-from EditApp.programs_tab import build_programs_tab
+from DesktopApp.exercises_tab import build_exercises_tab
+from DesktopApp.programs_tab import build_programs_tab
 
 dpg.create_context()
 

@@ -7,8 +7,8 @@ from GUI.elements.Element import Element
 from GUI.style import StyleManager
 
 class Table(Panel):
-    def __init__(self, x, y, width, height, manager, rows=1, cols=1,drawBorder = True):
-        super().__init__(x, y, width, height, manager, layout_type="grid")
+    def __init__(self, x, y, width, height, manager, rows=1, cols=1,drawBorder = False):
+        super().__init__(x, y, width, height, manager, layout_type="grid",drawBorder = False)
         self.draw_table_lines = True
         self.rows = rows
         self.cols = cols
@@ -68,15 +68,15 @@ class Table(Panel):
     
     def enforceElementsSize(self):
         """Ensure all elements fit within their grid cells."""
-        cell_width = self.width / self.cols
-        cell_height = self.height / self.rows
+        cell_width = self.width / self.cols - 1
+        cell_height = self.height / self.rows - 1
         for r in range(self.rows):
             for c in range(self.cols):
                 if self.elements_grid[r][c] is not None:
                     self.elements_grid[r][c].width = cell_width
                     self.elements_grid[r][c].height = cell_height
-                    self.elements_grid[r][c].x = self.x + c  * cell_width
-                    self.elements_grid[r][c].y = self.y + r * cell_height
+                    self.elements_grid[r][c].x = self.x + c  * cell_width + 2
+                    self.elements_grid[r][c].y = self.y + r * cell_height + 2
                         
                     
                     
@@ -241,12 +241,7 @@ class Table(Panel):
                 manager=manager,
                 parent_panel=self
             )
-            # Style the button differently
-            add_set_button.set_style_override({
-                'bg_color': (25, 25, 25),
-                'text_color': (255, 255, 255),
-                'highlight_color': (50, 50, 50)
-            })
+            
             # Add action to the button
             add_set_button.on_press = lambda r=r: self._add_set_to_row(r,programName)
             

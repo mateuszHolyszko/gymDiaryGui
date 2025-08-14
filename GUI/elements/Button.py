@@ -118,9 +118,9 @@ class Button(Element):
             pygame.draw.rect(screen, style.border_color, 
                            (self.x, self.y, self.width, self.height), 2)
 
-        # If bg_color is not black, font color should be black    
+        # If bg_color is light, font color should be black    
         text_color = style.text_color
-        if bg_color != (0,0,0):
+        if bg_color != StyleManager.DARK.bg_color and bg_color != StyleManager.DARK.highlight_color and bg_color != StyleManager.DARK.lg_bg_color:
             text_color = (0,0,0)
 
         text = self.font.render(self.text, True, text_color)

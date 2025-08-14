@@ -598,3 +598,69 @@ class Query:
         except Exception as e:
             print(f"Error adding session: {str(e)}")
             return False
+        
+    def get_last_session_date_by_program(self, program_name: str) -> Optional[str]:
+        """
+        Get the date of the most recent session for a given program.
+        
+        Args:
+            program_name: Name of the program to query
+            
+        Returns:
+            Date string in DD-MM-YYYY format if sessions exist, None otherwise
+        """
+        sessions = self.get_sessions_by_program(program_name)
+        if not sessions:
+            return None
+            
+        # Find session with latest date
+        latest_session = max(
+            sessions,
+            key=lambda s: datetime.strptime(s.date, "%d-%m-%Y")
+        )
+        return latest_session.date
+
+    def get_program_session_count(self, program_name: str, weeks: int = 3) -> int:
+        """
+        Get the number of sessions completed for a specific program within a time period.
+        
+        Args:
+            program_name: Name of the program to query
+            weeks: Time period in weeks to look back (default: 3)
+            
+        Returns:
+            Number of sessions completed for the program in the specified time period
+        """
+        if weeks <= 0:
+            raise ValueError("Weeks parameter must be positive")
+            
+        cutoff_date = datetime.now() - timedelta(weeks=weeks)
+        sessions = self.get_sessions_by_program(program_name)
+        
+        return sum(
+            1 for s in sessions 
+            if datetime.strptime(s.date, "%d-%m-%Y") >= cutoff_date
+        )
+    
+    def get_program_target_distribution(self, program_name: str) -> Dict[str, int]:
+        """
+        Get the distribution of target muscles in a program.
+        
+        Args:
+            program_name: Name of the program to analyze
+            
+        Returns:
+            Dictionary with target muscles as keys and counts as values.
+            Example: {'Chest': 2, 'Back': 3, 'Legs': 1}
+        """
+        program = self.get_program_by_name(program_name)
+        if not program:
+            return {}
+        
+        target_counts = {}
+        
+        for exercise, _ in program.exercises:
+            target = exercise.target
+            target_counts[target] = target_counts.get(target, 0) + 1
+        
+        return target_counts

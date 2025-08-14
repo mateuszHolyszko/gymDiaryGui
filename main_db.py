@@ -123,3 +123,8 @@ if __name__ == "__main__":
     # db.add_exercise(Exercise("Farmer's Walk", "Forearms", False, 2.5))
 
     # db.print_all_exercises(sort_by='name')
+
+
+    print( query.get_last_session_date_by_program("Push Day") )
+    print( query.get_program_session_count("Strength Training") )
+    print( query.get_program_target_distribution("Strength Training") )

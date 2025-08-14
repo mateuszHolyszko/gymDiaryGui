@@ -9,6 +9,7 @@ from GUI.panels.ProgramMenu_ex_selection import TargetSelectionPanel
 from GUI.elements.Image.Image2D_Graph import Image2D_Graph
 from GUI.panels.ProgramMenu_stats_exercise import ExerciseStatsPanel
 from workout_db_r.Target import Target
+from GUI.elements.PieChart import PieChart
 
 class ProgramMenu(Menu):
     def __init__(self, *args, **kwargs):
@@ -33,17 +34,19 @@ class ProgramMenu(Menu):
         self.btn_ProgramMode.activate()
         
         # Create choose programs panel, but dont add it to menu =====================================================================
-        self.programsPanel = Panel(x=0, y=0, width=screenWidth//4, height=65,manager=self.manager)
+        self.programsPanel = Panel(x=0, y=self.programs_excercieses_panel.y - 50, width=screenWidth//4, height=50,manager=self.manager)
         # Create table panel
-        self.table = Table(x=self.programsPanel.width,y=0,width=screenWidth*3//4,height=self.programs_excercieses_panel.y,rows=3,cols=3,manager=self.manager)
-        self.table.draw_table_lines = False 
+        self.table = Table(x=self.programsPanel.width,y=0,width=screenWidth*3//4,height=self.programs_excercieses_panel.y,rows=3,cols=3,manager=self.manager,drawBorder=True)
         
         # Add elements
         programNames = self.manager.queryTool.get_all_program_names()
-        self.selectProgram = SelectDropDown(options=programNames, width=self.programsPanel.width - 4, height=45, manager=self.manager, layer=2, drop_direction="down")
+        self.selectProgram = SelectDropDown(options=programNames[::-1], width=self.programsPanel.width - 6, height=self.programsPanel.height-5, manager=self.manager, layer=2, drop_direction="up")
         self.programsPanel.add_element(self.selectProgram)
 
         self.table.load_data_program(self.manager.queryTool.get_program_table_data(programNames[0]),manager=self.manager) # Load initial program data
+        self.pieChartPanel = Panel(x=0,y=0,width=self.table.x,height=self.table.height,manager=self.manager)
+        self.pieChart = PieChart(distribution=self.manager.queryTool.get_program_target_distribution(programNames[0]) ,x=0,y=0,width=self.pieChartPanel.width,height=self.pieChartPanel.width*0.58,manager=self.manager)
+        self.pieChartPanel.add_element(self.pieChart)
 
         # Excercises mode elements, but dont add it to menu:  =====================================================================
         self.targetSelectionPanel = TargetSelectionPanel(x=screenWidth - screenWidth//4,y=50, width=screenWidth//4, height=self.programs_excercieses_panel.y-50,manager=self.manager)
@@ -109,14 +112,16 @@ class ProgramMenu(Menu):
             # Add instances
             self.add_panel_instance(self.programsPanel)
             self.add_panel_instance(self.table)
+            self.add_panel_instance(self.pieChartPanel)
 
             # Connect navigation between programsPanel and table
             for programsPanel_elem in self.programsPanel.getElements():
-                programsPanel_elem.set_neighbor("right", self.table.elements_grid[1][0])  # First element in table
-            for row in self.table.elements_grid:
-                for elem in row:
+                programsPanel_elem.set_neighbor("right", self.table.elements_grid[-1][0])  # First element in last row table
+            for row in range(len(self.table.elements_grid)):
+                for elem in self.table.getElementsInRow(row):
                     if elem is not None:
                         elem.set_neighbor("left", self.programsPanel.getElements()[0])
+                        break
             # Connect PROGRAMS/EXERCISES panel and programsPanel
             self.selectProgram.set_neighbor("down", self.programs_excercieses_panel.getElements()[0])
             self.programs_excercieses_panel.getElements()[0].set_neighbor("up", self.selectProgram)
@@ -153,6 +158,8 @@ class ProgramMenu(Menu):
                 if elem is not None:
                     elem.set_neighbor("left", self.programsPanel.getElements()[0])
         self.table.setNeighbors()
+        # update chart
+        self.pieChart.update(self.manager.queryTool.get_program_target_distribution( self.selectProgram.getSelectedOption() ))
 
     def set_initial_focus_on_switch(self):
         # Set focus to the first nav bar button or any default element
