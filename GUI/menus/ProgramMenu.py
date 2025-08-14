@@ -10,6 +10,8 @@ from GUI.elements.Image.Image2D_Graph import Image2D_Graph
 from GUI.panels.ProgramMenu_stats_exercise import ExerciseStatsPanel
 from workout_db_r.Target import Target
 from GUI.elements.PieChart import PieChart
+from GUI.elements.ValueDisplay import ValueDisplay
+from GUI.style import StyleManager
 
 class ProgramMenu(Menu):
     def __init__(self, *args, **kwargs):
@@ -44,9 +46,25 @@ class ProgramMenu(Menu):
         self.programsPanel.add_element(self.selectProgram)
 
         self.table.load_data_program(self.manager.queryTool.get_program_table_data(programNames[0]),manager=self.manager) # Load initial program data
-        self.pieChartPanel = Panel(x=0,y=0,width=self.table.x,height=self.table.height,manager=self.manager)
-        self.pieChart = PieChart(distribution=self.manager.queryTool.get_program_target_distribution(programNames[0]) ,x=0,y=0,width=self.pieChartPanel.width,height=self.pieChartPanel.width*0.58,manager=self.manager)
+        self.pieChartPanel = Panel(x=0,y=0,width=self.table.x,height=self.table.x*0.58,manager=self.manager)
+        distribution = self.manager.queryTool.get_program_target_distribution(programNames[0])
+        self.pieChart = PieChart(distribution=distribution ,x=0,y=0,width=self.pieChartPanel.width,height=self.pieChartPanel.width*0.58,manager=self.manager)
         self.pieChartPanel.add_element(self.pieChart)
+        self.programStatsPanel = Panel(x=0,y=self.pieChartPanel.height,width=self.table.x,height=self.table.height-self.pieChartPanel.height-self.programsPanel.height,manager=self.manager)
+        dist_str=""
+        i = 1
+        for key in distribution.keys():
+            if i%4==0:
+                dist_str+=f"\n   {key[:3]}: {distribution[key]}"
+                i+=1
+            else:
+                dist_str+=f"   {key[:3]}: {distribution[key]}"
+                i+=1
+        stats_str = f"   Last 3 Weeks:   {self.manager.queryTool.get_program_session_count(programNames[0])}\n   Last Year:          {self.manager.queryTool.get_program_session_count(programNames[0],52)}"
+        self.programStatsValueDisplay1 = ValueDisplay(prompt="Muscles Hit", value=dist_str,width=self.programStatsPanel.width,height=self.programStatsPanel.height//2, manager=self.manager)
+        self.programStatsValueDisplay2 = ValueDisplay(prompt="Sessions Performed", value=stats_str,width=self.programStatsPanel.width,height=self.programStatsPanel.height//2, manager=self.manager)
+        self.programStatsPanel.add_element(self.programStatsValueDisplay1)
+        self.programStatsPanel.add_element(self.programStatsValueDisplay2)
 
         # Excercises mode elements, but dont add it to menu:  =====================================================================
         self.targetSelectionPanel = TargetSelectionPanel(x=screenWidth - screenWidth//4,y=50, width=screenWidth//4, height=self.programs_excercieses_panel.y-50,manager=self.manager)
@@ -113,6 +131,7 @@ class ProgramMenu(Menu):
             self.add_panel_instance(self.programsPanel)
             self.add_panel_instance(self.table)
             self.add_panel_instance(self.pieChartPanel)
+            self.add_panel_instance(self.programStatsPanel)
 
             # Connect navigation between programsPanel and table
             for programsPanel_elem in self.programsPanel.getElements():
@@ -160,6 +179,20 @@ class ProgramMenu(Menu):
         self.table.setNeighbors()
         # update chart
         self.pieChart.update(self.manager.queryTool.get_program_target_distribution( self.selectProgram.getSelectedOption() ))
+        # update stats
+        distribution = self.manager.queryTool.get_program_target_distribution( self.selectProgram.getSelectedOption() )
+        dist_str=""
+        i = 1
+        for key in distribution.keys():
+            if i%4==0:
+                dist_str+=f"\n   {key[:3]}: {distribution[key]}"
+                i+=1
+            else:
+                dist_str+=f"   {key[:3]}: {distribution[key]}"
+                i+=1
+        stats_str = f"   Last 3 Weeks:   {self.manager.queryTool.get_program_session_count( self.selectProgram.getSelectedOption() )}\n   Last Year:          {self.manager.queryTool.get_program_session_count(self.selectProgram.getSelectedOption(),52)}"
+        self.programStatsValueDisplay1.set_value(dist_str)
+        self.programStatsValueDisplay2.set_value(stats_str)
 
     def set_initial_focus_on_switch(self):
         # Set focus to the first nav bar button or any default element

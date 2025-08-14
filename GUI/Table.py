@@ -147,12 +147,14 @@ class Table(Panel):
                         manager=manager, parent_panel=self
                     )
                 else:
+                    color=StyleManager.get_muscle_group_color(self.manager.queryTool.get_exercise_by_name(data[r][0]).target)["bg_color"]
                     elem = Button(
                         text=str(value), x=x, y=y, 
                         width=cell_width, height=cell_height, 
                         manager=manager, parent_panel=self, 
                         **button_kwargs
                     )
+                    elem.set_style_override({'bg_color': color})
                 self.elements_grid[r][c] = elem
                 self.elements.append(elem)  # Add to elements list for rendering
                 
