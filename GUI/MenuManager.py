@@ -1,7 +1,7 @@
 from GUI.FocusManager import FocusManager
 
 class MenuManager:
-    def __init__(self, screen,queryTool, notification_system):
+    def __init__(self, screen,queryTool, notification_system,ctx,fbo,tex):
         self.screen = screen
         self.queryTool = queryTool
         self.notification_system = notification_system
@@ -9,6 +9,7 @@ class MenuManager:
         self.focus_manager = FocusManager()  # Central focus control
         self.menus = {}
         self.context = {} # for some globalcontext
+        self.screen3Drefs = {'ctx':ctx,'fbo':fbo,'tex':tex}
 
     def register_menu(self, name, menu_instance):
         self.menus[name] = menu_instance

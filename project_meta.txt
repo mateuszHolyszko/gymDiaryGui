@@ -1,5 +1,5 @@
-VersionData:13/08/2025,
-Version:0.2.5,
-Branch:Pie chart,
+VersionData:16/08/2025,
+Version:0.2.6,
+Branch:3D pipeline, 3D display, mesh loader,
 Status:Unstable,
 Author:Mateutek

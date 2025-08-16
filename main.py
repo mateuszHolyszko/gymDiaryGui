@@ -9,6 +9,7 @@ from GUI.menus.MainMenu import MainMenu
 from GUI.menus.SessionMenu import SessionMenu
 from GUI.menus.ProgramMenu import ProgramMenu
 from GUI.menus.StatsMenu import StatsMenu
+from GUI.menus.MockLoadingMenu import MockLoadingMenu
 from GUI.Notifications import Notification
 from GUI.ScrollingTableVertical import ScrollingTableVertical
 
@@ -31,10 +32,18 @@ def main():
     # === Setup moderngl context and shaders ===
     ctx = moderngl.create_context()
 
+    # Create offscreen GUI surface
+    gui_surface = pygame.Surface(screen_size)
+    # Seperate framebuffer for 3D elements
+    tex_3d = ctx.texture(screen_size, components=4)  # RGBA
+    tex_3d.repeat_x = False
+    tex_3d.repeat_y = False
+    depth_3d = ctx.depth_renderbuffer(screen_size)
+    fbo_3d = ctx.framebuffer(color_attachments=[tex_3d], depth_attachment=depth_3d)
+
     # Load shaders from files
     with open("GUI/Distortions/distortion.vert") as f:
         vertex_shader = f.read()
-   
     with open("GUI/Distortions/lighting.frag") as f:
         lighting_frag = f.read()
     with open("GUI/Distortions/distortion.frag") as f:
@@ -66,41 +75,49 @@ def main():
     vao_distortion = ctx.simple_vertex_array(prog_distortion, vbo, 'in_vert', 'in_uv')
     vao_barrel     = ctx.simple_vertex_array(prog_barrel,     vbo, 'in_vert', 'in_uv')
 
-    # Create offscreen GUI surface
-    gui_surface = pygame.Surface(screen_size)
-
     # Texture for GUI input
     texture_gui = ctx.texture(screen_size, 3)
     texture_gui.repeat_x = False
     texture_gui.repeat_y = False
 
+    # Composite pass (combining 3d framebuffer with pygame screen in gpu)
+    with open("GUI\\ThreeDee\\shaders\\composite.vert") as f:
+        composite_vert = f.read()
+    with open("GUI\\ThreeDee\\shaders\\composite.frag") as f:
+        composite_frag = f.read()
+    prog_composite = ctx.program(vertex_shader=composite_vert, fragment_shader=composite_frag)
+    vao_composite = ctx.simple_vertex_array(prog_composite, vbo, 'in_vert', 'in_uv')
+
     # Create intermediate framebuffers for passes
     tex_pass1 = ctx.texture(screen_size, 3)
     tex_pass2 = ctx.texture(screen_size, 3)
+    tex_pass3 = ctx.texture(screen_size, 3)
     fbo_pass1 = ctx.framebuffer(color_attachments=[tex_pass1])
     fbo_pass2 = ctx.framebuffer(color_attachments=[tex_pass2])
+    fbo_pass3 = ctx.framebuffer(color_attachments=[tex_pass3])
 
     # Setup notification system
     notification = Notification(font_size=24, display_time=2.5)
 
     # Create menu manager
-    manager = MenuManager(gui_surface,query,notification)
+    manager = MenuManager(gui_surface,query,notification,ctx,fbo_3d,tex_3d)
 
     # Instantiate all menus
+    loading_menu = MockLoadingMenu(gui_surface,manager)
     main_menu = MainMenu(gui_surface, manager)
     session_menu = SessionMenu(gui_surface, manager)
     program_menu = ProgramMenu(gui_surface, manager)
     stats_menu = StatsMenu(gui_surface, manager)
     
     # Register all menus with string names (pass instances)
+    manager.register_menu("LoadingMenu", loading_menu)
     manager.register_menu("MainMenu", main_menu)
     manager.register_menu("SessionMenu", session_menu)
     manager.register_menu("ProgramMenu", program_menu)
     manager.register_menu("StatsMenu", stats_menu)
 
     # Start with main menu
-    manager.switch_to("MainMenu")
-
+    manager.switch_to("LoadingMenu")
     # Main game loop
     running = True
     while running:
@@ -121,26 +138,52 @@ def main():
         # === Draw GUI to offscreen surface ===
         gui_surface.fill(StyleManager.DARK.bg_color)
         if manager.current_menu:
-            manager.current_menu.render(gui_surface)
+            manager.current_menu.render2d(gui_surface)
         notification.render(gui_surface)
 
         # === Convert surface to texture ===
         gui_rgb = pygame.surfarray.pixels3d(gui_surface).copy().swapaxes(0, 1)
         texture_gui.write(gui_rgb.tobytes())
 
+        # === Render 3D into fbo_3d ===
+        if manager.current_menu:
+            manager.current_menu.render3d()
+
         current_time = pygame.time.get_ticks() / 1000.0
 
-        # === Pass 1: Distortions ===
+        # === Composite GUI and 3D into first post-process texture ===
         fbo_pass1.use()
+        ctx.viewport = (0, 0, screen_size[0], screen_size[1])
         ctx.clear()
-        texture_gui.use()
+        texture_gui.use(0)
+        tex_3d.use(1)
+        prog_composite['tex_gui'] = 0
+        prog_composite['tex_3d'] = 1
+        display3d_elem = manager.current_menu.get_display3d_element()
+        if display3d_elem is not None:
+            prog_composite['elem_pos'].value = (
+                display3d_elem.x / screen_size[0],
+                display3d_elem.y / screen_size[1]
+            )
+            prog_composite['elem_size'].value = (
+                display3d_elem.width / screen_size[0],
+                display3d_elem.height / screen_size[1]
+            )
+        vao_composite.render(moderngl.TRIANGLE_STRIP)
+
+        
+
+        # === Pass 1: Distortions ===
+        fbo_pass2.use()
+        ctx.clear()
+        tex_pass1.use(0)
         prog_distortion['time'].value = current_time
         vao_distortion.render(moderngl.TRIANGLE_STRIP)
 
         # === Pass 2: Lighting (now after distortion) ===
-        fbo_pass2.use()
+        fbo_pass3.use()
         ctx.clear()
-        tex_pass1.use()
+        tex_pass2.use(0)
         prog_lighting['time'].value = current_time
 
         if manager.focus_manager.current_focus:                
@@ -171,7 +214,7 @@ def main():
         # === Pass 3: CRT barrel distortion ===
         ctx.screen.use()
         ctx.clear()
-        tex_pass2.use()
+        tex_pass3.use(0)
         vao_barrel.render(moderngl.TRIANGLE_STRIP)
 
         # === Swap buffers ===
