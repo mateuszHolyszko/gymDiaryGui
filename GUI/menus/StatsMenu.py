@@ -99,7 +99,7 @@ class StatsMenu(Menu):
         if selected_query == "weight":
             self.query = "weight"
             self.queryAxisY = "weight"
-            print("weight query selected")
+            #print("weight query selected")
             self.plotter.change_plot_color(StyleManager.current_style.text_color)
             self.set_plotter_data()
             # Deactivate Reps and Volume buttons and activate KG
@@ -111,7 +111,7 @@ class StatsMenu(Menu):
             for type_btn in self.queryTypePanel.getElements():
                 type_btn.set_neighbor("up", self.queryAxisPanel.getSelectableElements()[-1])
             self.queryAxisPanel.getSelectableElements()[0].set_neighbor("down", self.queryTypePanel.getElements()[0])
-            print(self.queryTypePanel.getElements()[0])
+            #print(self.queryTypePanel.getElements()[0])
 
             
         elif selected_query in self.manager.queryTool.get_all_targets():
@@ -132,7 +132,7 @@ class StatsMenu(Menu):
         self.set_plotter_data()
         
     def update_ploter_on_edit_finished(self,selected_query):
-        print(self.query)
+        #print(self.query)
         self.queryAxisY = "weight" # Default Y axis value
         self.plotter.y_label = self.queryAxisY
         self.Yaxis_weight_btn.activate()
@@ -163,13 +163,13 @@ class StatsMenu(Menu):
             self.y_vals, self.x_vals = self.manager.queryTool.get_bodyweight_history(self.week_input_form.getValue())
             self.x_vals.reverse()
             self.y_vals.reverse()
-            print(f"Y values: {self.y_vals}, X values: {self.x_vals}")
+            #print(f"Y values: {self.y_vals}, X values: {self.x_vals}")
         else:
             self.y_vals, self.x_vals = self.manager.queryTool.get_exercise_history(self.query, self.week_input_form.getValue())
             self.y_vals = [entry[self.queryAxisY] for entry in self.y_vals]
             self.x_vals.reverse()
             self.y_vals.reverse()
-            print(f"Y values: {self.y_vals}, X values: {self.x_vals}")
+            #print(f"Y values: {self.y_vals}, X values: {self.x_vals}")
         self.plotter.update_data(x_values=self.x_vals, y_values=self.y_vals)
 
     def weight_btn_press(self):

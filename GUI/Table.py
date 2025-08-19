@@ -190,7 +190,7 @@ class Table(Panel):
             exercise_name = str(row[0])
             exercise_repRange = self.manager.queryTool.get_exercise_rep_range(programName, exercise_name)
             exercise_target = self.manager.queryTool.get_exercise_by_name(exercise_name).target
-            print(f"EXERCISE targer: {exercise_target}")
+            #print(f"EXERCISE targer: {exercise_target}")
             button_elem = Button(
                 text=exercise_name,
                 x=self.x + 0.5 * cell_width,
@@ -225,10 +225,10 @@ class Table(Panel):
                     exercise=exercise_name,
                     **button_kwargs
                 )
-                print(f"r {r}")
-                print(f"cell height {cell_height}")
-                print(f"inside cell {cell_elem.y}")
-                print(f"table y  {self.y}")
+                #print(f"r {r}")
+                #print(f"cell height {cell_height}")
+                #print(f"inside cell {cell_elem.y}")
+                #print(f"table y  {self.y}")
                 self.elements_grid[r][c] = cell_elem
                 self.elements.append(cell_elem)
 

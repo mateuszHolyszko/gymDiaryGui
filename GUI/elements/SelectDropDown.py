@@ -162,7 +162,8 @@ class SelectDropDown(Element):
 
     def on_finished_edit(self):
         """Default finished edit action - can be overridden with lambda."""
-        print(f"finished editing SelectDropDown with selected option: {self.getSelectedOption()}")
+        #print(f"finished editing SelectDropDown with selected option: {self.getSelectedOption()}")
+        pass
 
     def handle_event(self, event: pygame.event.Event) -> bool:
         if not self.selectable:

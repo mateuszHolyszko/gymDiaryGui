@@ -19,15 +19,15 @@ class ScrollingTableVertical(Table):
         # First handle scrolling if it's a key event
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_COMMA:  # "<" key
-                print("im in")
+                #print("im in")
                 self.scroll_offset = max(self.scroll_offset - self.scroll_speed, 0)
-                print(self.scroll_offset)
+                #print(self.scroll_offset)
                 return True  # Event handled
                 
             elif event.key == pygame.K_PERIOD:  # ">" key
-                print("im in")
+                #print("im in")
                 self.scroll_offset = min(self.scroll_offset + self.scroll_speed, self.max_offset)
-                print(self.scroll_offset)
+                #print(self.scroll_offset)
                 return True  # Event handled
                 
         return False

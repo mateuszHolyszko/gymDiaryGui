@@ -57,7 +57,7 @@ class SessionMenu(Menu):
         totalHeightOfTable = max(self.table.height, totalRows * rowHeight )
         self.table.changeDims(newTotalHeight=totalHeightOfTable)
         self.connectNeighbors()
-        print(f"y={self.table.y}, height={self.table.height}, totalHeight={self.table.totalHeight}, lastRowCell y={self.table.getElements()[-1].y},last row cell height={self.table.getElements()[-1].height}")
+        #print(f"y={self.table.y}, height={self.table.height}, totalHeight={self.table.totalHeight}, lastRowCell y={self.table.getElements()[-1].y},last row cell height={self.table.getElements()[-1].height}")
         #when loading we are coming from top so ofsset 0
         self.table.scroll_offset = 0
         
@@ -81,7 +81,7 @@ class SessionMenu(Menu):
 
     def saveSession(self):
         bodyweight = self.manager.context["bodyweight"]
-        print(bodyweight)
+        #print(bodyweight)
         JSONdata = self.table.get_session_data_JSON(self.selectProgram.getSelectedOption(), datetime.now().strftime("%d-%m-%Y"), bodyweight )
         #print(JSONdata)
         self.manager.context["session_data"] = JSONdata # temporaly storage, so we can access it in Form

@@ -16,7 +16,7 @@ class Distortion:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         vert_path = os.path.join(base_dir, "distortion.vert")
         frag_path = os.path.join(base_dir, "distortion.frag")
-        print(vert_path)
+        #print(vert_path)
         
         try:
             # Initialize shader with the POST-shader surface as target

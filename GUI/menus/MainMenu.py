@@ -55,7 +55,7 @@ class MainMenu(Menu):
             bodyweight = self.manager.context["bodyweight"]
             if bodyweight is None:
                 raise KeyError("Bodyweight is None")  # Force fallback to last session
-            print(bodyweight)
+            #print(bodyweight)
         except (KeyError, AttributeError) as e:
             # Fallback 1: Try getting bodyweight from last session
             try:
@@ -63,7 +63,7 @@ class MainMenu(Menu):
                 if last_bodyweight is not None:
                     bodyweight = last_bodyweight
                     if bodyweight is not None:
-                        print(bodyweight)
+                        #print(bodyweight)
                         self.manager.context["bodyweight"] = bodyweight
                     else:
                         print("Warning: Bodyweight not found in last session")

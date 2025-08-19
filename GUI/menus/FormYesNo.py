@@ -37,15 +37,15 @@ class FormYesNo(Form):
         
         
     def yes_pressed(self):
-        print("YES")
+        #print("YES")
         JSONdata = self.manager.context["session_data"]
-        print(JSONdata)
+        #print(JSONdata)
         self.manager.queryTool.add_session(JSONdata)
         self.manager.notification_system.show("Session saved successfully!", 3)
         self.exit()
         
     def no_pressed(self):
-        print("NO")
+        #print("NO")
         # Return to previous menu using Form's exit method
         self.exit()
 

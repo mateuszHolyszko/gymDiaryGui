@@ -41,7 +41,7 @@ class TargetSelectionPanel(Table):
             self.getElements()[-2].set_neighbor("down", self.getElements()[-1])
 
     def on_button_press(self):
-        print(f"target selected: {self.manager.focus_manager.current_focus.text}")
+        #print(f"target selected: {self.manager.focus_manager.current_focus.text}")
         for btns in self.getElements():
             btns.deactivate()
         self.manager.focus_manager.current_focus.activate()

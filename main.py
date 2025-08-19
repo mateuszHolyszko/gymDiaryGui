@@ -5,10 +5,6 @@ from pygame.locals import DOUBLEBUF, OPENGL
 
 from GUI.MenuManager import MenuManager
 from GUI.style import StyleManager
-from GUI.menus.MainMenu import MainMenu
-from GUI.menus.SessionMenu import SessionMenu
-from GUI.menus.ProgramMenu import ProgramMenu
-from GUI.menus.StatsMenu import StatsMenu
 from GUI.menus.MockLoadingMenu import MockLoadingMenu
 from GUI.Notifications import Notification
 from GUI.ScrollingTableVertical import ScrollingTableVertical
@@ -102,25 +98,23 @@ def main():
     # Create menu manager
     manager = MenuManager(gui_surface,query,notification,ctx,fbo_3d,tex_3d)
 
-    # Instantiate all menus
+    # Instantiate all menus (Rest will be done in Moule Loading Menu)
     loading_menu = MockLoadingMenu(gui_surface,manager)
-    main_menu = MainMenu(gui_surface, manager)
-    session_menu = SessionMenu(gui_surface, manager)
-    program_menu = ProgramMenu(gui_surface, manager)
-    stats_menu = StatsMenu(gui_surface, manager)
     
-    # Register all menus with string names (pass instances)
+    # Register all menus with string names (pass instances) (Rest will be done in Moule Loading Menu)
     manager.register_menu("LoadingMenu", loading_menu)
-    manager.register_menu("MainMenu", main_menu)
-    manager.register_menu("SessionMenu", session_menu)
-    manager.register_menu("ProgramMenu", program_menu)
-    manager.register_menu("StatsMenu", stats_menu)
+    
 
     # Start with main menu
     manager.switch_to("LoadingMenu")
     # Main game loop
     running = True
     while running:
+
+        current_time = pygame.time.get_ticks() / 1000.0
+        last_time = current_time
+        delta_time = current_time - last_time
+        
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -135,6 +129,10 @@ def main():
             # Pass all events to menu manager
             manager.handle_event(event)
 
+        # Id menu has update() perform it
+        if hasattr(manager.current_menu,"update"):
+            manager.current_menu.update(delta_time)
+
         # === Draw GUI to offscreen surface ===
         gui_surface.fill(StyleManager.DARK.bg_color)
         if manager.current_menu:
@@ -148,8 +146,6 @@ def main():
         # === Render 3D into fbo_3d ===
         if manager.current_menu:
             manager.current_menu.render3d()
-
-        current_time = pygame.time.get_ticks() / 1000.0
 
         # === Composite GUI and 3D into first post-process texture ===
         fbo_pass1.use()

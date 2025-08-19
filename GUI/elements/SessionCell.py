@@ -126,7 +126,8 @@ class SessionCell(Element):
         self.manager.focus_manager.set_focus(self)
 
     def on_finished_edit(self):
-        print(f"finished editing cell with values: {self.weightFromThisSession}kg, {self.repsFromThisSession} reps")
+        #print(f"finished editing cell with values: {self.weightFromThisSession}kg, {self.repsFromThisSession} reps")
+        pass
 
     def handle_event(self, event: pygame.event.Event) -> bool:
         if not self.selectable:

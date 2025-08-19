@@ -31,7 +31,7 @@ class FormGetInputWeek(Form):
         self.weekInputField.on_press = self.on_press
 
     def on_press(self):
-        print(f"pressed {self.getValue()}")
+        #print(f"pressed {self.getValue()}")
         self.return_menu_instance.update_weeks()
         self.exit()
 
