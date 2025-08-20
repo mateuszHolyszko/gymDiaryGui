@@ -1,11 +1,10 @@
-#version 330
+#version 120
 
 uniform sampler2D tex;
 uniform float time;
 uniform float intensity;
 
-in vec2 uv;
-out vec4 fragColor;
+varying vec2 uv;
 
 // Random number generator
 float rand(vec2 co) {
@@ -34,9 +33,9 @@ void main() {
 
     // === Chromatic aberration ===
     float shift = 0.015 * intensity;
-    float r = texture(tex, uv0 + vec2(shift, 0.0)).r;
-    float g = texture(tex, uv0).g;
-    float b = texture(tex, uv0 - vec2(shift, 0.0)).b;
+    float r = texture2D(tex, uv0 + vec2(shift, 0.0)).r;
+    float g = texture2D(tex, uv0).g;
+    float b = texture2D(tex, uv0 - vec2(shift, 0.0)).b;
     vec3 color = vec3(r, g, b);
 
     // === Noise ===
@@ -53,8 +52,8 @@ void main() {
     color *= mix(darkness, 1.0, scanline);
 
     // Add subtle phosphor glow between lines
-    vec3 glow = texture(tex, uv0 + vec2(0.0, 0.01)).rgb * 0.2;
+    vec3 glow = texture2D(tex, uv0 + vec2(0.0, 0.01)).rgb * 0.2;
     color = max(color, glow);
 
-    fragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
+    gl_FragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
 }

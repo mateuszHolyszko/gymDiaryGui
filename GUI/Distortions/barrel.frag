@@ -1,10 +1,9 @@
-#version 330
+#version 120
 
 uniform sampler2D tex;
 uniform float time;
 
-in vec2 uv;
-out vec4 fragColor;
+varying vec2 uv;
 
 void main() {
     // === CRT tube distortion ===
@@ -18,9 +17,9 @@ void main() {
 
     // Outside screen → gray border
     if (uv0.x > 1.0 || uv0.x < 0.0 || uv0.y > 1.0 || uv0.y < 0.0) {
-        fragColor = vec4(0.1, 0.1, 0.1, 1.0);
+        gl_FragColor = vec4(0.1, 0.1, 0.1, 1.0);
         return;
     }
 
-    fragColor = texture(tex, uv0);
+    gl_FragColor = texture2D(tex, uv0);
 }
