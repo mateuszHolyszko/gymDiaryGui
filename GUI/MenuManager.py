@@ -38,9 +38,11 @@ class MenuManager:
 
         # Let focused element handle event first
         if self.focus_manager.current_focus and \
-           hasattr(self.focus_manager.current_focus, 'handle_event'):
-            if hasattr(self.focus_manager.current_focus.parent_panel,'handle_event'):
-                self.focus_manager.current_focus.parent_panel.handle_event(event)
-            return self.focus_manager.current_focus.handle_event(event)
+           hasattr(self.focus_manager.current_focus, 'handle_event'):          
+            hasHappend=self.focus_manager.current_focus.handle_event(event) # first let element consume event
+            if hasattr(self.focus_manager.current_focus.parent_panel,'handle_event') and hasHappend==False: # if element didnt consume event, pass it to parent container
+                return self.focus_manager.current_focus.parent_panel.handle_event(event)
+            else:
+                return False
         
         return False

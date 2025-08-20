@@ -91,9 +91,9 @@ class MockLoadingMenu(Menu):
         self.delays = []
         for i in range(1,18): #4loading bars, for each 3giberish lines
             if i%4 == 1:
-                self.delays.append(random.uniform(0.5, 1.5))
+                self.delays.append(random.uniform(0.3, 1))
             else:
-                self.delays.append(random.uniform(0.2, 0.6))
+                self.delays.append(random.uniform(0.1, 0.3))
         #print(self.next_delays)
         self.queue_iterator=0
         self.printed_flag = False
@@ -138,45 +138,6 @@ class MockLoadingMenu(Menu):
                 self.gibList = self.console.getGiberishList()
                 self.queue_iterator += 1
                 self.start_load_time = time.time()    
-            
-
-    def loadUpdatee(self, dt):
-        """Called every frame, dt = delta time in seconds"""
-        # this will replace usual Menu update which gets called each frame with delta time
-        # If we're in loading mode
-        if self.current_step < len(self.ExerciseModuleLoading_steps):
-            now = time.time()
-            #print(f"step: {((now - self.previous_time)/self.next_delay):.2f}%")
-            # when it steps over boundary and is yet to be checked it will be >100% so cap it
-            prog = min((now - self.previous_time)/self.next_delay , 1)
-            self.console.drawProgressBar(prompt=f"  Loading menu -> {self.ExerciseModuleLoading_steps[self.current_step][0]}   ({self.current_step+1}/{len(self.ExerciseModuleLoading_steps)})",startingCol=0,progress=prog)
-            if now - self.previous_time >= self.next_delay:
-                # Load current menu
-                name, cls = self.ExerciseModuleLoading_steps[self.current_step]
-                menu_instance = cls(self.manager.gui_surface, self.manager)
-                self.manager.register_menu(name, menu_instance)
-                #progress console row
-                self.console._advance_row()
-                self.console._advance_row()
-                self.console._advance_row()
-                
-                gibList = self.console.getGiberishList()
-                for nonsense in gibList:
-                    self.console.printText(nonsense)
-                    self.console._advance_row()
-                self.console._advance_row()
-                #print(f"loaded {name}")
-                #print(f"progress: {self.current_step+1}/{len(self.ExerciseModuleLoading_steps)}")
-
-                self.current_step += 1
-                self.previous_time = now
-                self.next_delay = random.uniform(0.5, 1.5)
-                
-
-            # when finished
-            if self.current_step == len(self.ExerciseModuleLoading_steps):
-                self.exerciseModuleBtn.activate()
-                self.exerciseModuleBtn.on_press = self.switch_to_exercise_module
             
                 
 
