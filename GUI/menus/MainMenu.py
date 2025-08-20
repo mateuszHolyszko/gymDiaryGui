@@ -45,7 +45,7 @@ class MainMenu(Menu):
 
         # Logo
         self.logoPanel = self.add_panel(Panel, x=0, y=self.MetaDataDisplayPanel.height , width=self.MetaDataDisplayPanel.width, height=self.LabelPanel.y-self.MetaDataDisplayPanel.height, drawBorder=True)
-        self.logo = Image2D(image_path="GUI\elements\Image\images\\Logo.png", height = 474//3 , width= 424//3, manager=self.manager,layer=2)
+        self.logo = Image2D(image_path="GUI/elements/Image/images/Logo.png", height = 474//3 , width= 424//3, manager=self.manager,layer=2)
         self.logoPanel.add_element(self.logo)
 
         # Add elements (InputPanel panel)
@@ -80,9 +80,9 @@ class MainMenu(Menu):
         self.InputPanel.add_element(self.btn)
 
         # Add elements (Carousel panel)
-        self.image1 = Image2D_Graph(image_path="GUI\elements\Image\images\\Front.png", height = 290 , width= 300*0.7, manager=self.manager,layer=2)
+        self.image1 = Image2D_Graph(image_path="GUI/elements/Image/images/Front.png", height = 290 , width= 300*0.7, manager=self.manager,layer=2)
         self.image1.muscleGroups = ["Forearms", "Biceps", "Triceps","Shoulders","Chest","Back","Abs","Quads","Calves"]
-        self.image2 = Image2D_Graph(image_path="GUI\elements\Image\images\\Back.png", height = 280 , width= 300*0.5, manager=self.manager,layer=2)
+        self.image2 = Image2D_Graph(image_path="GUI/elements/Image/images/Back.png", height = 280 , width= 300*0.5, manager=self.manager,layer=2)
         self.image2.muscleGroups = ["Back","Shoulders","Triceps","Forearms","Glutes","Hamstrings","Calves"]
         self.imageImageCarousel = ImageCarousel(images=[], manager=self.manager, mode="random_timed", height = 300 , width= 300*0.7,layer=2)
         self.CarouselPanel.add_element(self.imageImageCarousel)

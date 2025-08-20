@@ -77,9 +77,9 @@ def main():
     texture_gui.repeat_y = False
 
     # Composite pass (combining 3d framebuffer with pygame screen in gpu)
-    with open("GUI\\ThreeDee\\shaders\\composite.vert") as f:
+    with open("GUI/ThreeDee/shaders/composite.vert") as f:
         composite_vert = f.read()
-    with open("GUI\\ThreeDee\\shaders\\composite.frag") as f:
+    with open("GUI/ThreeDee/shaders/composite.frag") as f:
         composite_frag = f.read()
     prog_composite = ctx.program(vertex_shader=composite_vert, fragment_shader=composite_frag)
     vao_composite = ctx.simple_vertex_array(prog_composite, vbo, 'in_vert', 'in_uv')
