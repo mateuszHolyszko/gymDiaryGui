@@ -135,7 +135,7 @@ class MainMenu(Menu):
         self.volumeSummary.clear_elements()
         # Add elements (volumeSummary panel)
         for targetMuscle in self.imageImageCarousel.get_image().muscleGroups:
-            btn = Button(text=f"{targetMuscle}: {self.manager.queryTool.get_muscle_workload(muscle=targetMuscle,weeks=3)["total_sets"]}", width=150, height=30, manager=self.manager)
+            btn = Button(text=f"{targetMuscle}: {self.manager.queryTool.get_muscle_workload(muscle=targetMuscle,weeks=3)['total_sets']}", width=150, height=30, manager=self.manager)
             btn.set_style_override({'bg_color': StyleManager.get_muscle_group_color(targetMuscle)['bg_color']})
             self.volumeSummary.add_element(btn)
 

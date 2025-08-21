@@ -25,10 +25,10 @@ def main():
     clock = pygame.time.Clock()
 
     # === Setup moderngl context for OpenGL ES 2.0 ===
-    ctx = moderngl.create_context(require=300)  # Use 300 for better compatibility with ES 2.0
+    ctx = moderngl.create_context(require=200)  # Use 300 for better compatibility with ES 2.0
     
     # Alternative: try context creation with specific backend if needed
-    # ctx = moderngl.create_context(standalone=True, backend='egl', libgl='libGLESv2.so')
+    #ctx = moderngl.create_context(standalone=True, backend='egl')
     
     # Create offscreen GUI surface
     gui_surface = pygame.Surface(screen_size)
