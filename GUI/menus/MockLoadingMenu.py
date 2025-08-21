@@ -36,9 +36,6 @@ class MockLoadingMenu(Menu):
         self.display_3d = Display3D(
             x=0, y=0, width=self.panel3D.width, height=self.panel3D.height,
             manager=self.manager,
-            ctx=self.manager.screen3Drefs['ctx'],
-            fbo_3d=self.manager.screen3Drefs['fbo'],
-            tex_3d=self.manager.screen3Drefs['tex'],
             model_path="GUI/ThreeDee/models/Mat.obj",
             vertex_shader_path="GUI/ThreeDee/shaders/basic.vert",
             fragment_shader_path="GUI/ThreeDee/shaders/basic.frag",
