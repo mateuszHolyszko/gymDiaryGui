@@ -1,4 +1,5 @@
-#version 120
+#version 100
+precision highp float;
 
 attribute vec2 in_vert;
 attribute vec2 in_uv;

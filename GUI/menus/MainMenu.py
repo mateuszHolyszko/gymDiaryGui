@@ -45,7 +45,7 @@ class MainMenu(Menu):
 
         # Logo
         self.logoPanel = self.add_panel(Panel, x=0, y=self.MetaDataDisplayPanel.height , width=self.MetaDataDisplayPanel.width, height=self.LabelPanel.y-self.MetaDataDisplayPanel.height, drawBorder=True)
-        self.logo = Image2D(image_path="GUI/elements/Image/images/Logo.png", height = 474//3 , width= 424//3, manager=self.manager,layer=2)
+        self.logo = Image2D(image_path="GUI/elements/Image/images/logo.png", height = 474//3 , width= 424//3, manager=self.manager,layer=2)
         self.logoPanel.add_element(self.logo)
 
         # Add elements (InputPanel panel)

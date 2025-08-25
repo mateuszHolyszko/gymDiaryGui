@@ -2,7 +2,6 @@ from GUI.Panel import Panel
 from GUI.Table import Table
 from GUI.panels.navigation_bar import NavigationBar
 from GUI.ScrollingTableVertical import ScrollingTableVertical
-from GUI.elements.Display3D import Display3D
 import pygame
 class Menu:
     def __init__(self, screen, manager):
@@ -49,6 +48,13 @@ class Menu:
                 self.remove_panel(panel)
 
         
+    def has_3d(self):
+        """Check if any Display3D elements exist in the menu"""
+        for panel in self.panels:
+            for element in panel.elements:
+                if element.__class__.__name__ == "Display3D":
+                    return True
+        return False
     def render2d(self, screen):
         # Separate panels into two groups:
         # 1. Panels that handle their own rendering (like scrolling tables)
@@ -84,11 +90,6 @@ class Menu:
         for layer, element in sorted(all_elements, key=lambda x: x[0]):
             element.render(screen)
 
-    def render3d(self):
-        for panel in self.panels:
-            for elem in panel.getElements():
-                if isinstance(elem, Display3D):
-                    elem.render3d()
                 
     def set_initial_focus(self, element):
         """Delegate to manager's focus system"""
@@ -98,8 +99,3 @@ class Menu:
         """Delegate event handling to manager"""
         return self.manager.handle_event(event)
     
-    def get_display3d_element(self):
-        for panel in self.panels:
-            for elem in panel.getElements():
-                if isinstance(elem, Display3D):
-                    return elem

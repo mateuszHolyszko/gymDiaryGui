@@ -77,11 +77,11 @@ class ProgramMenu(Menu):
         imagePanelWidth=self.targetSelectionPanel.x - 350 # 350 - stats panel width
         self.imagePanel = Panel(x=self.targetSelectionPanel.x - imagePanelWidth, y=self.targetSelectionPanel.y, width=imagePanelWidth, height=self.targetSelectionPanel.height,manager=self.manager)
         scale = 0.5
-        self.image1 = Image2D_Graph(image_path="GUI\elements\Image\images\\Arm.png", height = 350*scale , width= 165*scale, manager=self.manager,layer=2, specificMuscleGroup=self.targetSelectionPanel.active_target )
+        self.image1 = Image2D_Graph(image_path="GUI/elements/Image/images/Arm.png", height = 350*scale , width= 165*scale, manager=self.manager,layer=2, specificMuscleGroup=self.targetSelectionPanel.active_target )
         self.image1.muscleGroups = ["Shoulders","Biceps","Triceps","Forearms"]
-        self.image2 = Image2D_Graph(image_path="GUI\elements\Image\images\\Leg.png", height = 350*scale , width= 210*scale, manager=self.manager,layer=2, specificMuscleGroup=self.targetSelectionPanel.active_target )
+        self.image2 = Image2D_Graph(image_path="GUI/elements/Image/images/Leg.png", height = 350*scale , width= 210*scale, manager=self.manager,layer=2, specificMuscleGroup=self.targetSelectionPanel.active_target )
         self.image2.muscleGroups = ["Glutes","Quads","Hamstrings","Calves"]
-        self.image3 = Image2D_Graph(image_path="GUI\elements\Image\images\\Torso.png", height = 350*scale , width= 291*scale, manager=self.manager,layer=2, specificMuscleGroup=self.targetSelectionPanel.active_target )
+        self.image3 = Image2D_Graph(image_path="GUI/elements/Image/images/torso.png", height = 350*scale , width= 291*scale, manager=self.manager,layer=2, specificMuscleGroup=self.targetSelectionPanel.active_target )
         self.image3.muscleGroups = ["Shoulders","Chest","Back","Abs"]
         self.imagePanel.add_element(self.image3) # Defult, since chest is the defult target
 

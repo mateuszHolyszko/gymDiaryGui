@@ -9,7 +9,10 @@ class MenuManager:
         self.focus_manager = FocusManager()  # Central focus control
         self.menus = {}
         self.context = {} # for some globalcontext
-        self.screen3Drefs = {'ctx':ctx,'fbo':fbo,'tex':tex}
+        #self.screen3Drefs = {'ctx':ctx,'fbo':fbo,'tex':tex}
+        self.fbo_3d = None
+        self.tex_3d = None
+
 
     def register_menu(self, name, menu_instance):
         self.menus[name] = menu_instance
@@ -46,3 +49,4 @@ class MenuManager:
                 return False
         
         return False
+    

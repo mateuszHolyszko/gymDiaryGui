@@ -1,81 +1,95 @@
-from OpenGL.GL import *
+# gl_helpers.py  (GLES2)
 import numpy as np
+import ctypes
+import os
+import sys
+# Try to use GLES2 first, fall back to desktop OpenGL if not available
+try:
+    # Try to set up Angle for Windows GLES support
+    os.environ['PYOPENGL_PLATFORM'] = 'angle'
+    from OpenGL import GLES2 as gl
+    USING_GLES = True
+    print("Using OpenGL ES 2.0 with Angle")
+except (ImportError, AttributeError, AssertionError) as e:
+    try:
+        # Fall back to desktop OpenGL
+        del os.environ['PYOPENGL_PLATFORM']  # Remove Angle setting
+        from OpenGL.GL import *
+        import OpenGL.GL as gl
+        USING_GLES = False
+        print("Using desktop OpenGL (fallback)")
+    except ImportError:
+        print("No OpenGL implementation available")
+        sys.exit(1)
 
-def compile_shader( src: str, shader_type) -> int:
-    sid = glCreateShader(shader_type)
-    glShaderSource(sid, src)
-    glCompileShader(sid)
-    status = glGetShaderiv(sid, GL_COMPILE_STATUS)
-    if status != GL_TRUE:
-        log = glGetShaderInfoLog(sid).decode()
+def compile_shader(src: str, shader_type) -> int:
+    sid = gl.glCreateShader(shader_type)
+    gl.glShaderSource(sid, src)
+    gl.glCompileShader(sid)
+    status = gl.glGetShaderiv(sid, gl.GL_COMPILE_STATUS)
+    if status != gl.GL_TRUE:
+        log = gl.glGetShaderInfoLog(sid).decode()
         raise RuntimeError(f"Shader compile error ({shader_type}):\n{log}")
     return sid
 
-
-def link_program( vs_src: str, fs_src: str) -> int:
-    vs = compile_shader(vs_src, GL_VERTEX_SHADER)
-    fs = compile_shader(fs_src, GL_FRAGMENT_SHADER)
-    pid = glCreateProgram()
-    glAttachShader(pid, vs)
-    glAttachShader(pid, fs)
-    glLinkProgram(pid)
-    status = glGetProgramiv(pid, GL_LINK_STATUS)
-    if status != GL_TRUE:
-        log = glGetProgramInfoLog(pid).decode()
+def link_program(vs_src: str, fs_src: str) -> int:
+    vs = compile_shader(vs_src, gl.GL_VERTEX_SHADER)
+    fs = compile_shader(fs_src, gl.GL_FRAGMENT_SHADER)
+    pid = gl.glCreateProgram()
+    gl.glAttachShader(pid, vs)
+    gl.glAttachShader(pid, fs)
+    gl.glLinkProgram(pid)
+    status = gl.glGetProgramiv(pid, gl.GL_LINK_STATUS)
+    if status != gl.GL_TRUE:
+        log = gl.glGetProgramInfoLog(pid).decode()
         raise RuntimeError(f"Program link error:\n{log}")
-    # Shaders can be deleted after linking
-    glDeleteShader(vs)
-    glDeleteShader(fs)
+    gl.glDeleteShader(vs)
+    gl.glDeleteShader(fs)
     return pid
 
-
 def create_rgba_texture(w: int, h: int, *, filter_linear=False, data=None) -> int:
-    tex = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, tex)
-    minf = GL_LINEAR if filter_linear else GL_NEAREST
-    magf = GL_LINEAR if filter_linear else GL_NEAREST
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minf)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magf)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                data if data is not None else None)
-    glBindTexture(GL_TEXTURE_2D, 0)
+    tex = gl.glGenTextures(1)
+    gl.glBindTexture(gl.GL_TEXTURE_2D, tex)
+    filt = gl.GL_LINEAR if filter_linear else gl.GL_NEAREST
+    gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, filt)
+    gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, filt)
+    gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_WRAP_S, gl.GL_CLAMP_TO_EDGE)
+    gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_WRAP_T, gl.GL_CLAMP_TO_EDGE)
+    gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, w, h, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE,
+                    data if data is not None else None)
+    gl.glBindTexture(gl.GL_TEXTURE_2D, 0)
     return tex
-
 
 def create_fbo_with_color(w: int, h: int) -> tuple[int, int]:
     color_tex = create_rgba_texture(w, h)
-    fbo = glGenFramebuffers(1)
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo)
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_tex, 0)
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
-    if status != GL_FRAMEBUFFER_COMPLETE:
+    fbo = gl.glGenFramebuffers(1)
+    gl.glBindFramebuffer(gl.GL_FRAMEBUFFER, fbo)
+    gl.glFramebufferTexture2D(gl.GL_FRAMEBUFFER, gl.GL_COLOR_ATTACHMENT0, gl.GL_TEXTURE_2D, color_tex, 0)
+    status = gl.glCheckFramebufferStatus(gl.GL_FRAMEBUFFER)
+    if status != gl.GL_FRAMEBUFFER_COMPLETE:
         raise RuntimeError(f"FBO incomplete (color only): {hex(status)}")
-    glBindFramebuffer(GL_FRAMEBUFFER, 0)
+    gl.glBindFramebuffer(gl.GL_FRAMEBUFFER, 0)
     return fbo, color_tex
-
 
 def create_fbo_with_color_depth(w: int, h: int) -> tuple[int, int, int]:
     color_tex = create_rgba_texture(w, h)
-    depth_rb = glGenRenderbuffers(1)
-    glBindRenderbuffer(GL_RENDERBUFFER, depth_rb)
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h)
+    depth_rb = gl.glGenRenderbuffers(1)
+    gl.glBindRenderbuffer(gl.GL_RENDERBUFFER, depth_rb)
+    # GLES2-guaranteed depth format:
+    gl.glRenderbufferStorage(gl.GL_RENDERBUFFER, gl.GL_DEPTH_COMPONENT16, w, h)
 
-    fbo = glGenFramebuffers(1)
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo)
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_tex, 0)
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rb)
+    fbo = gl.glGenFramebuffers(1)
+    gl.glBindFramebuffer(gl.GL_FRAMEBUFFER, fbo)
+    gl.glFramebufferTexture2D(gl.GL_FRAMEBUFFER, gl.GL_COLOR_ATTACHMENT0, gl.GL_TEXTURE_2D, color_tex, 0)
+    gl.glFramebufferRenderbuffer(gl.GL_FRAMEBUFFER, gl.GL_DEPTH_ATTACHMENT, gl.GL_RENDERBUFFER, depth_rb)
 
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
-    if status != GL_FRAMEBUFFER_COMPLETE:
+    status = gl.glCheckFramebufferStatus(gl.GL_FRAMEBUFFER)
+    if status != gl.GL_FRAMEBUFFER_COMPLETE:
         raise RuntimeError(f"FBO incomplete (color+depth): {hex(status)}")
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0)
-    glBindRenderbuffer(GL_RENDERBUFFER, 0)
+    gl.glBindFramebuffer(gl.GL_FRAMEBUFFER, 0)
+    gl.glBindRenderbuffer(gl.GL_RENDERBUFFER, 0)
     return fbo, color_tex, depth_rb
-    
-from OpenGL.GL import *
 
 class FullscreenQuad:
     def __init__(self):
@@ -87,33 +101,23 @@ class FullscreenQuad:
              1.0, -1.0, 1.0, 0.0,
         ], dtype=np.float32)
 
-        self.vbo = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-        glBufferData(GL_ARRAY_BUFFER, verts.nbytes, verts, GL_STATIC_DRAW)
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
-
-        self.stride = 4 * 4  # 4 floats per vertex (x,y,u,v), 4 bytes each
+        self.vbo = gl.glGenBuffers(1)
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vbo)
+        gl.glBufferData(gl.GL_ARRAY_BUFFER, verts.nbytes, verts, gl.GL_STATIC_DRAW)
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, 0)
+        self.stride = 4 * 4  # bytes
 
     def draw(self, program, a_pos, a_uv):
-        """Draws fullscreen quad with given program + attribute locations."""
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vbo)
 
-        # Position (x, y)
-        glEnableVertexAttribArray(a_pos)
-        glVertexAttribPointer(
-            a_pos, 2, GL_FLOAT, GL_FALSE, self.stride, ctypes.c_void_p(0)
-        )
+        gl.glEnableVertexAttribArray(a_pos)
+        gl.glVertexAttribPointer(a_pos, 2, gl.GL_FLOAT, gl.GL_FALSE, self.stride, ctypes.c_void_p(0))
 
-        # UV (u, v)
-        glEnableVertexAttribArray(a_uv)
-        glVertexAttribPointer(
-            a_uv, 2, GL_FLOAT, GL_FALSE, self.stride, ctypes.c_void_p(8)
-        )
+        gl.glEnableVertexAttribArray(a_uv)
+        gl.glVertexAttribPointer(a_uv, 2, gl.GL_FLOAT, gl.GL_FALSE, self.stride, ctypes.c_void_p(8))
 
-        # Draw quad as triangle strip (4 verts)
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+        gl.glDrawArrays(gl.GL_TRIANGLE_STRIP, 0, 4)
 
-        # Cleanup
-        glDisableVertexAttribArray(a_pos)
-        glDisableVertexAttribArray(a_uv)
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
+        gl.glDisableVertexAttribArray(a_pos)
+        gl.glDisableVertexAttribArray(a_uv)
+        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, 0)

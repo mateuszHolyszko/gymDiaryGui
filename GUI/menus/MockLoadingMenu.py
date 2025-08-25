@@ -34,12 +34,10 @@ class MockLoadingMenu(Menu):
         self.panel3D = Panel(x=0,y=0,width=screenWidth*0.4,height=screenHeight-self.buttonsPanel.height,manager=self.manager)
 
         self.display_3d = Display3D(
-            x=0, y=0, width=self.panel3D.width, height=self.panel3D.height,
+            #x=0, y=0, width=screenWidth, height=screenHeight,
+            x=300, y=0, width=self.panel3D.width, height=self.panel3D.height,
             manager=self.manager,
-            model_path="GUI/ThreeDee/models/Mat.obj",
-            vertex_shader_path="GUI/ThreeDee/shaders/basic.vert",
-            fragment_shader_path="GUI/ThreeDee/shaders/basic.frag",
-            target_size=2
+            model_path="GUI/ThreeDee/models/Mat.obj"
         )
         self.panel3D.add_element(self.display_3d)
 
@@ -140,7 +138,7 @@ class MockLoadingMenu(Menu):
 
     def switch_to_exercise_module(self):
         self.manager.switch_to("MainMenu")
-        self.display_3d.release()
+        self.display_3d.on_release()
 
     def set_initial_focus_on_switch(self):
         # Set focus to the first nav bar button or any default element

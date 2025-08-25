@@ -1,5 +1,5 @@
-VersionData:19/08/2025,
-Version:0.2.7,
-Branch:Mock Loading Screen/Console,
+VersionData:25/08/2025,
+Version:0.3.1,
+Branch:GLES2 port,
 Status:Unstable,
-Author:Mateutek
+Author:Mat
